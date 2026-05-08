@@ -32,6 +32,7 @@ export function PublicMenuClient({
     phone?: string;
     address?: string;
     googleMapsUrl?: string;
+    primaryColor?: string;
   };
   categories: Category[];
   products: Product[];
