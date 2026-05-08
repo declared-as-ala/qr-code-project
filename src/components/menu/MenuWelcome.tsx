@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { playPaperRustleSound } from "@/lib/sounds/play-paper-rustle";
 
 export function MenuWelcome({
   restaurantName,
@@ -16,7 +17,7 @@ export function MenuWelcome({
   onViewMenu: () => void;
 }) {
   return (
-    <section className="relative h-[78svh] min-h-[500px] max-h-[660px] overflow-hidden bg-[#121218]">
+    <section className="relative flex h-full min-h-0 flex-col overflow-hidden bg-[#121218]">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={
@@ -24,7 +25,7 @@ export function MenuWelcome({
           "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=1800&q=90"
         }
         alt={restaurantName}
-        className="h-full w-full object-cover"
+        className="absolute inset-0 h-full w-full object-cover"
       />
       <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/45 to-black/15" />
 
@@ -38,7 +39,10 @@ export function MenuWelcome({
         <h1 className="mt-3 font-serif text-3xl font-bold text-[#1d150f]">Bienvenue chez {restaurantName}</h1>
         <p className="mt-1 text-sm text-neutral-500">{subtitle}</p>
         <Button
-          onClick={onViewMenu}
+          onClick={() => {
+            void playPaperRustleSound();
+            onViewMenu();
+          }}
           className="mt-4 h-12 w-full rounded-full bg-[#101014] text-white hover:bg-[#1d1e26]"
         >
           Voir le menu
