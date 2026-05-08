@@ -49,6 +49,12 @@
 }
 
 :root {
+  --menu-navy: #11131d;
+  --menu-cream: #fffaf1;
+  --menu-ivory: #f7efe2;
+  --menu-gold: #d4a537;
+  --menu-shadow-soft: 0 12px 34px rgba(12, 9, 6, 0.14);
+  --menu-shadow-strong: 0 30px 90px rgba(0, 0, 0, 0.35);
   --card: oklch(0.18 0.01 75);
   --card-foreground: oklch(0.95 0.01 90);
   --popover: oklch(0.2 0.01 75);
@@ -126,15 +132,29 @@
     background-image: radial-gradient(circle at 10% 20%, color-mix(in oklch, var(--primary) 16%, transparent) 0%, transparent 35%),
       radial-gradient(circle at 90% 10%, color-mix(in oklch, var(--accent) 20%, transparent) 0%, transparent 30%);
     line-height: 1.55;
+    text-rendering: optimizeLegibility;
   }
   html {
     @apply font-sans;
+    scroll-behavior: smooth;
   }
   h1 {
     letter-spacing: -0.03em;
   }
   h2 {
     letter-spacing: -0.02em;
+  }
+
+  *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  *::-webkit-scrollbar-thumb {
+    background: color-mix(in oklch, var(--menu-gold) 50%, #3a3022);
+    border-radius: 999px;
+  }
+  *::-webkit-scrollbar-track {
+    background: color-mix(in oklch, var(--background) 85%, #0b0c11);
   }
 }
 
@@ -184,5 +204,19 @@
 
   .text-balance {
     text-wrap: balance;
+  }
+
+  .safe-bottom-pad {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+
+  .menu-glass {
+    background: color-mix(in oklch, white 85%, transparent);
+    backdrop-filter: blur(16px);
+    border: 1px solid color-mix(in oklch, var(--menu-gold) 30%, white);
+  }
+
+  .menu-card-shadow {
+    box-shadow: var(--menu-shadow-soft);
   }
 }

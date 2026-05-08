@@ -26,7 +26,7 @@ if (!MONGODB_URI) {
 async function run() {
   const getUpdatedDoc = (result) => result?.value ?? result;
 
-  await mongoose.connect(MONGODB_URI, { dbName: "QR" });
+  await mongoose.connect(MONGODB_URI, { dbName: "qr_menu_saas" });
 
   const db = mongoose.connection.db;
   const users = db.collection("users");
@@ -39,8 +39,8 @@ async function run() {
 
   const superAdminEmail = "superadmin@qrmenu.tn";
   const superAdminPassword = "SuperAdmin@123";
-  const restaurantAdminEmail = "admin@cafeblue.tn";
-  const restaurantAdminPassword = "CafeAdmin@123";
+  const restaurantAdminEmail = "admin@elgrotte.tn";
+  const restaurantAdminPassword = "Elgrotte@123";
 
   const superAdminHash = await bcrypt.hash(superAdminPassword, 12);
   const restaurantAdminHash = await bcrypt.hash(restaurantAdminPassword, 12);
@@ -65,7 +65,7 @@ async function run() {
     { email: restaurantAdminEmail },
     {
       $set: {
-        name: "Blue Cafe Owner",
+        name: "Elgrotte Owner",
         email: restaurantAdminEmail,
         passwordHash: restaurantAdminHash,
         role: "restaurant_admin",
@@ -81,18 +81,18 @@ async function run() {
   if (!ownerId) throw new Error("Failed to upsert restaurant admin user.");
 
   const restaurantResult = await restaurants.findOneAndUpdate(
-    { slug: "cafe-blue" },
+    { slug: "elgrotte" },
     {
       $set: {
         ownerId,
-        name: "Cafe Blue Tunis",
-        slug: "cafe-blue",
+        name: "Elgrotte",
+        slug: "elgrotte",
         establishmentType: "cafe",
-        phone: "+21650111222",
-        address: "Lac 2, Tunis, Tunisie",
-        instagram: "https://instagram.com/cafeblue",
-        facebook: "https://facebook.com/cafeblue",
-        googleMapsUrl: "https://maps.google.com/?q=Lac+2+Tunis",
+        phone: "+21697991266",
+        address: "Monastir, Tunisie",
+        instagram: "https://instagram.com/elgrotte",
+        facebook: "https://facebook.com/elgrotte",
+        googleMapsUrl: "https://maps.google.com/?q=Monastir+Tunisie",
         logo: "",
         coverImage: "",
         primaryColor: "#B08D57",
@@ -109,9 +109,11 @@ async function run() {
   if (!restaurantId) throw new Error("Failed to upsert demo restaurant.");
 
   const categoryData = [
-    { key: "hot-drinks", name: "Boissons chaudes", sortOrder: 1 },
-    { key: "cold-drinks", name: "Boissons froides", sortOrder: 2 },
+    { key: "entrees", name: "Entrees", sortOrder: 1 },
+    { key: "plats", name: "Plats principaux", sortOrder: 2 },
     { key: "desserts", name: "Desserts", sortOrder: 3 },
+    { key: "boissons", name: "Boissons", sortOrder: 4 },
+    { key: "cocktails", name: "Cocktails signature", sortOrder: 5 },
   ];
 
   const categoryIds = {};
@@ -138,40 +140,104 @@ async function run() {
 
   const productData = [
     {
-      name: "Cappuccino Signature",
-      categoryKey: "hot-drinks",
-      description: "Mousse onctueuse, grains selectionnes.",
-      price: 8.5,
-      badge: "Populaire",
+      name: "Tartare de saumon",
+      categoryKey: "entrees",
+      description: "Saumon frais, avocat, citron vert, huile d olive et coriandre.",
+      price: 95,
+      image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80",
+      badge: "Signature",
       isAvailable: true,
       sortOrder: 1,
     },
     {
-      name: "Latte Vanille",
-      categoryKey: "hot-drinks",
-      description: "Lait cremeux, touche vanille delicate.",
-      price: 9.0,
-      badge: "Nouveau",
+      name: "Burrata cremeuse",
+      categoryKey: "entrees",
+      description: "Burrata des Pouilles, tomates anciennes, basilic frais.",
+      price: 85,
+      image: "https://images.unsplash.com/photo-1546549032-9571cd6b27df?auto=format&fit=crop&w=800&q=80",
+      badge: "Populaire",
       isAvailable: true,
       sortOrder: 2,
     },
     {
-      name: "Iced Caramel",
-      categoryKey: "cold-drinks",
-      description: "Cafe froid caramel, ideal en ete.",
-      price: 10.0,
-      badge: "Promo",
+      name: "Filet de boeuf grille",
+      categoryKey: "plats",
+      description: "Sauce poivre maison, legumes sautes et puree truffee.",
+      price: 145,
+      image: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=80",
+      badge: "Signature",
       isAvailable: true,
       sortOrder: 3,
     },
     {
-      name: "Cheesecake Maison",
-      categoryKey: "desserts",
-      description: "Texture fondante, coulis fruits rouges.",
-      price: 12.0,
-      badge: "",
+      name: "Risotto aux champignons",
+      categoryKey: "plats",
+      description: "Risotto cremoso, parmesan affine, champignons saisis.",
+      price: 98,
+      image: "https://images.unsplash.com/photo-1476124369491-e7addf5db371?auto=format&fit=crop&w=800&q=80",
+      badge: "Nouveau",
       isAvailable: true,
       sortOrder: 4,
+    },
+    {
+      name: "Fondant chocolat",
+      categoryKey: "desserts",
+      description: "Coeur coulant, glace vanille et eclats de noisette.",
+      price: 42,
+      image: "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&w=800&q=80",
+      badge: "",
+      isAvailable: true,
+      sortOrder: 5,
+    },
+    {
+      name: "Cheesecake fruits rouges",
+      categoryKey: "desserts",
+      description: "Cremes legeres et coulis maison de fruits rouges.",
+      price: 38,
+      image: "https://images.unsplash.com/photo-1533134242443-d4fd215305ad?auto=format&fit=crop&w=800&q=80",
+      badge: "Populaire",
+      isAvailable: true,
+      sortOrder: 6,
+    },
+    {
+      name: "Cappuccino maison",
+      categoryKey: "boissons",
+      description: "Cafe intense, lait mousseux et touche cacao.",
+      price: 12,
+      image: "https://images.unsplash.com/photo-1517701604599-bb29b565090c?auto=format&fit=crop&w=800&q=80",
+      badge: "",
+      isAvailable: true,
+      sortOrder: 7,
+    },
+    {
+      name: "Iced latte vanille",
+      categoryKey: "boissons",
+      description: "Latte glace, vanille douce et creme fouettee.",
+      price: 16,
+      image: "https://images.unsplash.com/photo-1461023058943-07fcbe16d735?auto=format&fit=crop&w=800&q=80",
+      badge: "Nouveau",
+      isAvailable: true,
+      sortOrder: 8,
+    },
+    {
+      name: "Mojito fraise",
+      categoryKey: "cocktails",
+      description: "Menthe fraiche, citron vert, fraise et eau petillante.",
+      price: 24,
+      image: "https://images.unsplash.com/photo-1556679343-c7306c1976bc?auto=format&fit=crop&w=800&q=80",
+      badge: "Promo",
+      isAvailable: true,
+      sortOrder: 9,
+    },
+    {
+      name: "Sunset Elgrotte",
+      categoryKey: "cocktails",
+      description: "Cocktail signature agrumes et fruits exotiques.",
+      price: 28,
+      image: "https://images.unsplash.com/photo-1470337458703-46ad1756a187?auto=format&fit=crop&w=800&q=80",
+      badge: "",
+      isAvailable: true,
+      sortOrder: 10,
     },
   ];
 
@@ -185,7 +251,7 @@ async function run() {
           name: item.name,
           description: item.description,
           price: item.price,
-          image: "",
+          image: item.image || "",
           badge: item.badge,
           isAvailable: item.isAvailable,
           isFeatured: item.badge === "Populaire",
@@ -203,7 +269,7 @@ async function run() {
     {
       $set: {
         restaurantId,
-        targetUrl: "http://localhost:3000/menu/cafe-blue",
+        targetUrl: "http://localhost:3000/menu/elgrotte",
         qrImageUrl: "",
         updatedAt: now,
       },
@@ -220,7 +286,7 @@ async function run() {
   console.log(`  Email: ${restaurantAdminEmail}`);
   console.log(`  Password: ${restaurantAdminPassword}`);
   console.log("\nDemo public menu:");
-  console.log("  http://localhost:3000/menu/cafe-blue\n");
+  console.log("  http://localhost:3000/menu/elgrotte\n");
 
   await mongoose.disconnect();
 }

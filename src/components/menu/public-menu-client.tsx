@@ -1,9 +1,23 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import "./public-menu-premium.css";
+import { AnimatePresence, motion } from "framer-motion";
+import { Search } from "lucide-react";
+import { MenuWelcome } from "@/components/menu/MenuWelcome";
+import { MenuCategoryChips } from "@/components/menu/MenuCategoryChips";
+import { MenuProductCard } from "@/components/menu/MenuProductCard";
 
-type Product = { _id: string; name: string; description?: string; price: number; badge?: string; isAvailable: boolean; categoryId: string; image?: string };
+type Product = {
+  _id: string;
+  categoryId: string;
+  name: string;
+  description?: string;
+  price: number;
+  image?: string;
+  badge?: string;
+  isAvailable: boolean;
+};
+
 type Category = { _id: string; name: string };
 
 export function PublicMenuClient({
@@ -11,226 +25,217 @@ export function PublicMenuClient({
   categories,
   products,
 }: {
-  restaurant: { name: string; logo?: string; coverImage?: string; phone?: string; address?: string; primaryColor?: string };
+  restaurant: {
+    name: string;
+    logo?: string;
+    coverImage?: string;
+    phone?: string;
+    address?: string;
+    googleMapsUrl?: string;
+  };
   categories: Category[];
   products: Product[];
 }) {
-  const [query, setQuery] = useState("");
-  const [active, setActive] = useState<string | null>(categories[0]?._id ?? null);
-  const [toastVisible, setToastVisible] = useState(false);
+  const fallbackCategories: Category[] = [
+    { _id: "pizza", name: "Pizza" },
+    { _id: "pasta", name: "Pasta" },
+    { _id: "burgers", name: "Burgers" },
+    { _id: "cafes", name: "Cafes" },
+    { _id: "desserts", name: "Desserts" },
+    { _id: "boissons", name: "Boissons" },
+  ];
 
-  const filtered = useMemo(() => {
-    const q = query.toLowerCase();
-    return products.filter((p) => p.name.toLowerCase().includes(q) || (p.description ?? "").toLowerCase().includes(q));
-  }, [products, query]);
+  const effectiveCategories = categories.length > 0 ? categories : fallbackCategories;
+  const [search, setSearch] = useState("");
+  const [menuVisible, setMenuVisible] = useState(false);
+  const [activeCategory, setActiveCategory] = useState(effectiveCategories[0]?.name ?? "");
 
-  const grouped = useMemo(
+  const productsWithCategory = useMemo(
     () =>
-      categories.map((category) => ({
-        category,
-        products: filtered.filter((p) => p.categoryId === category._id),
+      products.map((product) => ({
+        ...product,
+        categoryName:
+          effectiveCategories.find((category) => category._id === product.categoryId)?.name ?? "",
       })),
-    [categories, filtered]
+    [products, effectiveCategories]
   );
 
-  const visibleCount = grouped.reduce((acc, group) => acc + group.products.length, 0);
+  const fallbackProducts = useMemo(
+    () => [
+      {
+        _id: "f1",
+        categoryId: effectiveCategories[0]?._id ?? "pizza",
+        categoryName: effectiveCategories[0]?.name ?? "Pizza",
+        name: "Pizza Burrata",
+        description: "Sauce tomate douce, burrata cremeuse, basilic frais.",
+        price: 24.5,
+        image:
+          "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=900&q=90",
+        badge: "Signature",
+        isAvailable: true,
+      },
+      {
+        _id: "f2",
+        categoryId: effectiveCategories[1]?._id ?? "pasta",
+        categoryName: effectiveCategories[1]?.name ?? "Pasta",
+        name: "Pasta Cremeuse",
+        description: "Parmesan affiné, crème légère, champignons sautés.",
+        price: 21,
+        image:
+          "https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?auto=format&fit=crop&w=900&q=90",
+        badge: "Populaire",
+        isAvailable: true,
+      },
+      {
+        _id: "f3",
+        categoryId: effectiveCategories[3]?._id ?? "cafes",
+        categoryName: effectiveCategories[3]?.name ?? "Cafes",
+        name: "Cappuccino Caramel",
+        description: "Espresso intense, mousse soyeuse, caramel premium.",
+        price: 7.5,
+        image:
+          "https://images.unsplash.com/photo-1517701604599-bb29b565090c?auto=format&fit=crop&w=900&q=90",
+        badge: "Nouveau",
+        isAvailable: true,
+      },
+    ],
+    [effectiveCategories]
+  );
 
-  function triggerToast() {
-    setToastVisible(true);
-    window.clearTimeout((window as { __menuToast?: number }).__menuToast);
-    (window as { __menuToast?: number }).__menuToast = window.setTimeout(() => setToastVisible(false), 1800);
+  const effectiveProducts = productsWithCategory.length > 0 ? productsWithCategory : fallbackProducts;
+
+  const filteredProducts = useMemo(() => {
+    return effectiveProducts.filter((product) => {
+      const matchesSearch =
+        product.name.toLowerCase().includes(search.toLowerCase()) ||
+        (product.description ?? "").toLowerCase().includes(search.toLowerCase());
+      return matchesSearch;
+    });
+  }, [effectiveProducts, search]);
+
+  function goToCategory(categoryName: string) {
+    setActiveCategory(categoryName);
+    const section = document.getElementById(`category-${categoryName}`);
+    if (section) {
+      section.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
   }
 
-  const phoneHref = restaurant.phone ? `tel:${restaurant.phone}` : "#";
-  const whatsappHref = restaurant.phone ? `https://wa.me/${restaurant.phone.replace(/\D/g, "")}` : "#";
-
   return (
-    <main className="premium-menu">
-      <div className={`menu-toast ${toastVisible ? "show" : ""}`}>Article ajoute a votre selection ✨</div>
+    <main className="min-h-screen bg-[linear-gradient(180deg,#f8f4ec_0%,#f4efe5_100%)] text-[#19120b] px-3 py-5 sm:px-4 sm:py-6">
+      <div className="mx-auto w-full max-w-[430px] rounded-[38px] border border-[#e8decd] bg-[#fffdf8] shadow-[0_22px_60px_rgba(36,28,18,0.18)] overflow-hidden">
+        <AnimatePresence mode="wait">
+          {!menuVisible ? (
+            <motion.div
+              key="welcome"
+              initial={{ opacity: 1, rotateY: 0 }}
+              animate={{ opacity: 1, rotateY: 0 }}
+              exit={{ opacity: 0, rotateY: 78, x: 24 }}
+              transition={{ duration: 0.6, ease: [0.19, 1, 0.22, 1] }}
+              style={{ transformOrigin: "left center" }}
+            >
+              <MenuWelcome
+                restaurantName={restaurant.name || "ELGROTTE"}
+                subtitle="Cafe & Restaurant"
+                coverImage={restaurant.coverImage}
+                logo={restaurant.logo}
+                onViewMenu={() => setMenuVisible(true)}
+              />
+            </motion.div>
+          ) : null}
 
-      <div className="app-shell">
-        <header className="top-bar" aria-label="Navigation principale">
-          <div className="brand">
-            <div className="brand-mark" aria-hidden="true">
-              ☕
-            </div>
-            <div>
-              <div className="brand-title">{restaurant.name || "ENSEIGNE"}</div>
-              <div className="brand-subtitle">Cafe & Restaurant</div>
-            </div>
-          </div>
-          <nav className="nav-actions" aria-label="Actions rapides">
-            <a className="pill-btn" href="#menu">
-              Menu
-            </a>
-            <a className="pill-btn" href="#contact">
-              Contact
-            </a>
-            <a className="pill-btn gold" href={whatsappHref}>
-              Commander
-            </a>
-          </nav>
-        </header>
-
-        <section className="hero" aria-labelledby="hero-title">
-          <div className="hero-content">
-            <div>
-              <div className="status-row">
-                <div className="status-chip">
-                  <span className="status-dot" />
-                  Ouvert aujourd hui
-                </div>
-                <div className="status-chip">Menu digital premium</div>
+          {menuVisible ? (
+            <motion.section
+              key="book-menu"
+              id="menu-content"
+              className="px-5 pb-24 pt-5 [perspective:1200px] relative"
+              initial={{ opacity: 0, rotateY: -108, x: -34, y: 0, scale: 0.985 }}
+              animate={{ opacity: 1, rotateY: 0, x: 0, y: 0, scale: 1 }}
+              exit={{ opacity: 0, rotateY: -32, x: -14, y: 0, scale: 0.99 }}
+              transition={{ duration: 0.78, ease: [0.19, 1, 0.22, 1] }}
+              style={{ transformOrigin: "left center" }}
+            >
+              <motion.div
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-0 -z-10 rounded-[28px]"
+                initial={{ opacity: 0, rotateY: -90, x: -20 }}
+                animate={{ opacity: 1, rotateY: 0, x: 0 }}
+                transition={{ duration: 0.82, ease: [0.19, 1, 0.22, 1] }}
+                style={{
+                  transformOrigin: "left center",
+                  background:
+                    "linear-gradient(90deg, rgba(246,238,225,0.7) 0%, rgba(255,251,244,0.95) 20%, rgba(255,253,248,1) 50%, rgba(251,245,235,1) 100%)",
+                  boxShadow:
+                    "inset 1px 0 0 rgba(199,161,97,0.28), inset 22px 0 34px rgba(209,184,137,0.18), 0 24px 60px rgba(0,0,0,0.16)",
+                }}
+              />
+              <div className="text-center">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={restaurant.logo || "https://api.dicebear.com/9.x/initials/svg?seed=EG"}
+              alt={restaurant.name}
+              className="mx-auto h-14 w-14 rounded-2xl border border-[#d4a537]/45 bg-white object-cover"
+            />
+            <h2 className="mt-3 font-serif text-4xl font-semibold tracking-tight text-[#1b140e] leading-[1.05]">
+              Bienvenue chez {restaurant.name || "ELGROTTE"}
+            </h2>
+            <p className="mt-2 text-[15px] text-neutral-500">Decouvrez notre menu digital</p>
               </div>
 
-              <h1 id="hero-title">
-                Votre pause
-                <span>merite mieux.</span>
-              </h1>
-              <p>Decouvrez notre carte digitale, pensee pour une experience rapide, elegante et toujours a jour.</p>
-
-              <div className="hero-actions">
-                <a href="#menu" className="pill-btn gold">
-                  Voir le menu
-                </a>
-                <a href={phoneHref} className="pill-btn">
-                  Appeler l etablissement
-                </a>
+              <div className="relative mt-5">
+                <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
+                <input
+                  value={search}
+                  onChange={(event) => setSearch(event.target.value)}
+                  placeholder="Rechercher un article..."
+                  className="h-12 w-full rounded-2xl border border-neutral-200 bg-[#faf7f1] pl-11 pr-4 text-[14px] text-[#2a2118] outline-none transition focus:border-[#d4a537] focus:ring-2 focus:ring-[#d4a537]/20"
+                />
               </div>
-            </div>
 
-            <div className="hero-stats" aria-label="Informations du restaurant">
-              <div className="stat-card">
-                <div className="stat-value">4.8/5</div>
-                <div className="stat-label">Note moyenne des clients</div>
+              <div className="sticky top-0 z-30 mt-4 -mx-2 px-2 py-2 bg-[#fffdf8]/96 backdrop-blur-md border-y border-[#ede3d5]">
+                <MenuCategoryChips
+                  categories={effectiveCategories.map((category) => category.name)}
+                  activeCategory={activeCategory}
+                  onSelect={goToCategory}
+                />
               </div>
-              <div className="stat-card">
-                <div className="stat-value">+{products.length}</div>
-                <div className="stat-label">Articles disponibles</div>
+
+              <div className="mt-4 space-y-7">
+                {effectiveCategories.map((category) => {
+                  const categoryItems = filteredProducts.filter(
+                    (product) => product.categoryName === category.name
+                  );
+                  if (categoryItems.length === 0) return null;
+
+                  return (
+                    <section key={category._id} id={`category-${category.name}`} className="scroll-mt-28">
+                      <div className="mb-3 flex items-center justify-between">
+                        <h3 className="font-serif text-[30px] font-semibold tracking-tight text-[#1b140e] leading-none">
+                          {category.name}
+                        </h3>
+                        <span className="text-[11px] font-medium text-neutral-500">{categoryItems.length} articles</span>
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        {categoryItems.map((product) => (
+                          <MenuProductCard
+                            key={product._id}
+                            name={product.name}
+                            description={product.description || "Recette signature de la maison."}
+                            price={`${Number(product.price).toFixed(3)} DT`}
+                            image={product.image}
+                            badge={product.badge}
+                            isAvailable={product.isAvailable}
+                          />
+                        ))}
+                      </div>
+                    </section>
+                  );
+                })}
               </div>
-              <div className="stat-card">
-                <div className="stat-value">2 min</div>
-                <div className="stat-label">Pour parcourir la carte</div>
-              </div>
-            </div>
-          </div>
-
-          <aside className="floating-qr" aria-label="QR code decoratif">
-            <div className="qr-inner">
-              <div className="fake-qr" aria-hidden="true" />
-            </div>
-            <div className="qr-caption">
-              <span>Scan Menu</span>
-              <span>Table 08</span>
-            </div>
-          </aside>
-        </section>
-
-        <div className="mobile-categories" aria-label="Categories rapides">
-          {categories.map((category) => (
-            <a key={`mobile-${category._id}`} href={`#cat-${category._id}`}>
-              {category.name}
-            </a>
-          ))}
-        </div>
-
-        <section id="menu" className="section menu-layout">
-          <aside className="menu-sidebar">
-            <div className="search-box">
-              <span>⌕</span>
-              <input id="searchInput" type="search" placeholder="Rechercher un article..." value={query} onChange={(e) => setQuery(e.target.value)} />
-            </div>
-
-            <div className="sidebar-title">Categories</div>
-            <div className="category-list">
-              {categories.map((c) => (
-                <a key={c._id} className={`category-btn ${active === c._id ? "active" : ""}`} href={`#cat-${c._id}`} onClick={() => setActive(c._id)}>
-                  <span>{c.name}</span>
-                  <small>{grouped.find((g) => g.category._id === c._id)?.products.length ?? 0}</small>
-                </a>
-              ))}
-            </div>
-
-            <div className="info-card">
-              <strong>Menu toujours a jour</strong>
-              <p>Les prix, disponibilites et nouveautes sont synchronises directement depuis le dashboard de l etablissement.</p>
-            </div>
-          </aside>
-
-          <section className="menu-main" aria-label="Menu du restaurant">
-            <div className="menu-toolbar">
-              <div>
-                <h2>Carte du jour</h2>
-                <p>Une selection raffinee de cafes, plats gourmands et douceurs preparees avec soin.</p>
-              </div>
-              <div className="service-badge">
-                Service actif
-                <small>Derniere mise a jour: il y a 3 min</small>
-              </div>
-            </div>
-
-            <div className="no-results" style={{ display: visibleCount === 0 ? "block" : "none" }}>
-              <h3>Aucun resultat</h3>
-              <p>Essayez un autre mot-cle ou explorez les categories du menu.</p>
-            </div>
-
-            {grouped
-              .filter((group) => (active ? group.category._id === active : true))
-              .map((group) =>
-                group.products.length ? (
-                  <article id={`cat-${group.category._id}`} className="category-section" data-category key={group.category._id}>
-                    <div className="category-heading">
-                      <h3>{group.category.name}</h3>
-                      <span>{group.products.length} articles</span>
-                    </div>
-                    <div className="product-grid">
-                      {group.products.map((p) => (
-                        <div key={p._id} className={`product-card ${!p.isAvailable ? "sold-out" : ""}`} data-name={`${p.name} ${p.description ?? ""}`.toLowerCase()}>
-                          <div className="product-image">
-                            {p.image ? (
-                              // eslint-disable-next-line @next/next/no-img-element
-                              <img src={p.image} alt={p.name} />
-                            ) : (
-                              <div className="product-image-placeholder" />
-                            )}
-                          </div>
-                          <div className="product-content">
-                            <div className="product-topline">
-                              {p.badge ? <span className="badge">{p.badge}</span> : <span className="badge soft">Selection</span>}
-                            </div>
-                            <h4>{p.name}</h4>
-                            <p>{p.description || "Recette de la maison."}</p>
-                            <div className="product-footer">
-                              <div className="price">
-                                {p.price.toFixed(3)} <small>DT</small>
-                              </div>
-                              <button className="add-btn" aria-label="Ajouter" onClick={triggerToast}>
-                                +
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </article>
-                ) : null
-              )}
-          </section>
-        </section>
+            </motion.section>
+          ) : null}
+        </AnimatePresence>
       </div>
-
-      <footer id="contact" className="bottom-bar" aria-label="Contact rapide">
-        <div className="bottom-bar-info">
-          <div className="mini-logo">☕</div>
-          <div>
-            <strong>Besoin d aide ?</strong>
-            <small>{restaurant.address || "Appelez ou envoyez un message au serveur"}</small>
-          </div>
-        </div>
-        <a className="pill-btn gold" href={whatsappHref}>
-          WhatsApp
-        </a>
-      </footer>
     </main>
   );
 }

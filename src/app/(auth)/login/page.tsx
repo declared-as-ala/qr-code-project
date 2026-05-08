@@ -5,13 +5,11 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Lock, Mail } from "lucide-react";
+import { Coffee, Lock, Mail, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { motionPreset } from "@/lib/motion/presets";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -43,49 +41,81 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-md items-center px-6">
-      <motion.div {...motionPreset} className="w-full">
-      <Card className="w-full border-primary/20 bg-card/90 shadow-2xl shadow-black/30">
-        <CardHeader>
-          <CardTitle className="text-2xl">Connexion securisee</CardTitle>
-          <CardDescription>
-            Connectez-vous a votre espace de gestion QR Menu Pro pour piloter votre enseigne.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={onSubmit} className="space-y-4">
+    <div className="min-h-screen grid lg:grid-cols-2 bg-background">
+      <div className="relative hidden lg:flex flex-col justify-between p-12 overflow-hidden bg-gradient-noir text-cream">
+        <div
+          className="absolute inset-0 opacity-40"
+          style={{
+            backgroundImage:
+              "url('https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=1600&q=80')",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-br from-black/90 via-black/60 to-black/95" />
+
+        <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="relative z-10 flex items-center gap-2">
+          <div className="h-10 w-10 rounded-xl bg-gradient-gold flex items-center justify-center shadow-gold">
+            <Coffee className="h-5 w-5 text-black" />
+          </div>
+          <span className="font-display text-xl font-semibold">QR Menu</span>
+        </motion.div>
+
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="relative z-10 max-w-md">
+          <h1 className="font-display text-5xl font-semibold leading-tight">
+            Le menu digital qui sublime vos <span className="text-gold">tables</span>.
+          </h1>
+          <p className="mt-6 text-cream/70 text-lg leading-relaxed">
+            Une experience client moderne, elegante et sans contact. Concue pour les cafes et restaurants d exception.
+          </p>
+        </motion.div>
+
+        <div className="relative z-10 text-xs text-cream/40">Plateforme SaaS premium QR Menu</div>
+      </div>
+
+      <div className="flex items-center justify-center p-6 sm:p-12">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md">
+          <div className="lg:hidden flex items-center gap-2 mb-8">
+            <div className="h-10 w-10 rounded-xl bg-gradient-gold flex items-center justify-center">
+              <Coffee className="h-5 w-5 text-black" />
+            </div>
+            <span className="font-display text-xl font-semibold">QR Menu</span>
+          </div>
+
+          <h2 className="font-display text-3xl font-semibold">Connexion</h2>
+          <p className="mt-2 text-muted-foreground">Accedez a votre espace de gestion</p>
+
+          <form onSubmit={onSubmit} className="mt-8 space-y-5">
             <div className="space-y-2">
-              <Label htmlFor="email">Email professionnel</Label>
+              <Label htmlFor="email">Adresse e-mail</Label>
               <div className="relative">
-                <Mail className="pointer-events-none absolute left-3 top-2 size-4 text-muted-foreground" />
-                <Input id="email" className="pl-9" placeholder="owner@enseigne.tn" value={email} onChange={(e) => setEmail(e.target.value)} />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input id="email" type="email" required placeholder="vous@exemple.com" value={email} onChange={(e) => setEmail(e.target.value)} className="pl-10 h-11" />
               </div>
             </div>
+
             <div className="space-y-2">
-              <Label htmlFor="password">Mot de passe</Label>
+              <div className="flex justify-between items-center">
+                <Label htmlFor="password">Mot de passe</Label>
+                <Link href="/login/forgot-password" className="text-xs text-gold hover:underline">Mot de passe oublie ?</Link>
+              </div>
               <div className="relative">
-                <Lock className="pointer-events-none absolute left-3 top-2 size-4 text-muted-foreground" />
-                <Input id="password" className="pl-9" placeholder="********" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input id="password" type="password" required placeholder="********" value={password} onChange={(e) => setPassword(e.target.value)} className="pl-10 h-11" />
               </div>
             </div>
-            {error ? (
-              <Alert variant="destructive">
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            ) : null}
-            <Button className="h-10 w-full bg-primary text-primary-foreground hover:bg-primary/90" disabled={loading}>
-              {loading ? "Connexion en cours..." : "Acceder au tableau de bord"}
+
+            {error ? <Alert variant="destructive"><AlertDescription>{error}</AlertDescription></Alert> : null}
+
+            <Button type="submit" disabled={loading} className="w-full h-11 bg-gradient-gold text-black font-semibold hover:opacity-90 shadow-gold">
+              {loading ? "Connexion..." : "Se connecter"}
+              <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
-            <p className="text-center text-sm text-muted-foreground">
-              Mot de passe oublie ?{" "}
-              <Link href="/login/forgot-password" className="text-primary underline-offset-4 hover:underline">
-                Demander une reinitialisation
-              </Link>
-            </p>
           </form>
-        </CardContent>
-      </Card>
-      </motion.div>
-    </main>
+
+          <p className="mt-6 text-xs text-muted-foreground text-center">L acces est reserve aux comptes crees par le Super Admin.</p>
+        </motion.div>
+      </div>
+    </div>
   );
 }
