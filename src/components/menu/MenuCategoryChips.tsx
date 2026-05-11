@@ -10,23 +10,40 @@ export function MenuCategoryChips({
   onSelect: (category: string) => void;
 }) {
   return (
-    <div className="flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+    <nav
+      className="flex gap-2 overflow-x-auto py-0.5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      aria-label="Catégories du menu"
+      role="tablist"
+    >
       {categories.map((category) => {
         const active = activeCategory === category;
         return (
           <button
             key={category}
+            role="tab"
+            aria-selected={active}
             onClick={() => onSelect(category)}
-            className={`shrink-0 rounded-full border px-4 py-2.5 text-[13px] font-semibold tracking-tight transition-all ${
+            className="shrink-0 whitespace-nowrap rounded-full px-4 py-[9px] text-[12.5px] font-medium tracking-tight transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 active:scale-[0.95]"
+            style={
               active
-                ? "border-[#111116] bg-[#111116] text-white shadow-[0_8px_20px_rgba(0,0,0,0.2)]"
-                : "border-neutral-200 bg-white text-neutral-700 hover:-translate-y-0.5 hover:border-[#d4a537]/55 hover:shadow-md"
-            }`}
+                ? {
+                    background: "var(--pm-bg-card-chip-active)",
+                    color: "var(--pm-text-on-dark)",
+                    boxShadow: "var(--pm-shadow-chip-active)",
+                    fontWeight: "600",
+                  }
+                : {
+                    background: "var(--pm-bg-card-elevated)",
+                    color: "var(--pm-text-body)",
+                    border: "1px solid var(--pm-border-subtle)",
+                    boxShadow: "var(--pm-shadow-chip-inactive)",
+                  }
+            }
           >
             {category}
           </button>
         );
       })}
-    </div>
+    </nav>
   );
 }
