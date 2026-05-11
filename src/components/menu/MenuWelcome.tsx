@@ -23,7 +23,7 @@ export function MenuWelcome({
       className="relative flex h-full min-h-0 flex-col overflow-hidden"
       aria-label="Page d'accueil"
     >
-      {/* Full-bleed cover */}
+      {/* ── Full-bleed cover photo ── */}
       <img
         src={
           coverImage ||
@@ -31,193 +31,201 @@ export function MenuWelcome({
         }
         alt={`${restaurantName} — ambiance`}
         className="absolute inset-0 h-full w-full object-cover"
-        style={{ filter: "brightness(0.9) saturate(1.08)" }}
+        style={{ filter: "brightness(0.82) saturate(1.08)" }}
       />
 
-      {/* Depth gradient — rich, cinematic */}
+      {/* Subtle overall vignette */}
       <div
         className="absolute inset-0"
         style={{
           background:
-            "linear-gradient(180deg, rgba(8,6,4,0.06) 0%, rgba(8,6,4,0.18) 30%, rgba(8,6,4,0.65) 58%, rgba(8,6,4,0.93) 80%, #08060400 100%), linear-gradient(180deg, transparent 50%, #0D0A07 100%)",
+            "radial-gradient(ellipse 90% 90% at 50% 50%, transparent 40%, rgba(0,0,0,0.32) 100%)",
         }}
       />
 
-      {/* Warm ambient glow upper-right */}
+      {/* Book frame — barely visible */}
+
+      {/* Spine — left */}
       <div
-        className="pointer-events-none absolute inset-0"
+        className="absolute inset-y-0 left-0 z-30 w-[10px]"
         style={{
           background:
-            "radial-gradient(ellipse 60% 40% at 70% 18%, rgba(201, 136, 26, 0.22), transparent 65%)",
+            "linear-gradient(to right, rgba(8,5,2,0.72) 0%, rgba(20,12,5,0.38) 60%, transparent 100%)",
         }}
       />
 
-      {/* Content — flows from bottom up */}
-      <div className="relative z-10 mt-auto">
-        {/* Restaurant name above the card */}
-        <motion.div
-          className="px-6 pb-4"
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-        >
-          <p
-            className="text-[10.5px] font-semibold uppercase tracking-[0.2em]"
-            style={{ color: "rgba(232, 184, 75, 0.88)" }}
-          >
-            {subtitle}
-          </p>
-          <h1
-            className="mt-1.5 text-[34px] font-bold leading-[1.0] tracking-[-0.03em]"
-            style={{ fontFamily: "var(--pm-font-serif)", color: "#F5F0E8" }}
-          >
-            {restaurantName}
-          </h1>
-        </motion.div>
+      {/* Pages edge — right */}
+      <div
+        className="absolute inset-y-0 right-0 z-30 w-[5px]"
+        style={{
+          background:
+            "repeating-linear-gradient(to bottom, rgba(238,227,203,0.18) 0px, rgba(238,227,203,0.18) 2px, rgba(210,196,168,0.10) 2px, rgba(210,196,168,0.10) 4px)",
+        }}
+      />
 
-        {/* Floating card */}
-        <motion.div
-          initial={{ opacity: 0, y: 32 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.68, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-          className="mx-3.5 mb-4 overflow-hidden rounded-[26px] p-5"
+      {/* ── TOP OVERLAY — frosted cream header ── */}
+      <motion.div
+        className="absolute inset-x-0 top-0 z-20 pl-[12px] pr-[7px]"
+        initial={{ opacity: 0, y: -8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+      >
+        {/* Gradient fade from top so it merges into the photo */}
+        <div
+          className="absolute inset-0"
           style={{
-            background: "rgba(255, 253, 248, 0.97)",
-            border: "1px solid rgba(193, 160, 98, 0.2)",
-            backdropFilter: "blur(24px) saturate(1.6)",
-            boxShadow:
-              "0 28px 70px rgba(0, 0, 0, 0.32), 0 6px 20px rgba(0, 0, 0, 0.14), inset 0 1px 0 rgba(255,255,255,0.8)",
+            background:
+              "linear-gradient(to bottom, rgba(14,9,4,0.68) 0%, rgba(14,9,4,0.38) 65%, transparent 100%)",
           }}
-        >
-          {/* Logo + info row */}
-          <div className="flex items-center gap-3.5">
-            <motion.div
-              initial={{ scale: 0.72, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.22, ease: [0.34, 1.56, 0.64, 1] }}
-              className="relative shrink-0"
-            >
-              {/* Ambient glow behind logo */}
-              <div
-                className="absolute inset-0 rounded-[20px] blur-[10px]"
-                style={{
-                  background:
-                    "radial-gradient(circle, rgba(201, 136, 26, 0.45), transparent 70%)",
-                  transform: "scale(1.4)",
-                }}
-              />
-              {/* Gold gradient ring */}
-              <div
-                className="absolute inset-[-2.5px] rounded-[20px]"
-                style={{
-                  background: "linear-gradient(145deg, #F5D78A 0%, #C9881A 45%, #7A4C0A 100%)",
-                }}
-              />
-              {/* Logo container */}
-              <div
-                className="relative flex h-[54px] w-[54px] items-center justify-center overflow-hidden rounded-[18px]"
-                style={{ background: "#FFF8EE" }}
-              >
-                {logo ? (
-                  <img
-                    src={logo}
-                    alt={restaurantName}
-                    className="h-full w-full object-cover"
-                  />
-                ) : (
-                  <MenuLogoFallback size={38} />
-                )}
-              </div>
-            </motion.div>
+        />
 
-            <div className="min-w-0 flex-1">
-              <p
-                className="truncate text-[15px] font-semibold leading-tight tracking-tight"
-                style={{
-                  fontFamily: "var(--pm-font-serif)",
-                  color: "var(--pm-text-heading)",
-                }}
-              >
-                {restaurantName}
-              </p>
-              <p
-                className="mt-0.5 text-[11.5px]"
-                style={{ color: "var(--pm-text-muted)" }}
-              >
-                {subtitle}
-              </p>
-            </div>
-
-            {/* Open status pill */}
+        <div className="relative flex items-center gap-3 px-3 pb-5 pt-4">
+          {/* Logo */}
+          <motion.div
+            className="relative shrink-0"
+            initial={{ scale: 0.72, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.45, delay: 0.18, ease: [0.34, 1.56, 0.64, 1] }}
+          >
             <div
-              className="shrink-0 flex items-center gap-1.5 rounded-full px-2.5 py-1.5"
+              className="absolute inset-[-2px] rounded-[13px]"
               style={{
-                background: "rgba(22, 163, 74, 0.09)",
-                border: "1px solid rgba(22, 163, 74, 0.22)",
+                background:
+                  "linear-gradient(145deg, #E8D38C 0%, #C48218 55%, #7A4C0A 100%)",
+              }}
+            />
+            <div
+              className="relative flex h-[42px] w-[42px] items-center justify-center overflow-hidden rounded-[11px]"
+              style={{ background: "#1A1007" }}
+            >
+              {logo ? (
+                <img
+                  src={logo}
+                  alt={restaurantName}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <MenuLogoFallback size={28} />
+              )}
+            </div>
+          </motion.div>
+
+          {/* Identity */}
+          <div className="min-w-0 flex-1">
+            <h1
+              className="truncate text-[19px] font-bold leading-tight tracking-tight text-white"
+              style={{
+                fontFamily: "var(--pm-font-serif)",
+                textShadow: "0 1px 4px rgba(0,0,0,0.5)",
               }}
             >
-              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
-              <span
-                className="text-[10px] font-semibold text-emerald-700"
-                style={{ letterSpacing: "0.04em" }}
-              >
-                Ouvert
-              </span>
-            </div>
+              {restaurantName}
+            </h1>
+            <p
+              className="mt-[3px] text-[9px] font-semibold uppercase"
+              style={{
+                color: "rgba(220, 190, 120, 0.85)",
+                letterSpacing: "0.18em",
+              }}
+            >
+              {subtitle}
+            </p>
           </div>
 
-          {/* Hairline separator */}
-          <div
-            className="my-4 h-px"
-            style={{ background: "var(--pm-border-subtle)" }}
-          />
+        </div>
+      </motion.div>
 
+      {/* ── BOTTOM OVERLAY — dark gradient with CTA ── */}
+      <motion.div
+        className="absolute inset-x-0 bottom-0 z-20 pl-[12px] pr-[7px]"
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+      >
+        {/* Dark gradient merging from photo */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(to top, rgba(10,6,2,0.92) 0%, rgba(10,6,2,0.70) 55%, transparent 100%)",
+          }}
+        />
+
+        <div className="relative px-3 pb-5 pt-10">
           {/* CTA button */}
           <button
             onClick={() => {
               void playPaperRustleSound();
               onViewMenu();
             }}
-            className="group relative w-full overflow-hidden rounded-[13px] transition-all duration-200 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+            className="group relative w-full overflow-hidden transition-all duration-200 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-1"
             style={{
-              height: "50px",
-              background: "linear-gradient(145deg, #2D2016 0%, #1A1209 100%)",
-              boxShadow:
-                "0 8px 24px rgba(26, 18, 9, 0.28), 0 2px 6px rgba(26, 18, 9, 0.14), inset 0 1px 0 rgba(255,255,255,0.07)",
+              height: "52px",
+              borderRadius: "10px",
+              background:
+                "linear-gradient(150deg, rgba(44,32,20,0.88) 0%, rgba(26,18,9,0.92) 55%, rgba(37,26,13,0.88) 100%)",
+              border: "1px solid rgba(193,155,80,0.32)",
+              boxShadow: [
+                "inset 0 1px 0 rgba(255,255,255,0.07)",
+                "inset 0 -1px 0 rgba(0,0,0,0.4)",
+                "0 4px 20px rgba(0,0,0,0.55)",
+              ].join(", "),
+              backdropFilter: "blur(12px)",
             }}
             aria-label="Voir le menu"
           >
-            {/* Subtle hover sheen */}
+            {/* Hover shimmer */}
             <div
               className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
               style={{
                 background:
-                  "linear-gradient(105deg, transparent 35%, rgba(255,255,255,0.07) 50%, transparent 65%)",
+                  "linear-gradient(105deg, transparent 30%, rgba(193,155,80,0.12) 50%, transparent 70%)",
               }}
             />
+
             <span className="relative flex items-center justify-center gap-2.5">
               <span
-                className="text-[14.5px] font-semibold"
-                style={{ color: "#F5F0E8", letterSpacing: "0.02em" }}
+                className="text-[15px] font-semibold"
+                style={{
+                  color: "#EDE5D4",
+                  letterSpacing: "0.03em",
+                }}
               >
                 Voir le menu
               </span>
               <ArrowRight
-                className="h-[15px] w-[15px] transition-transform duration-200 group-hover:translate-x-0.5"
-                style={{ color: "var(--pm-accent-light)" }}
+                className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-[3px]"
+                style={{ color: "#C4A05A" }}
                 aria-hidden="true"
               />
             </span>
           </button>
 
-          <p
-            className="mt-3 text-center text-[11px]"
-            style={{ color: "var(--pm-text-muted)", letterSpacing: "0.01em" }}
-          >
-            Scannez · Choisissez · Dégustez
-          </p>
-        </motion.div>
-      </div>
+          {/* Tagline */}
+          <div className="mt-3 flex items-center gap-2">
+            <div
+              className="h-px flex-1"
+              style={{
+                background:
+                  "linear-gradient(to right, transparent, rgba(193,155,80,0.30))",
+              }}
+            />
+            <p
+              className="text-[10px] font-medium"
+              style={{ color: "rgba(160,130,80,0.75)", letterSpacing: "0.10em" }}
+            >
+              Scannez · Choisissez · Dégustez
+            </p>
+            <div
+              className="h-px flex-1"
+              style={{
+                background:
+                  "linear-gradient(to left, transparent, rgba(193,155,80,0.30))",
+              }}
+            />
+          </div>
+        </div>
+      </motion.div>
     </section>
   );
 }
