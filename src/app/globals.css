@@ -283,50 +283,66 @@
 /* ─── Public Menu Design Tokens ─── */
 
 .public-menu {
-  /* Surfaces */
-  --pm-bg-page: #F9F4EC;
-  --pm-bg-page-deep: #F2EAD8;
+  --pm-bg-page: #F8F0E5;
+  --pm-bg-page-deep: #EBDCC8;
   --pm-bg-card: #FFFDF8;
   --pm-bg-card-elevated: #FFFFFF;
-  --pm-bg-chips-bar: rgba(242, 234, 216, 0.55);
-  --pm-bg-card-chip-active: #1A1209;
+  --pm-bg-chips-bar: rgba(248, 240, 229, 0.72);
+  --pm-bg-card-chip-active: #210D08;
   --pm-bg-welcome-overlay: #0A0805;
 
-  /* Text */
-  --pm-text-heading: #1A1209;
-  --pm-text-body: #2D2014;
-  --pm-text-muted: #8A7560;
-  --pm-text-on-dark: #F5F0E8;
+  --pm-text-heading: #1F120B;
+  --pm-text-body: #352016;
+  --pm-text-muted: #806A58;
+  --pm-text-on-dark: #FFF7EA;
 
   /* Accent — warm gold */
-  --pm-accent: #C9881A;
-  --pm-accent-light: #E8B84B;
-  --pm-accent-pale: rgba(201, 136, 26, 0.11);
-  --pm-accent-gradient: linear-gradient(135deg, #F5D78A, #C9881A 55%, #9D6410);
+  --pm-accent: var(--pm-brand-accent, #B91C1C);
+  --pm-accent-strong: #7F1D1D;
+  --pm-accent-light: #DC2626;
+  --pm-gold: #A16207;
+  --pm-gold-soft: #F8D88D;
+  --pm-accent-pale: rgba(185, 28, 28, 0.09);
+  --pm-accent-gradient: linear-gradient(135deg, #DC2626 0%, var(--pm-accent) 48%, #A16207 100%);
 
   /* Borders */
-  --pm-border-subtle: rgba(193, 160, 98, 0.14);
-  --pm-border-medium: rgba(193, 160, 98, 0.28);
-  --pm-border-strong: rgba(193, 160, 98, 0.45);
+  --pm-border-subtle: rgba(78, 43, 24, 0.12);
+  --pm-border-medium: rgba(78, 43, 24, 0.2);
+  --pm-border-strong: rgba(185, 28, 28, 0.28);
 
   /* Shadows */
-  --pm-shadow-card: 0 2px 12px rgba(26, 18, 9, 0.07), 0 1px 3px rgba(26, 18, 9, 0.04);
-  --pm-shadow-card-hover: 0 10px 28px rgba(26, 18, 9, 0.13), 0 2px 8px rgba(26, 18, 9, 0.06);
-  --pm-shadow-shell: 0 40px 100px rgba(26, 18, 9, 0.22), 0 12px 32px rgba(26, 18, 9, 0.1);
-  --pm-shadow-chip-active: 0 4px 14px rgba(0, 0, 0, 0.18);
-  --pm-shadow-chip-inactive: 0 1px 4px rgba(26, 18, 9, 0.05);
+  --pm-shadow-card: 0 10px 26px rgba(53, 32, 22, 0.08), 0 1px 4px rgba(53, 32, 22, 0.05);
+  --pm-shadow-card-hover: 0 18px 36px rgba(53, 32, 22, 0.15), 0 4px 10px rgba(53, 32, 22, 0.08);
+  --pm-shadow-shell: 0 34px 90px rgba(53, 32, 22, 0.24), 0 12px 32px rgba(53, 32, 22, 0.12);
+  --pm-shadow-hero: 0 18px 46px rgba(55, 13, 8, 0.24);
+  --pm-shadow-search: 0 12px 28px rgba(53, 32, 22, 0.13), 0 2px 8px rgba(53, 32, 22, 0.06);
+  --pm-shadow-chip-active: 0 10px 22px rgba(120, 22, 14, 0.22);
+  --pm-shadow-chip-inactive: 0 2px 8px rgba(53, 32, 22, 0.06);
+  --pm-shadow-action: 0 10px 24px rgba(185, 28, 28, 0.22);
   --pm-shadow-fab: 0 6px 20px rgba(26, 18, 9, 0.18), 0 2px 6px rgba(0, 0, 0, 0.08);
 
   /* Radii */
-  --pm-radius-shell: 36px;
-  --pm-radius-search: 14px;
-  --pm-radius-card: 20px;
+  --pm-radius-shell: 38px;
+  --pm-radius-search: 18px;
+  --pm-radius-card: 22px;
   --pm-radius-chip: 999px;
   --pm-radius-badge: 999px;
 
   /* Typography */
   --pm-font-serif: var(--font-playfair), "Playfair Display", Georgia, "Times New Roman", serif;
   --pm-font-sans: var(--font-inter), "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+
+  background:
+    linear-gradient(135deg, rgba(185, 28, 28, 0.13) 0%, transparent 32%),
+    linear-gradient(225deg, rgba(161, 98, 7, 0.16) 0%, transparent 38%),
+    var(--pm-bg-page);
+  color: var(--pm-text-body);
+  isolation: isolate;
+}
+
+.public-menu article:hover {
+  border-color: var(--pm-border-strong) !important;
+  box-shadow: var(--pm-shadow-card-hover) !important;
 }
 
 @media (prefers-reduced-motion: reduce) {

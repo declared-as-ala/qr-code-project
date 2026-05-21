@@ -12,7 +12,7 @@ export function MenuCategoryChips({
   return (
     <nav
       className="flex gap-2 overflow-x-auto py-0.5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-      aria-label="Catégories du menu"
+      aria-label="Categories du menu"
       role="tablist"
     >
       {categories.map((category) => {
@@ -23,14 +23,13 @@ export function MenuCategoryChips({
             role="tab"
             aria-selected={active}
             onClick={() => onSelect(category)}
-            className="shrink-0 whitespace-nowrap rounded-full px-4 py-[9px] text-[12.5px] font-medium tracking-tight transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 active:scale-[0.95]"
+            className="min-h-11 shrink-0 whitespace-nowrap rounded-full px-4 text-[12.5px] font-bold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 active:scale-[0.96]"
             style={
               active
                 ? {
-                    background: "var(--pm-bg-card-chip-active)",
-                    color: "var(--pm-text-on-dark)",
+                    background: "var(--pm-accent-gradient)",
+                    color: "white",
                     boxShadow: "var(--pm-shadow-chip-active)",
-                    fontWeight: "600",
                   }
                 : {
                     background: "var(--pm-bg-card-elevated)",
