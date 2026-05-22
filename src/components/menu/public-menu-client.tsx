@@ -3,7 +3,7 @@
 import type { CSSProperties } from "react";
 import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Clock3, MapPin, Phone, Search, Sparkles, X } from "lucide-react";
+import { Clock3, Search, Sparkles, X } from "lucide-react";
 import { MenuWelcome } from "@/components/menu/MenuWelcome";
 import { MenuCategoryChips } from "@/components/menu/MenuCategoryChips";
 import { MenuProductCard } from "@/components/menu/MenuProductCard";
@@ -44,6 +44,8 @@ export function PublicMenuClient({
     address?: string;
     googleMapsUrl?: string;
     primaryColor?: string;
+    instagram?: string;
+    facebook?: string;
   };
   categories: Category[];
   products: Product[];
@@ -132,7 +134,7 @@ export function PublicMenuClient({
     ? `tel:${restaurant.phone.replace(/[^\d+]/g, "")}`
     : undefined;
   const shellStyle = {
-    "--pm-brand-accent": restaurant.primaryColor || "#B91C1C",
+    "--pm-brand-accent": restaurant.primaryColor || "#d4a537",
     fontFamily: "var(--pm-font-sans)",
   } as CSSProperties;
 
@@ -200,26 +202,25 @@ export function PublicMenuClient({
             >
               <div className="shrink-0 px-3 pt-3 pb-0 sm:px-4 sm:pt-4">
                 <header
-                  className="relative overflow-hidden rounded-[28px] border px-4 pb-5 pt-4 text-[var(--pm-text-on-dark)]"
+                  className="relative overflow-hidden rounded-[28px] border px-4 pb-5 pt-4 text-white backdrop-blur-[12px]"
                   style={{
-                    borderColor: "rgba(255, 244, 220, 0.18)",
-                    background:
-                      "linear-gradient(145deg, rgba(44, 14, 10, 0.96), rgba(17, 11, 7, 0.97) 58%, rgba(112, 27, 17, 0.9))",
-                    boxShadow: "var(--pm-shadow-hero)",
+                    borderColor: "rgba(255, 255, 255, 0.06)",
+                    background: "rgba(17, 17, 21, 0.6)",
+                    boxShadow: "0 12px 30px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.05)",
                   }}
                 >
                   {restaurant.coverImage && (
                     <img
                       src={restaurant.coverImage}
                       alt=""
-                      className="absolute inset-0 h-full w-full object-cover opacity-30"
+                      className="absolute inset-0 h-full w-full object-cover opacity-20"
                     />
                   )}
                   <div
                     className="pointer-events-none absolute inset-0"
                     style={{
                       background:
-                        "linear-gradient(180deg, rgba(8, 5, 3, 0.18), rgba(8, 5, 3, 0.82))",
+                        "linear-gradient(180deg, rgba(3, 3, 3, 0.1) 0%, rgba(9, 9, 11, 0.8) 100%), radial-gradient(circle at 80% 20%, rgba(212, 165, 55, 0.15), transparent 50%)",
                     }}
                   />
 
@@ -232,8 +233,8 @@ export function PublicMenuClient({
                       <div
                         className="relative flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl"
                         style={{
-                          background: "#FFF8EE",
-                          boxShadow: "0 12px 28px rgba(0, 0, 0, 0.24)",
+                          background: "#09090b",
+                          boxShadow: "0 12px 28px rgba(0, 0, 0, 0.4)",
                         }}
                       >
                         {restaurant.logo ? (
@@ -249,18 +250,53 @@ export function PublicMenuClient({
                     </div>
 
                     <div className="min-w-0 flex-1 pt-0.5">
-                      <span
-                        className="inline-flex min-h-7 items-center gap-1.5 rounded-full px-2.5 text-[10px] font-bold uppercase"
-                        style={{
-                          background: "rgba(255, 255, 255, 0.1)",
-                          border: "1px solid rgba(255, 244, 220, 0.14)",
-                          color: "var(--pm-gold-soft)",
-                          letterSpacing: "0.08em",
-                        }}
-                      >
-                        <Clock3 className="h-3.5 w-3.5" aria-hidden="true" />
-                        Ouvert
-                      </span>
+                      <div className="flex items-center justify-between gap-2">
+                        <span
+                          className="inline-flex min-h-7 items-center gap-1.5 rounded-full px-2.5 text-[10px] font-bold uppercase"
+                          style={{
+                            background: "rgba(212, 165, 55, 0.15)",
+                            border: "1px solid rgba(212, 165, 55, 0.45)",
+                            color: "#efc360",
+                            boxShadow: "0 0 10px rgba(212, 165, 55, 0.35)",
+                            letterSpacing: "0.08em",
+                          }}
+                        >
+                          <span className="relative flex h-2 w-2">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#efc360] opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-2 w-2 bg-[#d4a537]"></span>
+                          </span>
+                          Ouvert
+                        </span>
+                        
+                        <div className="flex items-center gap-2">
+                          {restaurant.instagram && (
+                            <a
+                              href={restaurant.instagram}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="flex h-8 w-8 items-center justify-center rounded-full bg-white/5 text-[var(--pm-accent)] border border-[var(--pm-accent)]/20 transition-all duration-300 hover:bg-gradient-to-r hover:from-[#f5e6cc] hover:to-[#d4a537] hover:text-black hover:border-transparent hover:shadow-[0_0_12px_rgba(212, 165, 55, 0.4)] active:scale-90"
+                              aria-label="Instagram"
+                            >
+                              <svg className="h-3.5 w-3.5 fill-current" viewBox="0 0 24 24">
+                                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.051.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
+                              </svg>
+                            </a>
+                          )}
+                          {restaurant.facebook && (
+                            <a
+                              href={restaurant.facebook}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="flex h-8 w-8 items-center justify-center rounded-full bg-white/5 text-[var(--pm-accent)] border border-[var(--pm-accent)]/20 transition-all duration-300 hover:bg-gradient-to-r hover:from-[#f5e6cc] hover:to-[#d4a537] hover:text-black hover:border-transparent hover:shadow-[0_0_12px_rgba(212, 165, 55, 0.4)] active:scale-90"
+                              aria-label="Facebook"
+                            >
+                              <svg className="h-3.5 w-3.5 fill-current" viewBox="0 0 24 24">
+                                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+                              </svg>
+                            </a>
+                          )}
+                        </div>
+                      </div>
                       <h2
                         className="mt-2 truncate text-[30px] font-bold leading-none text-white"
                         style={{ fontFamily: "var(--pm-font-serif)" }}
@@ -273,8 +309,8 @@ export function PublicMenuClient({
                     </div>
                   </div>
 
-                  <div className="relative mt-4 grid grid-cols-3 gap-2">
-                    <div className="rounded-2xl border border-white/10 bg-white/10 px-3 py-2">
+                  <div className="relative mt-4 grid grid-cols-2 gap-2">
+                    <div className="rounded-2xl border border-white/5 bg-white/5 px-3 py-2">
                       <p className="text-[17px] font-black leading-none tabular-nums text-white">
                         {availableProducts.length}
                       </p>
@@ -282,24 +318,12 @@ export function PublicMenuClient({
                         plats
                       </p>
                     </div>
-                    <div className="rounded-2xl border border-white/10 bg-white/10 px-3 py-2">
+                    <div className="rounded-2xl border border-white/5 bg-white/5 px-3 py-2">
                       <p className="text-[17px] font-black leading-none tabular-nums text-white">
                         {effectiveCategories.length}
                       </p>
                       <p className="mt-1 text-[10px] font-semibold uppercase text-white/60">
                         categories
-                      </p>
-                    </div>
-                    <div className="rounded-2xl border border-white/10 bg-white/10 px-3 py-2">
-                      <p className="flex items-center gap-1 text-[17px] font-black leading-none text-white">
-                        <Sparkles
-                          className="h-4 w-4 text-[var(--pm-gold-soft)]"
-                          aria-hidden="true"
-                        />
-                        Chef
-                      </p>
-                      <p className="mt-1 text-[10px] font-semibold uppercase text-white/60">
-                        selection
                       </p>
                     </div>
                   </div>
@@ -319,19 +343,19 @@ export function PublicMenuClient({
                     value={search}
                     onChange={(event) => setSearch(event.target.value)}
                     placeholder="Rechercher un plat, un ingredient..."
-                    className="h-12 w-full rounded-[var(--pm-radius-search)] pl-11 pr-11 text-[14px] font-medium text-[var(--pm-text-body)] placeholder:text-[var(--pm-text-muted)] outline-none transition-all duration-200"
+                    className="h-12 w-full rounded-[var(--pm-radius-search)] pl-11 pr-11 text-[14px] font-medium text-white placeholder:text-zinc-500 outline-none transition-all duration-300"
                     style={{
-                      background: "var(--pm-bg-card-elevated)",
-                      border: "1px solid var(--pm-border-subtle)",
-                      boxShadow: "var(--pm-shadow-search)",
+                      background: "rgba(17, 17, 21, 0.75)",
+                      border: "1px solid rgba(255, 255, 255, 0.05)",
+                      boxShadow: "var(--pm-shadow-search), inset 0 1px 0 rgba(255, 255, 255, 0.02)",
                     }}
                     onFocus={(event) => {
-                      event.target.style.borderColor = "rgba(185, 28, 28, 0.32)";
+                      event.target.style.borderColor = "rgba(212, 165, 55, 0.5)";
                       event.target.style.boxShadow =
-                        "0 0 0 4px rgba(185, 28, 28, 0.1), var(--pm-shadow-search)";
+                        "0 0 15px rgba(212, 165, 55, 0.2), var(--pm-shadow-search), inset 0 1px 0 rgba(255, 255, 255, 0.02)";
                     }}
                     onBlur={(event) => {
-                      event.target.style.borderColor = "var(--pm-border-subtle)";
+                      event.target.style.borderColor = "rgba(255, 255, 255, 0.05)";
                       event.target.style.boxShadow = "var(--pm-shadow-search)";
                     }}
                   />
@@ -472,47 +496,6 @@ export function PublicMenuClient({
                 )}
               </div>
 
-              {(phoneHref || locationHref) && (
-                <div
-                  className="shrink-0 border-t px-4 py-3"
-                  style={{
-                    borderColor: "var(--pm-border-subtle)",
-                    background: "rgba(255, 253, 248, 0.92)",
-                  }}
-                >
-                  <div className="flex gap-2">
-                    {phoneHref && (
-                      <a
-                        href={phoneHref}
-                        className="flex min-h-11 flex-1 items-center justify-center gap-2 rounded-full px-4 text-[13px] font-bold transition-all duration-200 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2"
-                        style={{
-                          background: "var(--pm-bg-card-elevated)",
-                          border: "1px solid var(--pm-border-medium)",
-                          color: "var(--pm-text-heading)",
-                        }}
-                      >
-                        <Phone className="h-4 w-4" aria-hidden="true" />
-                        Appeler
-                      </a>
-                    )}
-                    {locationHref && (
-                      <a
-                        href={locationHref}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="flex min-h-11 flex-1 items-center justify-center gap-2 rounded-full px-4 text-[13px] font-bold text-white transition-all duration-200 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2"
-                        style={{
-                          background: "var(--pm-accent-gradient)",
-                          boxShadow: "var(--pm-shadow-action)",
-                        }}
-                      >
-                        <MapPin className="h-4 w-4" aria-hidden="true" />
-                        Itineraire
-                      </a>
-                    )}
-                  </div>
-                </div>
-              )}
             </motion.section>
           )}
         </AnimatePresence>

@@ -23,22 +23,33 @@ const NAV: NavItem[] = [
 function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
   return (
-    <div className="flex h-full flex-col bg-sidebar text-sidebar-foreground">
-      <div className="px-6 py-6 flex items-center gap-2 border-b border-sidebar-border">
-        <div className="h-9 w-9 rounded-xl bg-gradient-gold flex items-center justify-center"><Coffee className="h-4 w-4 text-noir" /></div>
+    <div className="flex h-full flex-col bg-zinc-950/60 backdrop-blur-xl border-r border-white/5 text-zinc-100">
+      <div className="px-6 py-6 flex items-center gap-3 border-b border-white/5 bg-black/10">
+        <div className="h-9 w-9 rounded-xl bg-gradient-gold flex items-center justify-center shadow-gold">
+          <Coffee className="h-4 w-4 text-black" />
+        </div>
         <div className="flex flex-col">
-          <span className="font-display text-base font-semibold">QR Menu</span>
-          <span className="text-[10px] uppercase tracking-widest text-gold/80">Premium</span>
+          <span className="font-display text-base font-semibold tracking-tight text-white">QR Menu</span>
+          <span className="text-[10px] font-bold uppercase tracking-widest text-primary">Premium</span>
         </div>
       </div>
-      <nav className="flex-1 px-3 py-4 space-y-1">
+      <nav className="flex-1 px-3 py-6 space-y-1.5">
         {NAV.map((item) => {
           const active = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href));
           return (
-            <Link key={item.href} href={item.href} onClick={onNavigate} className={`group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all ${active ? "bg-gradient-gold text-noir shadow-gold" : "text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"}`}>
-              <item.icon className="h-4 w-4" />
+            <Link
+              key={item.href}
+              href={item.href}
+              onClick={onNavigate}
+              className={`group flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all duration-300 ${
+                active
+                  ? "bg-gradient-gold text-black shadow-gold font-semibold"
+                  : "text-zinc-400 hover:bg-white/5 hover:text-white"
+              }`}
+            >
+              <item.icon className={`h-4 w-4 transition-transform duration-300 group-hover:scale-110 ${active ? "text-black" : "text-zinc-400 group-hover:text-primary"}`} />
               <span className="flex-1">{item.label}</span>
-              {active ? <ChevronRight className="h-4 w-4" /> : null}
+              {active ? <ChevronRight className="h-4 w-4 text-black" /> : null}
             </Link>
           );
         })}
@@ -51,44 +62,53 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="min-h-screen flex bg-background">
+    <div className="min-h-screen flex bg-[#09090b] text-zinc-100">
       <aside className="hidden lg:block w-64 shrink-0">
         <div className="fixed top-0 left-0 h-screen w-64"><Sidebar /></div>
       </aside>
 
       <Sheet open={open} onOpenChange={setOpen}>
-        <SheetContent side="left" className="p-0 w-64 bg-sidebar border-sidebar-border"><Sidebar onNavigate={() => setOpen(false)} /></SheetContent>
+        <SheetContent side="left" className="p-0 w-64 bg-zinc-950 border-r border-white/5"><Sidebar onNavigate={() => setOpen(false)} /></SheetContent>
       </Sheet>
 
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="sticky top-0 z-30 h-16 border-b border-border bg-background/80 backdrop-blur-xl">
+        <header className="sticky top-0 z-30 h-16 border-b border-white/5 bg-zinc-950/40 backdrop-blur-xl">
           <div className="h-full px-4 sm:px-8 flex items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setOpen(true)}><MenuIcon className="h-5 w-5" /></Button>
+              <Button variant="ghost" size="icon" className="lg:hidden hover:bg-white/5 text-zinc-400" onClick={() => setOpen(true)}>
+                <MenuIcon className="h-5 w-5" />
+              </Button>
               <div className="hidden sm:block">
-                <p className="text-xs text-muted-foreground">Espace Restaurateur</p>
-                <p className="text-sm font-medium font-display">Pilotage menu premium</p>
+                <p className="text-[10px] font-bold uppercase tracking-wider text-primary">Espace Restaurateur</p>
+                <p className="text-sm font-semibold font-display text-zinc-200">Pilotage menu premium</p>
               </div>
             </div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="flex items-center gap-3 rounded-full pl-1 pr-3 py-1 hover:bg-muted transition-colors">
-                  <div className="h-9 w-9 rounded-full bg-gradient-noir text-cream flex items-center justify-center text-xs font-semibold">RA</div>
+                <button className="flex items-center gap-3 rounded-full pl-1 pr-3 py-1 hover:bg-white/5 transition-colors border border-white/5 bg-zinc-900/30">
+                  <div className="h-8 w-8 rounded-full bg-gradient-gold text-black flex items-center justify-center text-xs font-bold shadow-gold">
+                    RA
+                  </div>
                   <div className="hidden sm:block text-left">
-                    <p className="text-sm font-medium leading-tight">Restaurant Admin</p>
-                    <p className="text-xs text-muted-foreground leading-tight">dashboard@qrmenu.tn</p>
+                    <p className="text-xs font-semibold leading-tight text-zinc-200">Restaurant Admin</p>
+                    <p className="text-[10px] text-zinc-500 leading-tight">dashboard@qrmenu.tn</p>
                   </div>
                 </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuItem asChild><Link href="/dashboard/settings">Parametres</Link></DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem className="text-destructive"><LogOut className="h-4 w-4 mr-2" />Se deconnecter</DropdownMenuItem>
+              <DropdownMenuContent align="end" className="w-56 bg-zinc-950 border border-white/10 text-zinc-200">
+                <DropdownMenuItem asChild className="focus:bg-white/5 focus:text-white">
+                  <Link href="/dashboard/settings">Paramètres</Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator className="bg-white/5" />
+                <DropdownMenuItem className="text-destructive focus:bg-destructive/10 focus:text-destructive">
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Se déconnecter
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
         </header>
-        <main className="flex-1 px-4 sm:px-8 py-6 sm:py-10 max-w-[1400px] w-full mx-auto">{children}</main>
+        <main className="flex-1 px-4 sm:px-8 py-6 sm:py-10 max-w-[1400px] w-full mx-auto animate-fade-up">{children}</main>
       </div>
     </div>
   );

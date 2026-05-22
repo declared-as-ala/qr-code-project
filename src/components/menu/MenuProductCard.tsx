@@ -1,6 +1,6 @@
 "use client";
 
-import { Plus } from "lucide-react";
+
 import { BadgePill } from "@/components/BadgePill";
 
 type BadgeType = "nouveau" | "populaire" | "promo" | "signature";
@@ -37,23 +37,23 @@ export function MenuProductCard({
 
   return (
     <article
-      className={`group relative flex h-full select-none flex-col overflow-hidden rounded-[var(--pm-radius-card)] border bg-[var(--pm-bg-card-elevated)] transition-all duration-200 hover:-translate-y-1 active:scale-[0.985] ${
-        !isAvailable ? "opacity-60" : ""
+      className={`group relative flex h-full select-none flex-col overflow-hidden rounded-[var(--pm-radius-card)] border bg-[var(--pm-bg-card-elevated)] transition-all duration-300 hover:-translate-y-1 active:scale-[0.985] ${
+        !isAvailable ? "opacity-40 backdrop-blur-[2px] filter grayscale-[40%] contrast-[90%] brightness-[75%]" : ""
       }`}
       style={{
-        borderColor: "var(--pm-border-subtle)",
-        boxShadow: "var(--pm-shadow-card)",
+        borderColor: "rgba(255, 255, 255, 0.05)",
+        boxShadow: "0 8px 24px -4px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.02)",
       }}
       aria-label={`${name}${!isAvailable ? " - Indisponible" : ""}`}
     >
-      <div className="relative aspect-[1.05/1] overflow-hidden bg-[#F0E8D8]">
+      <div className="relative aspect-[1.05/1] overflow-hidden bg-[var(--pm-bg-card)]">
         <img
           src={
             image ||
-            "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=85"
+            "https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=800&q=85"
           }
           alt={name}
-          className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]"
+          className="h-full w-full object-cover transition-transform duration-1000 ease-out group-hover:scale-[1.12] group-hover:rotate-1"
           loading="lazy"
         />
 
@@ -61,7 +61,7 @@ export function MenuProductCard({
           className="pointer-events-none absolute inset-x-0 bottom-0 h-2/3"
           style={{
             background:
-              "linear-gradient(to bottom, transparent, rgba(24, 10, 6, 0.44))",
+              "linear-gradient(to bottom, transparent, rgba(9, 9, 11, 0.65))",
           }}
         />
 
@@ -72,22 +72,26 @@ export function MenuProductCard({
         )}
 
         <span
-          className="absolute bottom-2 left-2 rounded-full px-2.5 py-1 text-[11px] font-black tabular-nums text-white"
+          className="absolute bottom-2 left-2 rounded-full px-3 py-1.5 text-[11.5px] font-black tabular-nums text-white backdrop-blur-md"
           style={{
-            background: "rgba(26, 18, 9, 0.78)",
-            boxShadow: "inset 0 0 0 1px rgba(255, 244, 220, 0.16)",
+            background: "rgba(3, 3, 3, 0.85)",
+            border: "1px solid rgba(255, 255, 255, 0.12)",
+            boxShadow: "0 6px 16px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.15)",
+            color: "#efc360",
           }}
         >
           {price}
         </span>
 
         {!isAvailable && (
-          <div className="absolute inset-0 flex items-center justify-center bg-white/45 backdrop-blur-[2px]">
+          <div className="absolute inset-0 flex items-center justify-center bg-[#09090b]/65 backdrop-blur-[4px]">
             <span
-              className="rounded-full px-3 py-1.5 text-[9.5px] font-bold uppercase tracking-[0.1em]"
+              className="rounded-full px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em]"
               style={{
-                background: "rgba(26, 18, 9, 0.78)",
-                color: "#F5F0E8",
+                background: "rgba(17, 17, 21, 0.95)",
+                color: "var(--pm-text-muted)",
+                border: "1px solid rgba(255, 255, 255, 0.08)",
+                boxShadow: "0 4px 14px rgba(0, 0, 0, 0.4)",
               }}
             >
               Indisponible
@@ -108,7 +112,7 @@ export function MenuProductCard({
           {description}
         </p>
 
-        <div className="mt-3 flex items-center justify-between gap-2">
+        <div className="mt-3 flex items-center gap-2">
           <span
             className="rounded-full px-2.5 py-1 text-[10px] font-bold uppercase"
             style={{
@@ -118,18 +122,6 @@ export function MenuProductCard({
             }}
           >
             Maison
-          </span>
-
-          <span
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-transform duration-200 group-hover:scale-105"
-            style={{
-              background: "var(--pm-accent-gradient)",
-              color: "white",
-              boxShadow: "var(--pm-shadow-action)",
-            }}
-            aria-hidden="true"
-          >
-            <Plus className="h-4 w-4" />
           </span>
         </div>
       </div>

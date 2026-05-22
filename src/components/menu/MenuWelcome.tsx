@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowRight, ChefHat, Sparkles } from "lucide-react";
+import { ArrowRight, Sparkles } from "lucide-react";
 import { playPaperRustleSound } from "@/lib/sounds/play-paper-rustle";
 import { MenuLogoFallback } from "@/components/menu/MenuLogoFallback";
 
@@ -26,7 +26,7 @@ export function MenuWelcome({
       <img
         src={
           coverImage ||
-          "https://images.unsplash.com/photo-1514190051997-0f6f39ca5cde?auto=format&fit=crop&w=1800&q=90"
+          "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=1800&q=90"
         }
         alt={`${restaurantName} ambiance`}
         className="absolute inset-0 h-full w-full object-cover"
@@ -37,7 +37,15 @@ export function MenuWelcome({
         className="absolute inset-0"
         style={{
           background:
-            "linear-gradient(180deg, rgba(8, 5, 3, 0.62) 0%, rgba(8, 5, 3, 0.18) 38%, rgba(8, 5, 3, 0.96) 100%)",
+            "linear-gradient(180deg, rgba(3, 3, 3, 0.45) 0%, rgba(3, 3, 3, 0.15) 35%, rgba(9, 9, 11, 0.98) 100%)",
+        }}
+      />
+
+      {/* Luxury radial gold glow overlay */}
+      <div
+        className="absolute inset-0 pointer-events-none z-10"
+        style={{
+          background: "radial-gradient(circle at 50% 35%, rgba(212, 165, 55, 0.18), transparent 60%)",
         }}
       />
 
@@ -73,7 +81,7 @@ export function MenuWelcome({
             className="absolute inset-[-2px] rounded-[18px]"
             style={{ background: "var(--pm-accent-gradient)" }}
           />
-          <div className="relative flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl bg-[#1A1007]">
+          <div className="relative flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl bg-[#09090b]">
             {logo ? (
               <img src={logo} alt={restaurantName} className="h-full w-full object-cover" />
             ) : (
@@ -84,22 +92,21 @@ export function MenuWelcome({
 
         <div className="min-w-0 flex-1">
           <h1
-            className="truncate text-[24px] font-bold leading-tight text-white"
+            className="truncate text-[26px] font-bold leading-tight text-transparent bg-clip-text bg-gradient-to-r from-[#f5e6cc] via-[#efc360] to-[#d4a537]"
             style={{
               fontFamily: "var(--pm-font-serif)",
-              textShadow: "0 2px 10px rgba(0, 0, 0, 0.5)",
+              filter: "drop-shadow(0 2px 8px rgba(212, 165, 55, 0.4)) drop-shadow(0 4px 12px rgba(0, 0, 0, 0.6))",
             }}
           >
             {restaurantName}
           </h1>
           <p
-            className="mt-1 flex items-center gap-1.5 text-[10px] font-bold uppercase"
+            className="mt-1 flex items-center gap-1.5 text-[10.5px] font-extrabold uppercase tracking-[0.15em] text-[#efc360]"
             style={{
-              color: "var(--pm-gold-soft)",
-              letterSpacing: "0.14em",
+              textShadow: "0 2px 8px rgba(212, 165, 55, 0.25)",
             }}
           >
-            <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
+            <Sparkles className="h-3.5 w-3.5 animate-pulse" aria-hidden="true" />
             {subtitle}
           </p>
         </div>
@@ -111,18 +118,7 @@ export function MenuWelcome({
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.16, ease: [0.16, 1, 0.3, 1] }}
       >
-        <span
-          className="mb-3 inline-flex min-h-8 items-center gap-2 rounded-full px-3 text-[11px] font-bold uppercase"
-          style={{
-            background: "rgba(255, 255, 255, 0.1)",
-            border: "1px solid rgba(255, 244, 220, 0.16)",
-            color: "var(--pm-gold-soft)",
-            letterSpacing: "0.1em",
-          }}
-        >
-          <ChefHat className="h-4 w-4" aria-hidden="true" />
-          Selection maison
-        </span>
+
 
         <h2
           className="max-w-[360px] text-[47px] font-bold leading-[0.92] text-white"
@@ -143,26 +139,26 @@ export function MenuWelcome({
             void playPaperRustleSound();
             onViewMenu();
           }}
-          className="group relative mt-6 flex h-[54px] w-full items-center justify-center overflow-hidden rounded-2xl text-[15px] font-bold transition-all duration-200 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2"
+          className="group relative mt-6 flex h-[54px] w-full items-center justify-center overflow-hidden rounded-2xl text-[15px] font-bold transition-all duration-300 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#d4a537]/50"
           style={{
             background: "var(--pm-accent-gradient)",
-            color: "white",
+            color: "var(--pm-text-on-dark, #09090b)",
             boxShadow:
-              "0 18px 42px rgba(120, 22, 14, 0.34), inset 0 1px 0 rgba(255,255,255,0.22)",
+              "0 12px 30px rgba(212, 165, 55, 0.35), inset 0 1px 0 rgba(255,255,255,0.4), 0 0 0 1px rgba(212, 165, 55, 0.2)",
           }}
           aria-label="Voir le menu"
         >
+          {/* Continuous shimmer glow */}
+          <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-white/30 to-transparent" />
+          
+          {/* Hover interactive overlay */}
           <span
-            className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-            style={{
-              background:
-                "linear-gradient(105deg, transparent 30%, rgba(255, 255, 255, 0.18) 50%, transparent 70%)",
-            }}
+            className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100 bg-black/5"
           />
           <span className="relative flex items-center gap-2.5">
             Voir le menu
             <ArrowRight
-              className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1"
+              className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1.5"
               aria-hidden="true"
             />
           </span>

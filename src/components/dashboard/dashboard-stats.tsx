@@ -43,34 +43,44 @@ export async function DashboardStats() {
 
   return (
     <div className="grid gap-4 md:grid-cols-3">
-      <Card className="border-primary/20 bg-gradient-to-b from-background to-card">
-        <CardHeader className="flex-row items-center justify-between space-y-0">
-          <CardTitle className="text-sm text-muted-foreground">Scans totaux</CardTitle>
-          <ScanLine className="size-4 text-primary" />
+      <Card className="glass-card">
+        <CardHeader className="flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-xs font-bold uppercase tracking-wider text-zinc-400">Scans totaux</CardTitle>
+          <div className="p-2 rounded-lg bg-primary/10 border border-primary/20 text-primary">
+            <ScanLine className="size-4" />
+          </div>
         </CardHeader>
-        <CardContent>
-          <p className="text-3xl font-semibold text-primary">{totalScans}</p>
-          <Badge className="mt-2 border border-primary/30 bg-primary/10 text-primary">Performance</Badge>
+        <CardContent className="pt-2">
+          <p className="text-4xl font-semibold text-white font-display">{totalScans}</p>
+          <span className="inline-block mt-2 px-2.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide bg-primary/10 text-primary border border-primary/20">
+            Performance
+          </span>
         </CardContent>
       </Card>
-      <Card className="border-primary/20 bg-gradient-to-b from-background to-card">
-        <CardHeader className="flex-row items-center justify-between space-y-0">
-          <CardTitle className="text-sm text-muted-foreground">Produits</CardTitle>
-          <QrCode className="size-4 text-primary" />
+
+      <Card className="glass-card">
+        <CardHeader className="flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-xs font-bold uppercase tracking-wider text-zinc-400">Produits</CardTitle>
+          <div className="p-2 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-400">
+            <QrCode className="size-4" />
+          </div>
         </CardHeader>
-        <CardContent>
-          <p className="text-3xl font-semibold">{products}</p>
-          <p className="mt-2 text-sm text-muted-foreground">Articles geres dans votre menu.</p>
+        <CardContent className="pt-2">
+          <p className="text-4xl font-semibold text-white font-display">{products}</p>
+          <p className="mt-2 text-xs text-zinc-500">Articles gérés dans votre menu.</p>
         </CardContent>
       </Card>
-      <Card className="border-primary/20 bg-gradient-to-b from-background to-card">
-        <CardHeader className="flex-row items-center justify-between space-y-0">
-          <CardTitle className="text-sm text-muted-foreground">Categories</CardTitle>
-          <Shapes className="size-4 text-primary" />
+
+      <Card className="glass-card">
+        <CardHeader className="flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-xs font-bold uppercase tracking-wider text-zinc-400">Catégories</CardTitle>
+          <div className="p-2 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400">
+            <Shapes className="size-4" />
+          </div>
         </CardHeader>
-        <CardContent>
-          <p className="text-3xl font-semibold">{categories}</p>
-          <p className="mt-2 text-sm text-muted-foreground">Structure de navigation client.</p>
+        <CardContent className="pt-2">
+          <p className="text-4xl font-semibold text-white font-display">{categories}</p>
+          <p className="mt-2 text-xs text-zinc-500">Structure de navigation client.</p>
         </CardContent>
       </Card>
     </div>

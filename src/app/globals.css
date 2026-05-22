@@ -203,9 +203,18 @@
   to { transform: rotate(360deg); }
 }
 
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
 /* ─── Utilities ─── */
 
 @layer utilities {
+  .animate-shimmer {
+    animation: shimmer 2.5s infinite;
+  }
+
   .animate-fade-up {
     animation: fade-up 0.65s cubic-bezier(0.16, 1, 0.3, 1) both;
   }
@@ -278,48 +287,70 @@
     );
     animation: skeleton-wave 1.6s ease-in-out infinite;
   }
+
+  .bg-gradient-gold {
+    background-image: linear-gradient(135deg, oklch(0.78 0.13 85) 0%, oklch(0.65 0.13 75) 100%);
+  }
+  .bg-gradient-noir {
+    background-image: linear-gradient(135deg, oklch(0.205 0 0) 0%, oklch(0.125 0 0) 100%);
+  }
+  .shadow-gold {
+    box-shadow: 0 10px 30px -10px color-mix(in oklab, oklch(0.78 0.13 85) 45%, transparent);
+  }
+  .glass-card {
+    background: rgba(17, 17, 21, 0.6);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .glass-card:hover {
+    border-color: rgba(212, 165, 55, 0.2);
+    box-shadow: 0 20px 40px rgba(212, 165, 55, 0.08), 0 10px 30px rgba(0, 0, 0, 0.6);
+    transform: translateY(-2px);
+  }
 }
 
 /* ─── Public Menu Design Tokens ─── */
 
 .public-menu {
-  --pm-bg-page: #F8F0E5;
-  --pm-bg-page-deep: #EBDCC8;
-  --pm-bg-card: #FFFDF8;
-  --pm-bg-card-elevated: #FFFFFF;
-  --pm-bg-chips-bar: rgba(248, 240, 229, 0.72);
-  --pm-bg-card-chip-active: #210D08;
-  --pm-bg-welcome-overlay: #0A0805;
+  --pm-bg-page: #09090b; /* deep obsidian black */
+  --pm-bg-page-deep: #030303; /* pure black for extreme depth */
+  --pm-bg-card: #111115; /* dark glass card */
+  --pm-bg-card-elevated: #18181f; /* elevated card backdrop */
+  --pm-bg-chips-bar: rgba(9, 9, 11, 0.82); /* blurred dark background */
+  --pm-bg-card-chip-active: #d4a537; /* gold background for active chips */
+  --pm-bg-welcome-overlay: rgba(3, 3, 3, 0.88); /* velvet welcome overlay */
 
-  --pm-text-heading: #1F120B;
-  --pm-text-body: #352016;
-  --pm-text-muted: #806A58;
-  --pm-text-on-dark: #FFF7EA;
+  --pm-text-heading: #fafafa; /* bright platinum white for headings */
+  --pm-text-body: #e4e4e7; /* smooth grey/zinc for readable body */
+  --pm-text-muted: #a1a1aa; /* zinc muted text */
+  --pm-text-on-dark: #09090b; /* dark text contrast on gold buttons */
 
-  /* Accent — warm gold */
-  --pm-accent: var(--pm-brand-accent, #B91C1C);
-  --pm-accent-strong: #7F1D1D;
-  --pm-accent-light: #DC2626;
-  --pm-gold: #A16207;
-  --pm-gold-soft: #F8D88D;
-  --pm-accent-pale: rgba(185, 28, 28, 0.09);
-  --pm-accent-gradient: linear-gradient(135deg, #DC2626 0%, var(--pm-accent) 48%, #A16207 100%);
+  /* Accent — rich brushed gold & platinum */
+  --pm-accent: #d4a537; /* vibrant gold */
+  --pm-accent-strong: #f5e6cc; /* bright gold / cream highlight */
+  --pm-accent-light: #efc360; /* lighter gold */
+  --pm-gold: #d4a537;
+  --pm-gold-soft: #f5e6cc;
+  --pm-accent-pale: rgba(212, 165, 55, 0.08); /* gold soft glow overlay */
+  --pm-accent-gradient: linear-gradient(135deg, #f5e6cc 0%, #d4a537 50%, #9a7620 100%); /* brushed gold gradient */
 
   /* Borders */
-  --pm-border-subtle: rgba(78, 43, 24, 0.12);
-  --pm-border-medium: rgba(78, 43, 24, 0.2);
-  --pm-border-strong: rgba(185, 28, 28, 0.28);
+  --pm-border-subtle: rgba(255, 255, 255, 0.06);
+  --pm-border-medium: rgba(255, 255, 255, 0.12);
+  --pm-border-strong: rgba(212, 165, 55, 0.35); /* luxury gold border */
 
-  /* Shadows */
-  --pm-shadow-card: 0 10px 26px rgba(53, 32, 22, 0.08), 0 1px 4px rgba(53, 32, 22, 0.05);
-  --pm-shadow-card-hover: 0 18px 36px rgba(53, 32, 22, 0.15), 0 4px 10px rgba(53, 32, 22, 0.08);
-  --pm-shadow-shell: 0 34px 90px rgba(53, 32, 22, 0.24), 0 12px 32px rgba(53, 32, 22, 0.12);
-  --pm-shadow-hero: 0 18px 46px rgba(55, 13, 8, 0.24);
-  --pm-shadow-search: 0 12px 28px rgba(53, 32, 22, 0.13), 0 2px 8px rgba(53, 32, 22, 0.06);
-  --pm-shadow-chip-active: 0 10px 22px rgba(120, 22, 14, 0.22);
-  --pm-shadow-chip-inactive: 0 2px 8px rgba(53, 32, 22, 0.06);
-  --pm-shadow-action: 0 10px 24px rgba(185, 28, 28, 0.22);
-  --pm-shadow-fab: 0 6px 20px rgba(26, 18, 9, 0.18), 0 2px 6px rgba(0, 0, 0, 0.08);
+  /* Shadows - deeper & darker for extreme premium look */
+  --pm-shadow-card: 0 10px 30px rgba(0, 0, 0, 0.6), 0 1px 3px rgba(0, 0, 0, 0.4);
+  --pm-shadow-card-hover: 0 20px 40px rgba(212, 165, 55, 0.15), 0 4px 12px rgba(0, 0, 0, 0.7);
+  --pm-shadow-shell: 0 34px 90px rgba(0, 0, 0, 0.8), 0 12px 32px rgba(0, 0, 0, 0.6);
+  --pm-shadow-hero: 0 18px 46px rgba(0, 0, 0, 0.7);
+  --pm-shadow-search: 0 12px 28px rgba(0, 0, 0, 0.5), 0 2px 8px rgba(0, 0, 0, 0.3);
+  --pm-shadow-chip-active: 0 10px 22px rgba(212, 165, 55, 0.3);
+  --pm-shadow-chip-inactive: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --pm-shadow-action: 0 10px 24px rgba(212, 165, 55, 0.25);
+  --pm-shadow-fab: 0 6px 20px rgba(0, 0, 0, 0.6), 0 2px 6px rgba(0, 0, 0, 0.4);
 
   /* Radii */
   --pm-radius-shell: 38px;
@@ -332,9 +363,9 @@
   --pm-font-serif: var(--font-playfair), "Playfair Display", Georgia, "Times New Roman", serif;
   --pm-font-sans: var(--font-inter), "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
 
-  background:
-    linear-gradient(135deg, rgba(185, 28, 28, 0.13) 0%, transparent 32%),
-    linear-gradient(225deg, rgba(161, 98, 7, 0.16) 0%, transparent 38%),
+  background: 
+    linear-gradient(135deg, rgba(212, 165, 55, 0.08) 0%, transparent 40%),
+    linear-gradient(225deg, rgba(255, 255, 255, 0.03) 0%, transparent 35%),
     var(--pm-bg-page);
   color: var(--pm-text-body);
   isolation: isolate;
