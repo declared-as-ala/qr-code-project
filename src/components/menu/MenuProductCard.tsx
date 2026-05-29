@@ -1,6 +1,8 @@
 "use client";
 
+import { memo } from "react";
 import { BadgePill } from "@/components/BadgePill";
+import { thumb } from "@/lib/utils";
 
 type BadgeType = "nouveau" | "populaire" | "promo" | "signature";
 
@@ -12,7 +14,7 @@ function resolvesBadge(badge?: string): BadgeType | undefined {
   return VALID_BADGES.has(key) ? key : undefined;
 }
 
-export function MenuProductCard({
+function MenuProductCardBase({
   name,
   description,
   price,
@@ -44,10 +46,13 @@ export function MenuProductCard({
       <div className="relative aspect-[4/3] overflow-hidden bg-[var(--pm-bg-card)]">
         {image ? (
           <img
-            src={image}
+            src={thumb(image, 240, 180)}
             alt={name}
-            className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]"
+            width={240}
+            height={180}
+            className="h-full w-full object-cover"
             loading="lazy"
+            decoding="async"
           />
         ) : (
           <div className="h-full w-full bg-gradient-to-br from-zinc-800 to-zinc-900" />
@@ -68,7 +73,7 @@ export function MenuProductCard({
         )}
 
         <span
-          className="absolute bottom-1.5 left-1.5 rounded-md px-2 py-0.5 text-[11px] font-black tabular-nums backdrop-blur-md"
+          className="absolute bottom-1.5 left-1.5 rounded-md px-2 py-0.5 text-[11px] font-black tabular-nums"
           style={{
             background: "rgba(3, 3, 3, 0.78)",
             border: "1px solid rgba(255, 255, 255, 0.10)",
@@ -110,3 +115,5 @@ export function MenuProductCard({
     </article>
   );
 }
+
+export const MenuProductCard = memo(MenuProductCardBase);

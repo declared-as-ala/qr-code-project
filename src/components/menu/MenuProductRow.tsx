@@ -1,6 +1,8 @@
 "use client";
 
+import { memo } from "react";
 import { BadgePill } from "@/components/BadgePill";
+import { thumb } from "@/lib/utils";
 
 type BadgeType = "nouveau" | "populaire" | "promo" | "signature";
 
@@ -12,7 +14,7 @@ function resolvesBadge(badge?: string): BadgeType | undefined {
   return VALID_BADGES.has(key) ? key : undefined;
 }
 
-export function MenuProductRow({
+function MenuProductRowBase({
   name,
   description,
   price,
@@ -41,10 +43,13 @@ export function MenuProductRow({
       <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-lg bg-[var(--pm-bg-card)]">
         {image ? (
           <img
-            src={image}
+            src={thumb(image, 56, 56)}
             alt={name}
+            width={56}
+            height={56}
             className={`h-full w-full object-cover ${!isAvailable ? "grayscale-[60%]" : ""}`}
             loading="lazy"
+            decoding="async"
           />
         ) : (
           <div className="h-full w-full bg-gradient-to-br from-zinc-800 to-zinc-900" />
@@ -89,3 +94,5 @@ export function MenuProductRow({
     </article>
   );
 }
+
+export const MenuProductRow = memo(MenuProductRowBase);

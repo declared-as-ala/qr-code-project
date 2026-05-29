@@ -92,7 +92,7 @@ export function MenuWelcome({
 
         <div className="min-w-0 flex-1">
           <h1
-            className="truncate text-[26px] font-bold leading-tight text-transparent bg-clip-text bg-gradient-to-r from-[#f5e6cc] via-[#efc360] to-[#d4a537]"
+            className="text-[25px] font-bold leading-tight text-transparent bg-clip-text bg-gradient-to-r from-[#f5e6cc] via-[#efc360] to-[#d4a537] [overflow-wrap:anywhere] line-clamp-2"
             style={{
               fontFamily: "var(--pm-font-serif)",
               filter: "drop-shadow(0 2px 8px rgba(212, 165, 55, 0.4)) drop-shadow(0 4px 12px rgba(0, 0, 0, 0.6))",

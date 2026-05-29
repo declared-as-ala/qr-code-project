@@ -9,6 +9,7 @@ import { MenuCategoryChips } from "@/components/menu/MenuCategoryChips";
 import { MenuProductCard } from "@/components/menu/MenuProductCard";
 import { MenuProductRow } from "@/components/menu/MenuProductRow";
 import { MenuLogoFallback } from "@/components/menu/MenuLogoFallback";
+import { thumb } from "@/lib/utils";
 
 type Product = {
   _id: string;
@@ -125,6 +126,12 @@ export function PublicMenuClient({
     fontFamily: "var(--pm-font-sans)",
   } as CSSProperties;
 
+  // Skip rendering off-screen category lists (huge win for a 180+ item menu).
+  const cvStyle = {
+    contentVisibility: "auto",
+    containIntrinsicSize: "auto 700px",
+  } as CSSProperties;
+
   const filteredProducts = useMemo(() => {
     if (!search.trim()) return effectiveProducts;
     const q = search.toLowerCase();
@@ -146,20 +153,26 @@ export function PublicMenuClient({
     if (!menuVisible) return;
     const root = scrollRef.current;
     if (!root) return;
+    let raf = 0;
     const obs = new IntersectionObserver(
       (entries) => {
         const visible = entries
           .filter((e) => e.isIntersecting)
           .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
-        if (visible) {
-          const name = (visible.target as HTMLElement).dataset.categoryName;
-          if (name) setActiveCategory(name);
-        }
+        if (!visible) return;
+        const name = (visible.target as HTMLElement).dataset.categoryName;
+        if (!name) return;
+        // Coalesce rapid updates during a fast fling into one per frame.
+        if (raf) cancelAnimationFrame(raf);
+        raf = requestAnimationFrame(() => setActiveCategory((cur) => (cur === name ? cur : name)));
       },
       { root, rootMargin: "-72px 0px -60% 0px", threshold: 0 }
     );
     root.querySelectorAll<HTMLElement>("[data-category-name]").forEach((el) => obs.observe(el));
-    return () => obs.disconnect();
+    return () => {
+      if (raf) cancelAnimationFrame(raf);
+      obs.disconnect();
+    };
   }, [menuVisible, effectiveCategories, filteredProducts]);
 
   return (
@@ -183,9 +196,8 @@ export function PublicMenuClient({
               className="flex h-full min-h-0 w-full flex-col"
               initial={{ opacity: 1 }}
               animate={{ opacity: 1 }}
-              exit={{ opacity: 0, rotateY: 70, x: 20 }}
-              transition={{ duration: 0.55, ease: [0.19, 1, 0.22, 1] }}
-              style={{ transformOrigin: "left center" }}
+              exit={{ opacity: 0, x: -24 }}
+              transition={{ duration: 0.2, ease: "easeIn" }}
             >
               <MenuWelcome
                 restaurantName={restaurant.name || "Le Bistrot"}
@@ -202,11 +214,10 @@ export function PublicMenuClient({
               key="menu"
               id="menu-content"
               className="relative flex h-full min-h-0 w-full flex-col overflow-hidden"
-              initial={{ opacity: 0, rotateY: -100, x: -28, scale: 0.97 }}
-              animate={{ opacity: 1, rotateY: 0, x: 0, scale: 1 }}
-              exit={{ opacity: 0, rotateY: -28, x: -12, scale: 0.99 }}
-              transition={{ duration: 0.72, ease: [0.19, 1, 0.22, 1] }}
-              style={{ transformOrigin: "left center", perspective: "1200px" }}
+              initial={{ opacity: 0, x: 24 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -12 }}
+              transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
             >
               {/* Single scrollable area: compact hero scrolls away, search+chips stay sticky inside */}
               <div
@@ -226,9 +237,11 @@ export function PublicMenuClient({
                   >
                     {restaurant.coverImage && (
                       <img
-                        src={restaurant.coverImage}
+                        src={thumb(restaurant.coverImage, 460, 140)}
                         alt=""
                         className="absolute inset-0 h-full w-full object-cover opacity-15"
+                        loading="lazy"
+                        decoding="async"
                       />
                     )}
                     <div
@@ -261,9 +274,9 @@ export function PublicMenuClient({
                       </div>
 
                       <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2">
+                        <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                           <h2
-                            className="truncate text-[20px] font-bold leading-tight text-white"
+                            className="text-[19px] font-bold leading-tight text-white [overflow-wrap:anywhere]"
                             style={{ fontFamily: "var(--pm-font-serif)" }}
                           >
                             {restaurant.name || "Le Bistrot"}
@@ -335,11 +348,8 @@ export function PublicMenuClient({
 
                 {/* STICKY: search + view toggle */}
                 <div
-                  className="sticky top-0 z-30 px-3 pt-3 pb-2 sm:px-4 backdrop-blur-md"
-                  style={{
-                    background:
-                      "linear-gradient(180deg, var(--pm-bg-card) 0%, var(--pm-bg-card) 80%, rgba(0,0,0,0))",
-                  }}
+                  className="sticky top-0 z-30 px-3 pt-3 pb-2 sm:px-4"
+                  style={{ background: "var(--pm-bg-card)" }}
                 >
                   <div className="flex items-center gap-2">
                     <div className="relative flex-1">
@@ -452,11 +462,10 @@ export function PublicMenuClient({
                           >
                             {/* Sticky thin band */}
                             <div
-                              className="sticky top-[104px] z-20 -mx-3 mb-2 px-3 py-1.5 sm:-mx-4 sm:px-4 backdrop-blur-md"
+                              className="sticky top-[100px] z-20 -mx-3 mb-2 px-3 py-1.5 sm:-mx-4 sm:px-4"
                               style={{
-                                background: "rgba(17, 17, 21, 0.85)",
-                                borderTop: "1px solid rgba(255, 255, 255, 0.04)",
-                                borderBottom: "1px solid rgba(255, 255, 255, 0.04)",
+                                background: "var(--pm-bg-card)",
+                                borderBottom: "1px solid rgba(255, 255, 255, 0.05)",
                               }}
                             >
                               <h3
@@ -471,43 +480,31 @@ export function PublicMenuClient({
                             </div>
 
                             {viewMode === "grid" ? (
-                              <div className="grid grid-cols-2 gap-2.5">
-                                {items.map((product, index) => (
-                                  <motion.div
+                              <div className="grid grid-cols-2 gap-2.5" style={cvStyle}>
+                                {items.map((product) => (
+                                  <MenuProductCard
                                     key={product._id}
-                                    initial={{ opacity: 0, y: 8 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ duration: 0.25, delay: index * 0.025 }}
-                                  >
-                                    <MenuProductCard
-                                      name={product.name}
-                                      description={product.description}
-                                      price={`${Number(product.price).toFixed(3)} DT`}
-                                      image={product.image}
-                                      badge={product.badge}
-                                      isAvailable={product.isAvailable}
-                                    />
-                                  </motion.div>
+                                    name={product.name}
+                                    description={product.description}
+                                    price={`${Number(product.price).toFixed(3)} DT`}
+                                    image={product.image}
+                                    badge={product.badge}
+                                    isAvailable={product.isAvailable}
+                                  />
                                 ))}
                               </div>
                             ) : (
-                              <div className="divide-y divide-white/[0.04]">
-                                {items.map((product, index) => (
-                                  <motion.div
+                              <div className="divide-y divide-white/[0.04]" style={cvStyle}>
+                                {items.map((product) => (
+                                  <MenuProductRow
                                     key={product._id}
-                                    initial={{ opacity: 0, y: 6 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ duration: 0.2, delay: index * 0.015 }}
-                                  >
-                                    <MenuProductRow
-                                      name={product.name}
-                                      description={product.description}
-                                      price={`${Number(product.price).toFixed(3)} DT`}
-                                      image={product.image}
-                                      badge={product.badge}
-                                      isAvailable={product.isAvailable}
-                                    />
-                                  </motion.div>
+                                    name={product.name}
+                                    description={product.description}
+                                    price={`${Number(product.price).toFixed(3)} DT`}
+                                    image={product.image}
+                                    badge={product.badge}
+                                    isAvailable={product.isAvailable}
+                                  />
                                 ))}
                               </div>
                             )}

@@ -50,11 +50,7 @@ export function BadgePill({ badge, className }: { badge: BadgeType; className?: 
         "inline-flex items-center rounded-full px-2.5 py-[3.5px] text-[9.5px] font-black uppercase tracking-[0.1em]",
         className
       )}
-      style={{
-        backdropFilter: "blur(8px)",
-        WebkitBackdropFilter: "blur(8px)",
-        ...STYLES[badge],
-      }}
+      style={STYLES[badge]}
     >
       {LABELS[badge]}
     </span>
