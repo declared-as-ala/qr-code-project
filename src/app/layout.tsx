@@ -17,8 +17,14 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "QR Menu SaaS",
-  description: "Premium digital QR menus for cafes and restaurants.",
+  title: {
+    default: "ClickMenu — Digital QR menus for cafés & restaurants",
+    template: "%s · ClickMenu",
+  },
+  description:
+    "ClickMenu: build and manage premium digital QR menus for cafés and restaurants in minutes.",
+  applicationName: "ClickMenu",
+  appleWebApp: { capable: true, title: "ClickMenu", statusBarStyle: "black-translucent" },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

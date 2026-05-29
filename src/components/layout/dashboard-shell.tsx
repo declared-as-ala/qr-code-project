@@ -4,7 +4,8 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
-import { Menu as MenuIcon, Settings, LogOut, UtensilsCrossed, Flame, ExternalLink } from "lucide-react";
+import Image from "next/image";
+import { Menu as MenuIcon, Settings, LogOut, UtensilsCrossed, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
@@ -21,11 +22,11 @@ function Sidebar({ onNavigate, slug }: { onNavigate?: () => void; slug?: string 
   return (
     <div className="flex h-full flex-col bg-zinc-950 border-r border-white/5 text-zinc-100">
       <div className="px-6 py-6 flex items-center gap-3 border-b border-white/5">
-        <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-red-500 to-red-700 flex items-center justify-center">
-          <Flame className="h-4 w-4 text-white" />
+        <div className="h-9 w-9 rounded-xl overflow-hidden shrink-0">
+          <Image src="/logos/clickmenu-mark.svg" alt="ClickMenu" width={36} height={36} priority />
         </div>
         <div className="flex flex-col">
-          <span className="font-display text-base font-semibold tracking-tight text-white">Menu Manager</span>
+          <span className="font-display text-base font-semibold tracking-tight text-white">ClickMenu</span>
           <span className="text-[10px] font-bold uppercase tracking-widest text-primary">Admin</span>
         </div>
       </div>
