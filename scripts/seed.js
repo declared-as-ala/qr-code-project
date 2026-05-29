@@ -754,6 +754,389 @@ async function run() {
     { upsert: true }
   );
 
+  // ── cheese-steak (Yasmine Hammamet) ────────────────────────────────────────
+  const csAdminEmail = "owner@cheesesteak.tn";
+  const csAdminPassword = "CheeseSteak@2026";
+  const csAdminHash = await bcrypt.hash(csAdminPassword, 12);
+
+  const csAdminResult = await users.findOneAndUpdate(
+    { email: csAdminEmail },
+    {
+      $set: {
+        name: "Cheese Steak Owner",
+        email: csAdminEmail,
+        passwordHash: csAdminHash,
+        role: "restaurant_admin",
+        mustChangePassword: false,
+        updatedAt: now,
+      },
+      $setOnInsert: { createdAt: now },
+    },
+    { upsert: true, returnDocument: "after" }
+  );
+
+  const csOwnerId = getUpdatedDoc(csAdminResult)?._id;
+  if (!csOwnerId) throw new Error("Failed to upsert cheese-steak admin user.");
+
+  const csRestaurantResult = await restaurants.findOneAndUpdate(
+    { slug: "cheese-steak" },
+    {
+      $set: {
+        ownerId: csOwnerId,
+        name: "Cheese Steak",
+        slug: "cheese-steak",
+        establishmentType: "restaurant",
+        tagline: "Bold Flavors - Melty Cheese - Perfect Steaks",
+        description:
+          "Resto - Bar - Cafe à Yasmine Hammamet. Viandes grillées, fruits de mer, pâtes, pizzas et cocktails dans une ambiance chaleureuse.",
+        email: "cheeseandsteak@outlook.fr",
+        phone: "+216 70 240 240",
+        address: "Entrée Carthage Land, Yasmine Hammamet, Tunisie",
+        instagram: "https://instagram.com/cheesesteak.hammamet",
+        facebook: "https://facebook.com/cheesesteak.hammamet",
+        tiktok: "https://tiktok.com/@cheesesteak.hammamet",
+        whatsapp: "https://wa.me/21670240240",
+        googleMapsUrl: "https://maps.google.com/?q=Carthage+Land+Yasmine+Hammamet",
+        logo: "/logos/cheese-steak.svg",
+        coverImage:
+          "https://images.unsplash.com/photo-1558030006-450675393462?auto=format&fit=crop&w=1800&q=90",
+        primaryColor: "#B5121B",
+        secondaryColor: "#1A1A1A",
+        currency: "DT",
+        isActive: true,
+        updatedAt: now,
+      },
+      $setOnInsert: { createdAt: now },
+    },
+    { upsert: true, returnDocument: "after" }
+  );
+
+  const csRestaurantId = getUpdatedDoc(csRestaurantResult)?._id;
+  if (!csRestaurantId) throw new Error("Failed to upsert cheese-steak restaurant.");
+
+  const csCategoryData = [
+    { key: "cold_starters",   name: "Entrées Froides",        sortOrder: 1 },
+    { key: "hot_starters",    name: "Entrées Chaudes",         sortOrder: 2 },
+    { key: "meats",           name: "Les Viandes",             sortOrder: 3 },
+    { key: "fish",            name: "Les Poissons",            sortOrder: 4 },
+    { key: "pasta",           name: "Les Pâtes",               sortOrder: 5 },
+    { key: "chef",            name: "Spécialité du Chef",      sortOrder: 6 },
+    { key: "pizzas",          name: "Les Pizzas",              sortOrder: 7 },
+    { key: "kids",            name: "Menu Kids",               sortOrder: 8 },
+    { key: "cold_drinks",     name: "Boissons Froides",        sortOrder: 9 },
+    { key: "juices",          name: "Les Jus",                 sortOrder: 10 },
+    { key: "coffees",         name: "Les Cafés",               sortOrder: 11 },
+    { key: "teas",            name: "Les Thés",                sortOrder: 12 },
+    { key: "breakfast",       name: "Petit Déjeuner",          sortOrder: 13 },
+    { key: "mocktails",       name: "Cocktails sans Alcool",   sortOrder: 14 },
+    { key: "cocktails",       name: "Cocktails avec Alcool",   sortOrder: 15 },
+    { key: "milkshakes",      name: "Milkshakes",              sortOrder: 16 },
+    { key: "smoothies",       name: "Smoothies",               sortOrder: 17 },
+    { key: "ice_desserts",    name: "Desserts Glacés",         sortOrder: 18 },
+    { key: "desserts",        name: "Les Desserts",            sortOrder: 19 },
+    { key: "liqueurs",        name: "Liqueurs",                sortOrder: 20 },
+    { key: "beers",           name: "Bières",                  sortOrder: 21 },
+    { key: "wines",           name: "Les Vins",                sortOrder: 22 },
+  ];
+
+  const csCategoryIds = {};
+  for (const item of csCategoryData) {
+    const result = await categories.findOneAndUpdate(
+      { restaurantId: csRestaurantId, name: item.name },
+      {
+        $set: {
+          restaurantId: csRestaurantId,
+          name: item.name,
+          description: "",
+          sortOrder: item.sortOrder,
+          isActive: true,
+          updatedAt: now,
+        },
+        $setOnInsert: { createdAt: now },
+      },
+      { upsert: true, returnDocument: "after" }
+    );
+    const catId = getUpdatedDoc(result)?._id;
+    if (!catId) throw new Error(`Failed to upsert cheese-steak category: ${item.name}`);
+    csCategoryIds[item.key] = catId;
+  }
+
+  // helper for image picks
+  const img = (id) => `https://images.unsplash.com/${id}?auto=format&fit=crop&w=800&q=80`;
+
+  const csProductData = [
+    // Entrées Froides
+    { c: "cold_starters", n: "Salade Tunisienne",         en: "Tunisian salad",            p: 12,    i: "photo-1540420773420-3366772f4999" },
+    { c: "cold_starters", n: "Salade Mechouia",            en: "Mechouia salad",            p: 13.5,  i: "photo-1505253716362-afaea1d3d1af" },
+    { c: "cold_starters", n: "Duo de Salade Tunisienne",   en: "Duo of Tunisian salad",     p: 18,    i: "photo-1540420773420-3366772f4999" },
+    { c: "cold_starters", n: "Salade César",               en: "Caesar Salad",              p: 28,    i: "photo-1550304943-4f24f54ddde9", b: "Populaire" },
+
+    // Entrées Chaudes
+    { c: "hot_starters",  n: "Assiette de Frites",         en: "Plate of fries",            p: 6.5,   i: "photo-1573080496219-bb080dd4f877" },
+    { c: "hot_starters",  n: "Brik au Thon",                en: "Brik with tuna",            p: 8.5,   i: "photo-1601050690597-df0568f70950", b: "Signature" },
+    { c: "hot_starters",  n: "Brik aux Chevrettes",         en: "Brik with shrimp",          p: 13.5,  i: "photo-1625944525533-473f1b3d9684" },
+    { c: "hot_starters",  n: "Soupe au Poulet",             en: "Chicken soup",              p: 9,     i: "photo-1547592180-85f173990554" },
+    { c: "hot_starters",  n: "Soupe au Poisson",            en: "Fish soup",                 p: 12,    i: "photo-1547592166-23ac45744acd" },
+    { c: "hot_starters",  n: "Crème de Légumes",            en: "Vegetable cream",           p: 11,    i: "photo-1547308283-b941e0f7d54a" },
+    { c: "hot_starters",  n: "Assiette de Mini Brik",       en: "Plate of mini brik",        p: 12,    i: "photo-1601050690597-df0568f70950" },
+    { c: "hot_starters",  n: "Ojja au Merguez",             en: "Ojja with merguez",         p: 28,    i: "photo-1604908554049-29795f1d1c6e" },
+    { c: "hot_starters",  n: "Ojja Fruits de Mer",          en: "Ojja with seafood",         p: 38,    i: "photo-1559847844-1ff4d5bcd28e" },
+    { c: "hot_starters",  n: "Moule Marinière",             en: "Marine mussel",             p: 36,    i: "photo-1565680018434-b513d5e5fd47" },
+    { c: "hot_starters",  n: "Chevrettes Sautées",          en: "Shrimp sauteed",            p: 36.5,  i: "photo-1625944525533-473f1b3d9684" },
+    { c: "hot_starters",  n: "Calamars Dorés",              en: "Golden squid",              p: 38,    i: "photo-1599487488170-d11ec9c172f0" },
+    { c: "hot_starters",  n: "Chevrette Panée",             en: "Breaded shrimp",            p: 39,    i: "photo-1625944525533-473f1b3d9684" },
+    { c: "hot_starters",  n: "Gratin de Fruits de Mer",     en: "Seafood gratin",            p: 44,    i: "photo-1559847844-1ff4d5bcd28e" },
+
+    // Les Viandes
+    { c: "meats", n: "Poulet Grillé",                       en: "Grilled chicken",                          p: 26, i: "photo-1532550907401-a500c9a57435" },
+    { c: "meats", n: "Escalope de Dinde Grillée",            en: "Grilled turkey escalope",                   p: 28, i: "photo-1432139509613-5c4255815697" },
+    { c: "meats", n: "Plat Chawarma",                        en: "Chicken shawarma plate",                    p: 29, i: "photo-1633321702518-7feccafb94d5", b: "Populaire" },
+    { c: "meats", n: "Brochette de Poulet",                  en: "Chicken kebab",                             p: 29, i: "photo-1599487488170-d11ec9c172f0" },
+    { c: "meats", n: "Cordon Bleu",                          en: "Cordon bleu",                               p: 31, i: "photo-1562967914-608f82629710" },
+    { c: "meats", n: "Escalope de Dinde Panée",              en: "Breaded turkey escalope",                   p: 32, i: "photo-1432139509613-5c4255815697" },
+    { c: "meats", n: "Merguez Grillée",                      en: "Grilled merguez sausages",                  p: 32, i: "photo-1529193591184-b1d58069ecdd" },
+    { c: "meats", n: "Émincé de Dinde Sauce Champignon",     en: "Sliced turkey with mushroom sauce",         p: 37, i: "photo-1432139509613-5c4255815697" },
+    { c: "meats", n: "Suprême de Poulet Sauce Champignons",  en: "Chicken supreme with mushroom sauce",       p: 38, i: "photo-1532550907401-a500c9a57435" },
+    { c: "meats", n: "Côtelette d'Agneau Grillée",           en: "Grilled lamb chops",                        p: 57, i: "photo-1607330289024-1535c6b4e1c1", b: "Signature" },
+    { c: "meats", n: "Entrecôte Grillée",                    en: "Grilled steak",                             p: 58, i: "photo-1546964124-0cce460f38ef" },
+    { c: "meats", n: "Grillade Mixte",                       en: "Mixed grill",                               p: 59, i: "photo-1544025162-d76694265947" },
+    { c: "meats", n: "Côte de Bœuf Grillée",                 en: "Grilled rib of beef",                       p: 61, i: "photo-1558030006-450675393462" },
+    { c: "meats", n: "Émincé de Veau Sauce Champignons",     en: "Sliced veal with mushroom sauce",           p: 61, i: "photo-1544025162-d76694265947" },
+    { c: "meats", n: "Filet Grillé, Sauce au Choix",         en: "Grilled beef fillet with sauce of choice",  p: 64, i: "photo-1546964124-0cce460f38ef" },
+    { c: "meats", n: "T-Bone Steak",                         en: "T-Bone steak",                              p: 69, i: "photo-1558030006-450675393462", b: "Signature" },
+    { c: "meats", n: "Supplément Sauce",                     en: "Extra sauce (pepper / blue cheese / mushrooms)", p: 12, i: "photo-1607330289024-1535c6b4e1c1" },
+
+    // Les Poissons
+    { c: "fish", n: "Dorade Grillée (100gr)",                en: "Grilled sea bream (100g)",                  p: 12.5, i: "photo-1599084993091-1cb5c0721cc6" },
+    { c: "fish", n: "Loup Grillé (100gr)",                    en: "Grilled sea bass (100g)",                   p: 14,   i: "photo-1535140728325-a4d3707eee94" },
+    { c: "fish", n: "Poisson du Jour (100gr)",                en: "Fish of the day (100g)",                    p: 15,   i: "photo-1535140728325-a4d3707eee94" },
+    { c: "fish", n: "Seiche Grillée",                          en: "Grilled cuttlefish",                        p: 39,   i: "photo-1599084993091-1cb5c0721cc6" },
+    { c: "fish", n: "Espadon Grillé",                          en: "Grilled swordfish",                         p: 42,   i: "photo-1535140728325-a4d3707eee94" },
+    { c: "fish", n: "Langouste (100gr)",                       en: "Lobster (100g)",                            p: 42,   i: "photo-1559737558-2f5a35f4523b" },
+    { c: "fish", n: "Calamar Grillé",                          en: "Grilled squid",                             p: 45,   i: "photo-1599487488170-d11ec9c172f0" },
+    { c: "fish", n: "Mérou Grillé",                            en: "Grilled grouper",                           p: 56,   i: "photo-1535140728325-a4d3707eee94" },
+    { c: "fish", n: "Crevette Royale Grillée/Sautée",          en: "Grilled prawns",                            p: 78,   i: "photo-1625944525533-473f1b3d9684" },
+    { c: "fish", n: "Assiette de Délice de la Mer",            en: "Dish of seafood delicacies",                p: 125,  i: "photo-1559847844-1ff4d5bcd28e", b: "Signature" },
+    { c: "fish", n: "Symphonie Fruit de Mer (2 pax)",          en: "Seafood symphony (2 pax)",                  p: 199,  i: "photo-1559847844-1ff4d5bcd28e", b: "Royal" },
+
+    // Les Pâtes
+    { c: "pasta", n: "Penne à la Puttanesca",                 en: "Penne puttanesca",                          p: 26,   i: "photo-1551183053-bf91a1d81141" },
+    { c: "pasta", n: "Penne Carbonara",                        en: "Penne carbonara",                           p: 29,   i: "photo-1612874742237-6526221588e3" },
+    { c: "pasta", n: "Penne 4 Fromages",                       en: "Penne 4 cheese",                            p: 32,   i: "photo-1473093295043-cdd812d0e601" },
+    { c: "pasta", n: "Macaroni au Poulet",                     en: "Chicken makaroni",                          p: 29,   i: "photo-1612874742237-6526221588e3" },
+    { c: "pasta", n: "Macaroni à l'Escalope",                  en: "Macaroni with cutlet",                      p: 29.5, i: "photo-1612874742237-6526221588e3" },
+    { c: "pasta", n: "Macaroni au Poisson",                    en: "Fish makaroni",                             p: 35,   i: "photo-1473093295043-cdd812d0e601" },
+    { c: "pasta", n: "Macaroni à l'Espadon",                   en: "Macaroni with swordfish",                   p: 42,   i: "photo-1473093295043-cdd812d0e601" },
+    { c: "pasta", n: "Spaghetti à l'Escalope Sauce Blanche",   en: "Chicken spaghetti with white sauce",        p: 32,   i: "photo-1473093295043-cdd812d0e601" },
+    { c: "pasta", n: "Spaghetti Bolognaise",                    en: "Spaghetti bolognese",                       p: 36,   i: "photo-1551183053-bf91a1d81141", b: "Populaire" },
+    { c: "pasta", n: "Spaghetti aux Fruits de Mer",             en: "Spaghetti with seafood",                    p: 43,   i: "photo-1563379926898-05f4575a45d8" },
+    { c: "pasta", n: "Farfalle aux Chevrettes et Champignons",  en: "Farfalle with shrimp and mushrooms",        p: 41,   i: "photo-1473093295043-cdd812d0e601" },
+    { c: "pasta", n: "Lasagne Bolognaise",                      en: "Bolognese lasagna",                         p: 37,   i: "photo-1619895092538-128f4f29b1bb" },
+    { c: "pasta", n: "Lasagne Fruits de Mer",                   en: "Seafood lasagna",                           p: 44,   i: "photo-1619895092538-128f4f29b1bb" },
+
+    // Spécialité du Chef
+    { c: "chef", n: "Couscous Végétarien",                     en: "Vegetarian couscous",                       p: 26,   i: "photo-1568901346375-23c9450c58cd" },
+    { c: "chef", n: "Couscous au Poulet",                       en: "Chicken couscous",                          p: 32,   i: "photo-1568901346375-23c9450c58cd" },
+    { c: "chef", n: "Couscous au Merguez",                      en: "Red sausage couscous",                      p: 36,   i: "photo-1568901346375-23c9450c58cd" },
+    { c: "chef", n: "Couscous à l'Agneau",                      en: "Lamb couscous",                             p: 42,   i: "photo-1568901346375-23c9450c58cd" },
+    { c: "chef", n: "Couscous à l'Espadon",                     en: "Fish couscous",                             p: 44,   i: "photo-1568901346375-23c9450c58cd" },
+    { c: "chef", n: "Couscous Royal",                            en: "Royal couscous",                            p: 49,   i: "photo-1568901346375-23c9450c58cd", b: "Royal" },
+    { c: "chef", n: "Couscous au Mérou",                         en: "Couscous with grouper",                     p: 56,   i: "photo-1568901346375-23c9450c58cd" },
+    { c: "chef", n: "Riz au Poulet",                              en: "Chicken rice",                              p: 32,   i: "photo-1603133872878-684f208fb84b" },
+    { c: "chef", n: "Riz aux Fruits de Mer",                      en: "Seafood rice",                              p: 43,   i: "photo-1603133872878-684f208fb84b" },
+    { c: "chef", n: "Kamounia Fruits de Mer",                     en: "Seafood kamounia",                          p: 39,   i: "photo-1604908554049-29795f1d1c6e" },
+    { c: "chef", n: "Symphonie Fruits de Terre (1 pax)",          en: "Land Meat Symphony (1 pax)",                p: 90,   i: "photo-1544025162-d76694265947", b: "Signature" },
+    { c: "chef", n: "Symphonie Fruits de Terre (2 pax)",          en: "Land Meat Symphony (2 pax)",                p: 172,  i: "photo-1544025162-d76694265947", b: "Signature" },
+    { c: "chef", n: "Mezza Royale (2 pax)",                       en: "Royal Mezza (2 pax)",                       p: 150,  i: "photo-1559847844-1ff4d5bcd28e", b: "Royal" },
+
+    // Les Pizzas
+    { c: "pizzas", n: "Pizza Margherita",        en: "Margherita pizza (tomato, cheese, olives, capers)",                                     p: 21, i: "photo-1604068549290-dea0e4a305ca" },
+    { c: "pizzas", n: "Pizza 4 Saisons",          en: "4 seasons pizza (tomato, chilli, fresh tomato, onion, capers, olives, mushroom)",       p: 25, i: "photo-1574071318508-1cdbab80d002" },
+    { c: "pizzas", n: "Pizza Neptune",            en: "Neptune pizza (tomato, cheese, olives, capers, tuna)",                                  p: 28, i: "photo-1565299624946-b28f40a0ae38" },
+    { c: "pizzas", n: "Pizza Escalope",           en: "Escalope pizza (tomato, onion, pepper, olives, escalope)",                              p: 29, i: "photo-1565299624946-b28f40a0ae38" },
+    { c: "pizzas", n: "Pizza 4 Fromages",         en: "Pizza 4 cheese (tomato sauce, 4 cheeses)",                                              p: 34, i: "photo-1513104890138-7c749659a591", b: "Populaire" },
+    { c: "pizzas", n: "Pizza Orientale",          en: "Oriental pizza (tomato, mozzarella, egg, minced meat)",                                 p: 36, i: "photo-1513104890138-7c749659a591" },
+    { c: "pizzas", n: "Pizza Fruits de Mer",      en: "Seafood pizza",                                                                          p: 39, i: "photo-1574071318508-1cdbab80d002", b: "Signature" },
+
+    // Menu Kids
+    { c: "kids", n: "Pâtes au Beurre + Frites + Jus",         en: "Butter pasta + fries + juice",      p: 12.5, i: "photo-1473093295043-cdd812d0e601" },
+    { c: "kids", n: "Pâte à la Crème + Frites + Jus",          en: "Cream pasta + fries + juice",       p: 15,   i: "photo-1473093295043-cdd812d0e601" },
+    { c: "kids", n: "Nugget de Poulet + Frites + Jus",         en: "Chicken nuggets + fries + juice",   p: 15.5, i: "photo-1562967914-608f82629710", b: "Populaire" },
+    { c: "kids", n: "Mini Pizza Margherita + Jus",             en: "Mini Margherita pizza + juice",     p: 12.5, i: "photo-1604068549290-dea0e4a305ca" },
+    { c: "kids", n: "Mini Pizza au Thon + Jus",                en: "Mini tuna pizza + juice",           p: 14.5, i: "photo-1565299624946-b28f40a0ae38" },
+
+    // Boissons Froides
+    { c: "cold_drinks", n: "Eau 0.5L",          en: "Water",                p: 2.5, i: "photo-1559839734-2b71ea197ec2" },
+    { c: "cold_drinks", n: "Eau Plate",          en: "Still water",          p: 4.5, i: "photo-1559839734-2b71ea197ec2" },
+    { c: "cold_drinks", n: "Soda (Coca/Boga/Fanta)", en: "Soda",            p: 4.5, i: "photo-1554866585-cd94860890b7" },
+    { c: "cold_drinks", n: "Eau Gazéifiée",      en: "Sparkling water",      p: 4.9, i: "photo-1559839734-2b71ea197ec2" },
+    { c: "cold_drinks", n: "Schweppes",          en: "Schweppes",            p: 5.5, i: "photo-1554866585-cd94860890b7" },
+    { c: "cold_drinks", n: "Shark",              en: "Energy drink",         p: 12,  i: "photo-1622543925917-763c34d1a86e" },
+    { c: "cold_drinks", n: "Dose Menthe",         en: "Mint shot",            p: 3,   i: "photo-1602938616030-fdee47ae8aaa" },
+    { c: "cold_drinks", n: "Dose Grenadine",      en: "Grenadine shot",       p: 3,   i: "photo-1602938616030-fdee47ae8aaa" },
+
+    // Les Jus
+    { c: "juices", n: "Jus d'Orange",         en: "Orange juice",                p: 7.5,  i: "photo-1613478223719-2ab802602423", b: "Populaire" },
+    { c: "juices", n: "Citronnade",            en: "Lemonade",                    p: 8,    i: "photo-1513558161293-cdaf765ed2fd" },
+    { c: "juices", n: "Jus de Fraise",         en: "Strawberry juice",            p: 9,    i: "photo-1546173159-315724a31696" },
+    { c: "juices", n: "Jus de Pomme",          en: "Apple juice",                 p: 9,    i: "photo-1622597467836-f3285f2131b8" },
+    { c: "juices", n: "Jus d'Ananas",          en: "Pineapple juice",             p: 9.5,  i: "photo-1546173159-315724a31696" },
+    { c: "juices", n: "Jus de Banane",         en: "Banana juice",                p: 9.5,  i: "photo-1622597467836-f3285f2131b8" },
+    { c: "juices", n: "Jus Orange Banane",     en: "Orange and banana juice",     p: 12,   i: "photo-1613478223719-2ab802602423" },
+    { c: "juices", n: "Jus de Fraise Banane",  en: "Strawberry and banana juice", p: 12.5, i: "photo-1546173159-315724a31696" },
+    { c: "juices", n: "Jus de Fruits",          en: "Fruits juice",                p: 15,   i: "photo-1546173159-315724a31696", b: "Signature" },
+
+    // Les Cafés
+    { c: "coffees", n: "Express",        en: "Espresso",       p: 4,   i: "photo-1510591509098-f4fdc6d0ff04" },
+    { c: "coffees", n: "Capucin",         en: "Capuchin coffee", p: 4.5, i: "photo-1572442388796-11668a67e53d" },
+    { c: "coffees", n: "Américain",       en: "Americano",       p: 5,   i: "photo-1495474472287-4d71bcdd2085" },
+    { c: "coffees", n: "Café Direct",     en: "Milk coffee",     p: 5.5, i: "photo-1541167760496-1628856ab772" },
+    { c: "coffees", n: "Cappuccino",       en: "Cappuccino",      p: 7.5, i: "photo-1572442388796-11668a67e53d", b: "Populaire" },
+    { c: "coffees", n: "Café Glacé",       en: "Iced coffee",     p: 9.5, i: "photo-1517701550927-30cf4ba1dba5" },
+
+    // Les Thés
+    { c: "teas", n: "Thé à la Menthe",  en: "Fresh mint tea",   p: 4,   i: "photo-1576092768241-dec231879fc3", b: "Populaire" },
+    { c: "teas", n: "Infusion",          en: "Tea infusion",     p: 4.5, i: "photo-1576092768241-dec231879fc3" },
+    { c: "teas", n: "Verveine",          en: "Verbena",          p: 4.9, i: "photo-1576092768241-dec231879fc3" },
+    { c: "teas", n: "Thé aux Amandes",   en: "Almond tea",       p: 9,   i: "photo-1576092768241-dec231879fc3" },
+    { c: "teas", n: "Thé aux Pignons",   en: "Tea with pine nuts", p: 11, i: "photo-1576092768241-dec231879fc3", b: "Signature" },
+
+    // Petit Déjeuner
+    { c: "breakfast", n: "Petit Déjeuner à la Française", en: "French breakfast (coffee, cake, juice)",                                    p: 15, i: "photo-1496048970039-6a4c36bd0d2b" },
+    { c: "breakfast", n: "Petit Déjeuner Cheese Steak",   en: "Cheese steak breakfast (coffee, cake, juice, omelette, butter, chocolate, half water)", p: 27, i: "photo-1533089860892-a7c6f0a88666", b: "Signature" },
+
+    // Cocktails sans Alcool
+    { c: "mocktails", n: "Cocktail Caraïbes",  en: "Caribbean cocktail (pineapple juice, grenadine)",                            p: 14,   i: "photo-1551024709-8f23befc6f87" },
+    { c: "mocktails", n: "Blue Sky",            en: "Blue Sky (blue curacao, orange, pineapple, coconut + sprite)",                p: 14.5, i: "photo-1582106245687-cbb466a9f07f" },
+    { c: "mocktails", n: "Cocktail Bella Luna", en: "Bella Luna cocktail (orange, pineapple, lime juice)",                        p: 15.5, i: "photo-1551024709-8f23befc6f87" },
+    { c: "mocktails", n: "Lemon Mint",          en: "Lemon Mint (lemon juice, mint syrup, fresh mint leaves)",                    p: 15.5, i: "photo-1513558161293-cdaf765ed2fd", b: "Populaire" },
+    { c: "mocktails", n: "Mojito sans Alcool",  en: "Non-alcoholic Mojito (fresh mint, lime, sparkling water, lemon slice)",       p: 16,   i: "photo-1551538827-9c037cb4f32a", b: "Populaire" },
+    { c: "mocktails", n: "Piña Colada",         en: "Piña Colada (pineapple juice, coconut cream)",                                p: 19,   i: "photo-1502740479091-635887520276", b: "Signature" },
+
+    // Cocktails avec Alcool
+    { c: "cocktails", n: "Gin Fizz",         en: "Gin Fizz (gin, lemon juice, sugar syrup, sparkling water)",            p: 22, i: "photo-1551024709-8f23befc6f87" },
+    { c: "cocktails", n: "Sex on the Beach", en: "Sex on the Beach (vodka, peach cream, orange juice, grenadine)",        p: 24, i: "photo-1571950006418-f226dc106482", b: "Populaire" },
+    { c: "cocktails", n: "Mojito",            en: "Mojito (rum, fresh mint, lime, sugar, sparkling water)",                p: 25, i: "photo-1551538827-9c037cb4f32a", b: "Populaire" },
+    { c: "cocktails", n: "Piña Colada",       en: "Piña Colada (rum, pineapple juice, coconut cream)",                     p: 28, i: "photo-1502740479091-635887520276", b: "Signature" },
+
+    // Milkshakes
+    { c: "milkshakes", n: "Milkshake Vanille",   en: "Milkshake vanilla",     p: 12.5, i: "photo-1572490122747-3968b75cc699" },
+    { c: "milkshakes", n: "Milkshake Fraise",     en: "Milkshake strawberry",  p: 12.5, i: "photo-1572490122747-3968b75cc699", b: "Populaire" },
+    { c: "milkshakes", n: "Milkshake Banane",     en: "Milkshake banana",      p: 12.5, i: "photo-1572490122747-3968b75cc699" },
+    { c: "milkshakes", n: "Milkshake Pistache",   en: "Milkshake pistachio",   p: 12.5, i: "photo-1572490122747-3968b75cc699" },
+    { c: "milkshakes", n: "Milkshake Chocolat",   en: "Milkshake chocolate",   p: 12.5, i: "photo-1572490122747-3968b75cc699" },
+
+    // Smoothies
+    { c: "smoothies", n: "Pêche",  en: "Peach (peach, orange juice, vanilla scoop)",   p: 15, i: "photo-1553530666-ba11a7da3888" },
+    { c: "smoothies", n: "Melon",  en: "Melon (melon, vanilla scoop)",                  p: 15, i: "photo-1553530666-ba11a7da3888" },
+    { c: "smoothies", n: "Pomme",  en: "Apple (apple juice, vanilla scoop)",            p: 15, i: "photo-1553530666-ba11a7da3888" },
+    { c: "smoothies", n: "Citron", en: "Lemon (lemonade, vanilla scoop)",                p: 15, i: "photo-1553530666-ba11a7da3888" },
+
+    // Desserts Glacés
+    { c: "ice_desserts", n: "Sorbet au Citron",         en: "Lemon sorbet",            p: 7,    i: "photo-1488900128323-21503983a07e" },
+    { c: "ice_desserts", n: "Coupe Glace Sicilienne",    en: "Sicilian ice cream cup",  p: 9,    i: "photo-1488900128323-21503983a07e" },
+    { c: "ice_desserts", n: "Chocolat Liégeois",          en: "Liège chocolate",         p: 11.5, i: "photo-1497034825429-c343d7c6a68f" },
+    { c: "ice_desserts", n: "Café Liégeois",              en: "Liège coffee",            p: 12,   i: "photo-1594911774802-8822a707cbb3" },
+    { c: "ice_desserts", n: "Coupe Glace Pepito",         en: "Pepito ice cream cup",    p: 15,   i: "photo-1497034825429-c343d7c6a68f" },
+    { c: "ice_desserts", n: "Coupe Glace Banana Split",   en: "Banana split ice cream cup", p: 17, i: "photo-1497034825429-c343d7c6a68f", b: "Populaire" },
+    { c: "ice_desserts", n: "Assortiment de Glaces Maison", en: "Selection of homemade ice cream", p: 21, i: "photo-1497034825429-c343d7c6a68f", b: "Signature" },
+
+    // Les Desserts
+    { c: "desserts", n: "Fondant au Chocolat",        en: "Chocolate fondant",                  p: 12, i: "photo-1606313564200-e75d5e30476c", b: "Populaire" },
+    { c: "desserts", n: "Mini Assiette de Fruits",     en: "Mini seasonal fruit plate",          p: 18, i: "photo-1490474418585-ba9bad8fd0ea" },
+    { c: "desserts", n: "Plat de Fruits Royale",       en: "Royal fruit platter",                p: 34, i: "photo-1490474418585-ba9bad8fd0ea", b: "Royal" },
+    { c: "desserts", n: "Chicha au Choix + Thé Menthe", en: "Hookah of your choice + fresh mint tea", p: 28, i: "photo-1601493700750-58b6c4b6b6f3", b: "Ambiance" },
+
+    // Liqueurs
+    { c: "liqueurs", n: "J&B",            en: "Whisky J&B",          p: 23,   i: "photo-1527281400683-1aae777175f8" },
+    { c: "liqueurs", n: "J.Walker Red",    en: "Whisky JW Red",       p: 24,   i: "photo-1527281400683-1aae777175f8" },
+    { c: "liqueurs", n: "Baileys",         en: "Baileys",             p: 25,   i: "photo-1527281400683-1aae777175f8" },
+    { c: "liqueurs", n: "Jack Daniel",     en: "Jack Daniel's",       p: 28,   i: "photo-1527281400683-1aae777175f8" },
+    { c: "liqueurs", n: "J.Walker Black",  en: "Whisky JW Black",     p: 31,   i: "photo-1527281400683-1aae777175f8" },
+    { c: "liqueurs", n: "Chivas Régal",    en: "Chivas Regal",        p: 32,   i: "photo-1527281400683-1aae777175f8", b: "Signature" },
+    { c: "liqueurs", n: "Anisette",        en: "Anisette",            p: 12,   i: "photo-1527281400683-1aae777175f8" },
+    { c: "liqueurs", n: "Pastis",          en: "Pastis",              p: 15,   i: "photo-1527281400683-1aae777175f8" },
+    { c: "liqueurs", n: "Capris",          en: "Capris",              p: 15,   i: "photo-1527281400683-1aae777175f8" },
+    { c: "liqueurs", n: "Ricard",          en: "Ricard",              p: 15,   i: "photo-1527281400683-1aae777175f8" },
+    { c: "liqueurs", n: "Martini Blanc",   en: "Martini Bianco",      p: 16,   i: "photo-1527281400683-1aae777175f8" },
+    { c: "liqueurs", n: "Martini Rouge",   en: "Martini Rosso",       p: 16,   i: "photo-1527281400683-1aae777175f8" },
+    { c: "liqueurs", n: "Cognac",          en: "Cognac",              p: 16,   i: "photo-1527281400683-1aae777175f8" },
+    { c: "liqueurs", n: "Get 27",           en: "Get 27",              p: 17,   i: "photo-1527281400683-1aae777175f8" },
+    { c: "liqueurs", n: "Malibu",           en: "Malibu",              p: 18,   i: "photo-1527281400683-1aae777175f8" },
+    { c: "liqueurs", n: "Boukhas",          en: "Boukha",              p: 15.5, i: "photo-1527281400683-1aae777175f8" },
+    { c: "liqueurs", n: "Thibarine",        en: "Thibarine",           p: 16,   i: "photo-1527281400683-1aae777175f8" },
+    { c: "liqueurs", n: "Rhum Rouge",       en: "Red rum",             p: 18,   i: "photo-1527281400683-1aae777175f8" },
+    { c: "liqueurs", n: "Rhum Blanc",       en: "White rum",           p: 18,   i: "photo-1527281400683-1aae777175f8" },
+    { c: "liqueurs", n: "Gin Mayfer",       en: "Gin Mayfer",          p: 18.5, i: "photo-1527281400683-1aae777175f8" },
+    { c: "liqueurs", n: "Gin Gordon",       en: "Gin Gordon's",        p: 19.5, i: "photo-1527281400683-1aae777175f8" },
+    { c: "liqueurs", n: "Smirnoff Red",     en: "Vodka Smirnoff Red",  p: 21,   i: "photo-1527281400683-1aae777175f8" },
+    { c: "liqueurs", n: "Vodka Orloff",     en: "Vodka Orloff",        p: 21,   i: "photo-1527281400683-1aae777175f8" },
+    { c: "liqueurs", n: "Vodka Absolut",    en: "Vodka Absolut",       p: 24,   i: "photo-1527281400683-1aae777175f8", b: "Populaire" },
+    { c: "liqueurs", n: "Vodka Reservi",     en: "Vodka Reservi",       p: 24,   i: "photo-1527281400683-1aae777175f8" },
+
+    // Bières
+    { c: "beers", n: "Celtia (bouteille)",   en: "Celtia bottle",       p: 7.5,  i: "photo-1535958636474-b021ee887b13" },
+    { c: "beers", n: "Amstel",                en: "Amstel",              p: 7.5,  i: "photo-1535958636474-b021ee887b13" },
+    { c: "beers", n: "Heineken",              en: "Heineken",            p: 8.5,  i: "photo-1535958636474-b021ee887b13", b: "Populaire" },
+    { c: "beers", n: "Beck's",                en: "Beck's",              p: 8.5,  i: "photo-1535958636474-b021ee887b13" },
+    { c: "beers", n: "Celtia 33cl (pression)", en: "Celtia 33cl draft", p: 7.5,  i: "photo-1535958636474-b021ee887b13" },
+    { c: "beers", n: "Celtia 50cl (pression)", en: "Celtia 50cl draft", p: 11,   i: "photo-1535958636474-b021ee887b13" },
+    { c: "beers", n: "Heineken 33cl (pression)", en: "Heineken 33cl draft", p: 8.5, i: "photo-1535958636474-b021ee887b13" },
+    { c: "beers", n: "Heineken 50cl (pression)", en: "Heineken 50cl draft", p: 12.5, i: "photo-1535958636474-b021ee887b13" },
+
+    // Les Vins
+    { c: "wines", n: "Ugni Blanc (75cl)",                 en: "Ugni Blanc",                  p: 33, i: "photo-1510812431401-41d2bd2722f3" },
+    { c: "wines", n: "Château Rosé/Rouge (75cl)",          en: "Château Rosé / Red",          p: 39, i: "photo-1510812431401-41d2bd2722f3" },
+    { c: "wines", n: "Vin Gris (75cl)",                    en: "Gris wine",                   p: 42, i: "photo-1510812431401-41d2bd2722f3" },
+    { c: "wines", n: "Magon Rouge/Rosé/Blanc (75cl)",      en: "Magon Red / Rosé / White",    p: 47, i: "photo-1510812431401-41d2bd2722f3" },
+    { c: "wines", n: "Désir Rouge/Rosé/Blanc (75cl)",      en: "Désir Red / Rosé / White",    p: 61, i: "photo-1510812431401-41d2bd2722f3" },
+    { c: "wines", n: "Chardonnay (75cl)",                  en: "Chardonnay",                   p: 61, i: "photo-1510812431401-41d2bd2722f3" },
+    { c: "wines", n: "Selian Rouge/Rosé/Blanc (75cl)",     en: "Selian Red / Rosé / White",   p: 63, i: "photo-1510812431401-41d2bd2722f3" },
+    { c: "wines", n: "Magnifique Rouge/Rosé/Blanc (75cl)", en: "Magnifique Red / Rosé / White", p: 65, i: "photo-1510812431401-41d2bd2722f3", b: "Signature" },
+    { c: "wines", n: "Jour et Nuit Rouge/Rosé/Blanc (75cl)", en: "Jour et Nuit", p: 65, i: "photo-1510812431401-41d2bd2722f3" },
+    { c: "wines", n: "Vieux Magon (75cl)",                 en: "Vieux Magon",                 p: 69, i: "photo-1510812431401-41d2bd2722f3", b: "Royal" },
+  ];
+
+  let csSort = 0;
+  for (const item of csProductData) {
+    csSort += 1;
+    await products.findOneAndUpdate(
+      { restaurantId: csRestaurantId, name: item.n },
+      {
+        $set: {
+          restaurantId: csRestaurantId,
+          categoryId: csCategoryIds[item.c],
+          name: item.n,
+          nameEn: item.en,
+          description: item.en,
+          price: item.p,
+          image: item.i ? img(item.i) : "",
+          badge: item.b || "",
+          isAvailable: true,
+          isFeatured: item.b === "Populaire" || item.b === "Signature",
+          sortOrder: csSort,
+          updatedAt: now,
+        },
+        $setOnInsert: { createdAt: now },
+      },
+      { upsert: true }
+    );
+  }
+
+  await qrcodes.findOneAndUpdate(
+    { restaurantId: csRestaurantId },
+    {
+      $set: {
+        restaurantId: csRestaurantId,
+        targetUrl: "http://localhost:3000/menu/cheese-steak",
+        qrImageUrl: "",
+        updatedAt: now,
+      },
+      $setOnInsert: { createdAt: now },
+    },
+    { upsert: true }
+  );
+
   console.log("\nSeed completed successfully.");
   console.log("Super Admin:");
   console.log(`  Email: ${superAdminEmail}`);
@@ -764,9 +1147,13 @@ async function run() {
   console.log("\nRestaurant Admin (Coffee Elgrotte):");
   console.log(`  Email: ${coffeAdminEmail}`);
   console.log(`  Password: ${coffeAdminPassword}`);
+  console.log("\nRestaurant Admin (Cheese Steak - Yasmine Hammamet):");
+  console.log(`  Email: ${csAdminEmail}`);
+  console.log(`  Password: ${csAdminPassword}`);
   console.log("\nDemo public menus:");
   console.log("  http://localhost:3000/menu/elgrotte");
-  console.log("  http://localhost:3000/menu/coffee-elgrotte\n");
+  console.log("  http://localhost:3000/menu/coffee-elgrotte");
+  console.log("  http://localhost:3000/menu/cheese-steak\n");
 
   await mongoose.disconnect();
 }

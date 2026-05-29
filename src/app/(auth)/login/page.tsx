@@ -33,7 +33,7 @@ export default function LoginPage() {
     const session = await sessionResponse.json();
 
     if (session?.user?.mustChangePassword) {
-      router.push("/dashboard/password");
+      router.push("/dashboard/settings");
       return;
     }
 
