@@ -3,7 +3,15 @@
     "allow": [
       "Bash(npx tsc *)",
       "Bash(git add *)",
-      "Bash(git commit -m ' *)"
+      "Bash(git commit -m ' *)",
+      "Bash(pdfinfo \"/c/Users/Ala/Desktop/QR/src/components/menu/menu final 2.pdf\")",
+      "Bash(pdftotext -layout \"src/components/menu/menu final 2.pdf\" menu_extract.txt)",
+      "Bash(python -c \"import fitz; print\\(fitz.__doc__\\)\")",
+      "Bash(mkdir -p /tmp/menupages)",
+      "Bash(python)",
+      "Bash(node *)",
+      "Bash(git push *)",
+      "mcp__ide__getDiagnostics"
     ]
   }
 }
