@@ -16,6 +16,7 @@ const RestaurantSchema = new Schema(
     primaryColor: { type: String, default: "#B08D57" },
     secondaryColor: { type: String, default: "#F5E6CC" },
     isActive: { type: Boolean, default: true },
+    showPrices: { type: Boolean, default: true },
   },
   { timestamps: true }
 );

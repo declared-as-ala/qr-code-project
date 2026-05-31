@@ -43,6 +43,7 @@ export default async function PublicMenuPage({ params }: { params: Promise<{ slu
         primaryColor: restaurant.primaryColor,
         instagram: restaurant.instagram,
         facebook: restaurant.facebook,
+        showPrices: restaurant.showPrices !== false,
       }}
       categories={categories.map((c) => ({ _id: String(c._id), name: c.name }))}
       products={products.map((p) => ({

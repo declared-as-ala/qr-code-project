@@ -51,10 +51,12 @@ export function PublicMenuClient({
     primaryColor?: string;
     instagram?: string;
     facebook?: string;
+    showPrices?: boolean;
   };
   categories: Category[];
   products: Product[];
 }) {
+  const showPrices = restaurant.showPrices !== false;
   const effectiveCategories = categories.length > 0 ? categories : FALLBACK_CATEGORIES;
   const [search, setSearch] = useState("");
   const [menuVisible, setMenuVisible] = useState(false);
@@ -490,6 +492,7 @@ export function PublicMenuClient({
                                     image={product.image}
                                     badge={product.badge}
                                     isAvailable={product.isAvailable}
+                                    showPrice={showPrices}
                                   />
                                 ))}
                               </div>
@@ -504,6 +507,7 @@ export function PublicMenuClient({
                                     image={product.image}
                                     badge={product.badge}
                                     isAvailable={product.isAvailable}
+                                    showPrice={showPrices}
                                   />
                                 ))}
                               </div>

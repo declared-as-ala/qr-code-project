@@ -1137,6 +1137,203 @@ async function run() {
     { upsert: true }
   );
 
+  // ── maliks-restolounge ──────────────────────────────────────────────────────
+  const maliksAdminEmail = "owner@maliks-restolounge.tn";
+  const maliksAdminPassword = "MaliksLounge@2026";
+  const maliksAdminHash = await bcrypt.hash(maliksAdminPassword, 12);
+
+  const maliksAdminResult = await users.findOneAndUpdate(
+    { email: maliksAdminEmail },
+    {
+      $set: {
+        name: "Malik's Resto Lounge Owner",
+        email: maliksAdminEmail,
+        passwordHash: maliksAdminHash,
+        role: "restaurant_admin",
+        mustChangePassword: false,
+        updatedAt: now,
+      },
+      $setOnInsert: { createdAt: now },
+    },
+    { upsert: true, returnDocument: "after" }
+  );
+
+  const maliksOwnerId = getUpdatedDoc(maliksAdminResult)?._id;
+  if (!maliksOwnerId) throw new Error("Failed to upsert maliks admin user.");
+
+  const maliksRestaurantResult = await restaurants.findOneAndUpdate(
+    { slug: "maliks-restolounge" },
+    {
+      $set: {
+        ownerId: maliksOwnerId,
+        name: "Malik's Resto Lounge",
+        slug: "maliks-restolounge",
+        establishmentType: "restaurant",
+        tagline: "Fine Food - Luxury Lounge - Magical Atmosphere",
+        description:
+          "Restaurant Lounge de luxe à la Marina de Yasmine Hammamet. Découvrez notre cuisine raffinée, nos fruits de mer frais, nos grillades d'exception et nos spécialités tunisiennes authentiques dans un cadre somptueux.",
+        email: "maliks.restolounge@gmail.com",
+        phone: "+216 55 312 915",
+        address: "La Marina, Yasmine Hammamet, Tunisie",
+        instagram: "https://www.instagram.com/maliks_restolounge",
+        facebook: "https://facebook.com/maliks.restolounge",
+        googleMapsUrl: "https://maps.google.com/?q=Malik's+Resto+Lounge+Marina+Yasmine+Hammamet",
+        logo: "/logos/maliks.jpg",
+        coverImage:
+          "https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&w=1800&q=90",
+        primaryColor: "#B08D57",
+        secondaryColor: "#0F0F10",
+        currency: "DT",
+        isActive: true,
+        showPrices: false,
+        updatedAt: now,
+      },
+      $setOnInsert: { createdAt: now },
+    },
+    { upsert: true, returnDocument: "after" }
+  );
+
+  const maliksRestaurantId = getUpdatedDoc(maliksRestaurantResult)?._id;
+  if (!maliksRestaurantId) throw new Error("Failed to upsert maliks restaurant.");
+
+  const maliksCategoryData = [
+    { key: "cold_starters", name: "Entrées Froides", sortOrder: 1 },
+    { key: "hot_starters", name: "Entrées Chaudes", sortOrder: 2 },
+    { key: "pasta", name: "Nos Plats", sortOrder: 3 },
+    { key: "poultry", name: "Volailles", sortOrder: 4 },
+    { key: "meats", name: "Viandes", sortOrder: 5 },
+    { key: "seafood", name: "Fruits de Mer", sortOrder: 6 },
+    { key: "tunisian", name: "Spécialités Tunisiennes", sortOrder: 7 },
+    { key: "desserts", name: "Desserts", sortOrder: 8 },
+  ];
+
+  const maliksCategoryIds = {};
+  for (const item of maliksCategoryData) {
+    const result = await categories.findOneAndUpdate(
+      { restaurantId: maliksRestaurantId, name: item.name },
+      {
+        $set: {
+          restaurantId: maliksRestaurantId,
+          name: item.name,
+          description: "",
+          isActive: true,
+          sortOrder: item.sortOrder,
+          updatedAt: now,
+        },
+        $setOnInsert: { createdAt: now },
+      },
+      { upsert: true, returnDocument: "after" }
+    );
+    maliksCategoryIds[item.key] = getUpdatedDoc(result)?._id;
+  }
+
+  const maliksProductData = [
+    // Entrées Froides
+    { c: "cold_starters", n: "Salade verte / Mechouia / Tunisienne", p: 16, i: "photo-1540420773420-3366772f4999", b: "Nouveau" },
+    { c: "cold_starters", n: "Salade Niçoise", p: 22, i: "photo-1546069901-ba9599a7e63c" },
+    { c: "cold_starters", n: "Salade César", p: 25, i: "photo-1550304943-4f24f54ddde9", b: "Populaire" },
+    { c: "cold_starters", n: "Salade de fruits de mer", p: 30, i: "photo-1565557623262-b51c2513a641" },
+    { c: "cold_starters", n: "Salade de poulpe", p: 45, i: "photo-1599084993091-1cb5c0721cc6" },
+
+    // Entrées Chaudes
+    { c: "hot_starters", n: "Brick au thon / Brick aux crevettes", p: 15, i: "photo-1608897013039-887f21d8c804", b: "Signature" },
+    { c: "hot_starters", n: "Ojja aux Merguez", p: 25, i: "photo-1590412200988-a436bb7050a7" },
+    { c: "hot_starters", n: "Friture de rouget", p: 24, i: "photo-1534604973900-c43ab4c2e0ab" },
+    { c: "hot_starters", n: "Moule à la marinière", p: 25, i: "photo-1534422298391-e4f8c172dddb" },
+    { c: "hot_starters", n: "Ojja aux fruits de mer", p: 30, i: "photo-1534080564583-6be75777b70a" },
+    { c: "hot_starters", n: "Clovisses à la marinière", p: 35, i: "photo-1553618551-fba689030290" },
+
+    // Nos Plats
+    { c: "pasta", n: "Spaghetti tomate et basilic", p: 22, i: "photo-1546549032-9571cd6b27df" },
+    { c: "pasta", n: "Pâtes à la carbonara", p: 28, i: "photo-1612874742237-6526221588e3" },
+    { c: "pasta", n: "Pâtes bolognaise", p: 32, i: "photo-1563379091339-03b21ab4a4f8" },
+    { c: "pasta", n: "Pâtes émincé de poulet", p: 40, i: "photo-1608897013039-887f21d8c804" },
+    { c: "pasta", n: "Pâtes aux fruits de mer", p: 45, i: "photo-1563379971899-660589a01cf3" },
+    { c: "pasta", n: "Paella royale aux fruits de mer", p: 48, i: "photo-1534080564583-6be75777b70a", b: "Populaire" },
+
+    // Volailles
+    { c: "poultry", n: "Escalope grillée", p: 25, i: "photo-1604503468506-a8da13d82791" },
+    { c: "poultry", n: "Escalope Panée", p: 28, i: "photo-1594834749740-74b3f6764be4" },
+    { c: "poultry", n: "Escalope sauce champignons", p: 32, i: "photo-1603360946369-dc9bb6258143" },
+
+    // Viandes
+    { c: "meats", n: "Côte à l'os", p: 48, i: "photo-1544025162-d76694265947", b: "Populaire" },
+    { c: "meats", n: "Grillade mixte", p: 50, i: "photo-1555939594-58d7cb561ad1" },
+    { c: "meats", n: "Filet de boeuf grillé", p: 65, i: "photo-1546964124-0cce460f38ef" },
+    { c: "meats", n: "Filet de boeuf sauce champignons", p: 65, i: "photo-1600891964599-f61ba0e24092" },
+    { c: "meats", n: "Filet de boeuf au poivre", p: 65, i: "photo-1558030006-450675393462" },
+    { c: "meats", n: "Filet de boeuf sauce roquefort", p: 65, i: "photo-1544025162-d76694265947" },
+    { c: "meats", n: "Merguez grillées", p: 25, i: "photo-1580959375944-abd7e990f585" },
+    { c: "meats", n: "Osso buco", p: 58, i: "photo-1608248597279-f99d160bfcbc", b: "Signature" },
+    { c: "meats", n: "Souris d'agneau", p: 60, i: "photo-1602881917760-7379db593981" },
+
+    // Fruits de Mer
+    { c: "seafood", n: "Loup / Daurade grillé", p: 40, i: "photo-1519708227418-c8fd9a32b7a2" },
+    { c: "seafood", n: "Poissons du jour (100g)", p: 16, i: "photo-1534604973900-c43ab4c2e0ab" },
+    { c: "seafood", n: "Seiche grillée", p: 40, i: "photo-1599084993091-1cb5c0721cc6" },
+    { c: "seafood", n: "Crevettes royales grillées (100g)", p: 27, i: "photo-1565557623262-b51c2513a641", b: "Populaire" },
+    { c: "seafood", n: "Chevrette sautée / panée", p: 42, i: "photo-1559737607-966b52f372c3" },
+    { c: "seafood", n: "Calamars grillés", p: 45, i: "photo-1599084993091-1cb5c0721cc6" },
+    { c: "seafood", n: "Poulpe grillé", p: 47, i: "photo-1565557623262-b51c2513a641", b: "Signature" },
+    { c: "seafood", n: "Plateau fruits de mer (2 pax)", p: 170, i: "photo-1540189549336-e6e99c3679fe" },
+    { c: "seafood", n: "Plateau fruits de mer (4 pax)", p: 270, i: "photo-1534080564583-6be75777b70a" },
+
+    // Spécialités Tunisiennes
+    { c: "tunisian", n: "Fell à l'agneau", p: 50, i: "photo-1568901346375-23c9450c58cd", b: "Nouveau" },
+    { c: "tunisian", n: "Koucha d'agneau", p: 55, i: "photo-1602881917760-7379db593981", b: "Populaire" },
+    { c: "tunisian", n: "Mloukhia traditionnelle", p: 40, i: "photo-1541832676-9b763b0239ab" },
+    { c: "tunisian", n: "Madfouna", p: 38, i: "photo-1574484284002-952d92456975" },
+    { c: "tunisian", n: "Couscous à l'agneau", p: 55, i: "photo-1541832676-9b763b0239ab" },
+    { c: "tunisian", n: "Couscous au poisson", p: 50, i: "photo-1540189549336-e6e99c3679fe", b: "Signature" },
+    { c: "tunisian", n: "Bnadek (Boulettes de viande)", p: 45, i: "photo-1529042410759-befb1204b468" },
+
+    // Desserts
+    { c: "desserts", n: "Coupe de glace", p: 12, i: "photo-1501443721117-39d6e87f1854" },
+    { c: "desserts", n: "Fondant au chocolat", p: 15, i: "photo-1606313564200-e75d5e30476c", b: "Populaire" },
+    { c: "desserts", n: "Fruits de saison", p: 15, i: "photo-1498837167922-ddd27525d352" },
+    { c: "desserts", n: "Plateau de fruits de saison", p: 28, i: "photo-1519996529931-28324d5a630e" },
+  ];
+
+  let maliksSort = 0;
+  for (const item of maliksProductData) {
+    maliksSort += 1;
+    await products.findOneAndUpdate(
+      { restaurantId: maliksRestaurantId, name: item.n },
+      {
+        $set: {
+          restaurantId: maliksRestaurantId,
+          categoryId: maliksCategoryIds[item.c],
+          name: item.n,
+          nameEn: item.n,
+          description: item.n,
+          price: item.p,
+          image: item.i ? img(item.i) : "",
+          badge: item.b || "",
+          isAvailable: true,
+          isFeatured: item.b === "Populaire" || item.b === "Signature",
+          sortOrder: maliksSort,
+          updatedAt: now,
+        },
+        $setOnInsert: { createdAt: now },
+      },
+      { upsert: true }
+    );
+  }
+
+  await qrcodes.findOneAndUpdate(
+    { restaurantId: maliksRestaurantId },
+    {
+      $set: {
+        restaurantId: maliksRestaurantId,
+        targetUrl: "http://localhost:3000/menu/maliks-restolounge",
+        qrImageUrl: "",
+        updatedAt: now,
+      },
+      $setOnInsert: { createdAt: now },
+    },
+    { upsert: true }
+  );
+
   console.log("\nSeed completed successfully.");
   console.log("Super Admin:");
   console.log(`  Email: ${superAdminEmail}`);
@@ -1150,10 +1347,14 @@ async function run() {
   console.log("\nRestaurant Admin (Cheese Steak - Yasmine Hammamet):");
   console.log(`  Email: ${csAdminEmail}`);
   console.log(`  Password: ${csAdminPassword}`);
+  console.log("\nRestaurant Admin (Malik's Resto Lounge - Yasmine Hammamet):");
+  console.log(`  Email: ${maliksAdminEmail}`);
+  console.log(`  Password: ${maliksAdminPassword}`);
   console.log("\nDemo public menus:");
   console.log("  http://localhost:3000/menu/elgrotte");
   console.log("  http://localhost:3000/menu/coffee-elgrotte");
-  console.log("  http://localhost:3000/menu/cheese-steak\n");
+  console.log("  http://localhost:3000/menu/cheese-steak");
+  console.log("  http://localhost:3000/menu/maliks-restolounge\n");
 
   await mongoose.disconnect();
 }

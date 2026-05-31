@@ -21,6 +21,7 @@ function MenuProductCardBase({
   image,
   badge,
   isAvailable,
+  showPrice = true,
 }: {
   name: string;
   description?: string;
@@ -28,6 +29,7 @@ function MenuProductCardBase({
   image?: string;
   badge?: string;
   isAvailable: boolean;
+  showPrice?: boolean;
 }) {
   const badgeKey = resolvesBadge(badge);
   const hasDescription = !!description?.trim();
@@ -72,16 +74,18 @@ function MenuProductCardBase({
           </div>
         )}
 
-        <span
-          className="absolute bottom-1.5 left-1.5 rounded-md px-2 py-0.5 text-[11px] font-black tabular-nums"
-          style={{
-            background: "rgba(3, 3, 3, 0.78)",
-            border: "1px solid rgba(255, 255, 255, 0.10)",
-            color: "#efc360",
-          }}
-        >
-          {price}
-        </span>
+        {showPrice && (
+          <span
+            className="absolute bottom-1.5 left-1.5 rounded-md px-2 py-0.5 text-[11px] font-black tabular-nums"
+            style={{
+              background: "rgba(3, 3, 3, 0.78)",
+              border: "1px solid rgba(255, 255, 255, 0.10)",
+              color: "#efc360",
+            }}
+          >
+            {price}
+          </span>
+        )}
 
         {!isAvailable && (
           <div className="absolute inset-0 flex items-center justify-center bg-[#09090b]/65 backdrop-blur-[3px]">

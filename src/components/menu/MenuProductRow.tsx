@@ -21,6 +21,7 @@ function MenuProductRowBase({
   image,
   badge,
   isAvailable,
+  showPrice = true,
 }: {
   name: string;
   description?: string;
@@ -28,6 +29,7 @@ function MenuProductRowBase({
   image?: string;
   badge?: string;
   isAvailable: boolean;
+  showPrice?: boolean;
 }) {
   const badgeKey = resolvesBadge(badge);
   const hasDescription = !!description?.trim();
@@ -81,16 +83,18 @@ function MenuProductRowBase({
       </div>
 
       {/* Price */}
-      <div
-        className="shrink-0 rounded-md px-2 py-1 text-[12.5px] font-black tabular-nums"
-        style={{
-          background: "rgba(212, 165, 55, 0.08)",
-          color: "#efc360",
-          border: "1px solid rgba(212, 165, 55, 0.18)",
-        }}
-      >
-        {price}
-      </div>
+      {showPrice && (
+        <div
+          className="shrink-0 rounded-md px-2 py-1 text-[12.5px] font-black tabular-nums"
+          style={{
+            background: "rgba(212, 165, 55, 0.08)",
+            color: "#efc360",
+            border: "1px solid rgba(212, 165, 55, 0.18)",
+          }}
+        >
+          {price}
+        </div>
+      )}
     </article>
   );
 }
