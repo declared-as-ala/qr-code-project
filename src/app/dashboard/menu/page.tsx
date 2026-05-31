@@ -90,6 +90,48 @@ export default function MenuManagerPage() {
     product?: Product;
   }>({ open: false });
 
+  // Cover image states
+  const [coverImage, setCoverImage] = useState<string | undefined>();
+  const [uploadingCover, setUploadingCover] = useState(false);
+  const coverFileRef = useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    fetch("/api/restaurants/me")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data?.coverImage) setCoverImage(data.coverImage);
+      })
+      .catch(() => {});
+  }, []);
+
+  async function handleUploadCover(file: File) {
+    setUploadingCover(true);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const res = await fetch("/api/uploads/image", { method: "POST", body: fd });
+      if (!res.ok) throw new Error();
+      const { url } = (await res.json()) as { url: string };
+      
+      const patchRes = await fetch("/api/restaurants/me", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ coverImage: url }),
+      });
+      
+      if (patchRes.ok) {
+        setCoverImage(url);
+        toast.success("Image de couverture mise à jour");
+      } else {
+        throw new Error();
+      }
+    } catch {
+      toast.error("Échec de l'upload de la couverture");
+    } finally {
+      setUploadingCover(false);
+    }
+  }
+
   // ── Data loading ───────────────────────────────────────────────────
   async function loadAll() {
     const [cRes, pRes] = await Promise.all([
@@ -254,6 +296,74 @@ export default function MenuManagerPage() {
           <span className="hidden sm:inline">Ajouter</span>
           <span className="sm:hidden">+</span>
         </Button>
+      </div>
+
+      {/* ── Cover image quick banner ───────────────────────────────────── */}
+      <div 
+        className="relative h-44 sm:h-52 w-full rounded-2xl overflow-hidden border border-white/5 bg-zinc-950/60 mb-6 flex flex-col justify-end p-6 group"
+        style={{
+          boxShadow: "0 8px 32px 0 rgba(0,0,0,0.37)"
+        }}
+      >
+        {coverImage ? (
+          <Image 
+            src={coverImage} 
+            alt="Restaurant Cover" 
+            fill 
+            className="object-cover transition-transform duration-700 group-hover:scale-105"
+            unoptimized
+          />
+        ) : (
+          <div className="absolute inset-0 bg-gradient-to-br from-zinc-800 to-zinc-950" />
+        )}
+        
+        {/* Dark radial glow overlays */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent z-10" />
+        
+        {/* Floating change button */}
+        <button
+          type="button"
+          disabled={uploadingCover}
+          onClick={() => coverFileRef.current?.click()}
+          className="absolute right-4 top-4 z-25 flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-semibold bg-black/75 hover:bg-primary text-white border border-white/10 hover:border-primary hover:text-primary-foreground shadow-lg backdrop-blur-md transition-all duration-300 active:scale-[0.97]"
+        >
+          {uploadingCover ? (
+            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+          ) : (
+            <ImagePlus className="h-3.5 w-3.5" />
+          )}
+          <span>{uploadingCover ? "Upload…" : "Changer la couverture"}</span>
+        </button>
+        
+        {/* Banner Title Info */}
+        <div className="relative z-20 flex items-center gap-3">
+          <div className="h-10 w-10 rounded-xl overflow-hidden shrink-0 border border-white/10 bg-zinc-950 shadow-md">
+            <div className="h-full w-full flex items-center justify-center bg-gradient-gold text-black font-extrabold text-[11px] tracking-tight">
+              COVER
+            </div>
+          </div>
+          <div className="flex flex-col">
+            <h2 className="text-sm font-bold text-white tracking-wide" style={{ textShadow: "0 2px 4px rgba(0,0,0,0.5)" }}>
+              Photo de couverture
+            </h2>
+            <p className="text-[11px] text-zinc-300 font-medium" style={{ textShadow: "0 1px 2px rgba(0,0,0,0.5)" }}>
+              Affichée en grand format sur l'écran d'accueil de votre menu public
+            </p>
+          </div>
+        </div>
+        
+        {/* Hidden File Input */}
+        <input
+          ref={coverFileRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={(e) => {
+            const f = e.target.files?.[0];
+            if (f) handleUploadCover(f);
+            e.target.value = "";
+          }}
+        />
       </div>
 
       {/* ── Mobile category scroll (hidden on lg+) ─────────────────────── */}
