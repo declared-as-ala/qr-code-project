@@ -1286,6 +1286,7 @@ async function run() {
     { c: "tunisian", n: "Couscous à l'agneau", p: 55, i: "photo-1541832676-9b763b0239ab" },
     { c: "tunisian", n: "Couscous au poisson", p: 50, i: "photo-1540189549336-e6e99c3679fe", b: "Signature" },
     { c: "tunisian", n: "Bnadek (Boulettes de viande)", p: 45, i: "photo-1529042410759-befb1204b468" },
+    { c: "tunisian", n: "Golla d'agneau", p: 58, i: "photo-1608248597279-f99d160bfcbc", b: "Signature" },
 
     // Desserts
     { c: "desserts", n: "Coupe de glace", p: 12, i: "photo-1501443721117-39d6e87f1854" },
