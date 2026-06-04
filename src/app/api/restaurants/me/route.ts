@@ -20,7 +20,7 @@ export async function PATCH(req: Request) {
     await connectDb();
     const user = await requireUser();
     const restaurant = await Restaurant.findOne({ ownerId: user.id });
-    const body = restaurantSchema.parse(await req.json());
+    const body = restaurantSchema.partial().parse(await req.json());
 
     const result = restaurant
       ? await Restaurant.findByIdAndUpdate(restaurant._id, body, { new: true })
