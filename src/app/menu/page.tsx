@@ -3,6 +3,8 @@ import { Restaurant } from "@/models/Restaurant";
 import { RestaurantDirectoryClient } from "@/components/menu/restaurant-directory-client";
 import type { Metadata } from "next";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Nos Établissements Partenaires | ClickMenu",
   description: "Explorez et accédez aux cartes et menus digitaux des meilleurs cafés, restaurants et fast-foods en Tunisie.",
