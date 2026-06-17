@@ -52,6 +52,7 @@ export function PublicMenuClient({
     instagram?: string;
     facebook?: string;
     showPrices?: boolean;
+    logoBg?: string;
   };
   categories: Category[];
   products: Product[];
@@ -206,6 +207,7 @@ export function PublicMenuClient({
                 subtitle="Cafe & Restaurant"
                 coverImage={restaurant.coverImage}
                 logo={restaurant.logo}
+                logoBg={restaurant.logoBg}
                 onViewMenu={() => setMenuVisible(true)}
               />
             </motion.div>

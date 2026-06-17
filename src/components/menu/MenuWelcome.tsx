@@ -10,12 +10,14 @@ export function MenuWelcome({
   subtitle,
   coverImage,
   logo,
+  logoBg,
   onViewMenu,
 }: {
   restaurantName: string;
   subtitle: string;
   coverImage?: string;
   logo?: string;
+  logoBg?: string;
   onViewMenu: () => void;
 }) {
   return (
@@ -81,7 +83,7 @@ export function MenuWelcome({
             className="absolute inset-[-2px] rounded-[18px]"
             style={{ background: "var(--pm-accent-gradient)" }}
           />
-          <div className="relative flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl bg-[#09090b]">
+          <div className="relative flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl" style={{ background: logoBg || "#09090b" }}>
             {logo ? (
               <img src={logo} alt={restaurantName} className="h-full w-full object-cover" />
             ) : (

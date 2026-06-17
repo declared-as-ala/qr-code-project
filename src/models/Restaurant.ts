@@ -15,6 +15,7 @@ const RestaurantSchema = new Schema(
     googleMapsUrl: String,
     primaryColor: { type: String, default: "#B08D57" },
     secondaryColor: { type: String, default: "#F5E6CC" },
+    logoBg: String,
     isActive: { type: Boolean, default: true },
     showPrices: { type: Boolean, default: true },
   },
