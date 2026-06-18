@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
-import { Menu as MenuIcon, Settings, LogOut, UtensilsCrossed, ExternalLink } from "lucide-react";
+import { Menu as MenuIcon, Settings, LogOut, UtensilsCrossed, ExternalLink, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -23,7 +23,8 @@ type NavItem = {
 };
 
 const NAV: NavItem[] = [
-  { href: "/dashboard/menu", label: "Menu", icon: UtensilsCrossed },
+  { href: "/dashboard/menu",     label: "Menu",     icon: UtensilsCrossed },
+  { href: "/dashboard/stock",    label: "Stock",    icon: Package },
   { href: "/dashboard/settings", label: "Réglages", icon: Settings },
 ];
 
