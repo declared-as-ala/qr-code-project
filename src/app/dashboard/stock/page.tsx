@@ -303,32 +303,35 @@ function CommandeDialog({ open, onClose, items, onSaved }: {
     <Modal open={open} onClose={onClose} title="Passer une commande" width="max-w-2xl">
       <form onSubmit={submit} className="space-y-5">
 
-        {/* Search to add items */}
+        {/* Item list with search filter */}
         <div>
-          <label className={labelCls}>Rechercher un article à consommer</label>
-          <div className="relative">
+          <label className={labelCls}>Articles disponibles — cliquez pour ajouter</label>
+          <div className="relative mb-2">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-400" />
-            <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Farine, beurre, œufs…" className={`pl-9 ${inputCls}`} />
+            <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Filtrer les articles…" className={`pl-9 ${inputCls}`} />
+            {search && <button type="button" onClick={()=>setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-700"><X className="h-3.5 w-3.5"/></button>}
           </div>
-          {search && available.length > 0 && (
-            <div className="mt-1.5 border border-stone-200 rounded-xl overflow-hidden bg-white shadow-sm max-h-44 overflow-y-auto">
-              {available.slice(0,8).map(item=>(
-                <button key={item._id} type="button" onClick={()=>addItem(item)}
-                  className="w-full flex items-center justify-between px-4 py-2.5 text-sm hover:bg-amber-50 transition-colors border-b border-stone-50 last:border-0">
-                  <div className="text-left">
-                    <span className="font-medium text-stone-800">{item.name}</span>
-                    <span className="text-stone-400 text-[11px] ml-2">{item.category}</span>
-                  </div>
+          <div className="border border-stone-200 rounded-xl overflow-hidden bg-white max-h-48 overflow-y-auto">
+            {available.length === 0 ? (
+              <div className="flex items-center justify-center h-14 text-xs text-stone-400">
+                {search ? "Aucun article correspondant" : "Tous les articles sont déjà sélectionnés"}
+              </div>
+            ) : available.map(item=>(
+              <button key={item._id} type="button" onClick={()=>addItem(item)}
+                className="w-full flex items-center justify-between px-4 py-2.5 text-sm hover:bg-amber-50 transition-colors border-b border-stone-50 last:border-0 group">
+                <div className="text-left">
+                  <span className="font-medium text-stone-800 group-hover:text-amber-800">{item.name}</span>
+                  <span className="text-stone-400 text-[11px] ml-2">{item.category}</span>
+                </div>
+                <div className="flex items-center gap-2 shrink-0">
                   <span className={`text-xs font-semibold ${item.quantity===0?"text-red-400":"text-stone-400"}`}>
                     {fmtNum(item.quantity)} {item.unit}
                   </span>
-                </button>
-              ))}
-            </div>
-          )}
-          {search && available.length === 0 && (
-            <p className="text-xs text-stone-400 mt-1.5 px-1">Aucun article trouvé ou déjà ajouté</p>
-          )}
+                  <Plus className="h-3.5 w-3.5 text-stone-300 group-hover:text-amber-600 transition-colors"/>
+                </div>
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Selected items */}
