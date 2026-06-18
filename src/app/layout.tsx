@@ -25,6 +25,11 @@ export const metadata: Metadata = {
     "ClickMenu: build and manage premium digital QR menus for cafés and restaurants in minutes.",
   applicationName: "ClickMenu",
   appleWebApp: { capable: true, title: "ClickMenu", statusBarStyle: "black-translucent" },
+  icons: {
+    icon: "/logos/logo.png",
+    shortcut: "/logos/logo.png",
+    apple: "/logos/logo.png",
+  },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
