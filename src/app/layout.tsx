@@ -35,7 +35,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="fr" className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} ${playfair.variable}`}>
-      <body className="min-h-screen bg-zinc-950 text-zinc-100 antialiased">
+      <body className="min-h-screen bg-[#fafaf8] text-stone-900 antialiased">
         <AppProviders>{children}</AppProviders>
       </body>
     </html>
