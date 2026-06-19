@@ -102,10 +102,9 @@ export default function MenuManagerPage() {
   useEffect(() => { loadAll(); }, []);
 
   const filtered = useMemo(() => {
-    let list = products;
-    if (activeCat) list = list.filter(p => p.categoryId === activeCat);
-    if (search.trim()) { const q = search.toLowerCase(); list = list.filter(p => p.name.toLowerCase().includes(q)); }
-    return list;
+    const q = search.trim().toLowerCase();
+    if (q) return products.filter(p => p.name.toLowerCase().includes(q));
+    return activeCat ? products.filter(p => p.categoryId === activeCat) : products;
   }, [products, activeCat, search]);
 
   // Category ops
@@ -178,9 +177,9 @@ export default function MenuManagerPage() {
       <div className="flex items-center justify-between mb-5">
         <div>
           <h1 className="text-2xl font-bold text-stone-900">Mon Menu</h1>
-          {activeCatName && (
-            <p className="text-xs text-stone-500 mt-0.5">{activeCatName} · {filtered.length} article{filtered.length!==1?"s":""}</p>
-          )}
+          <p className="text-xs text-stone-500 mt-0.5">
+            {search.trim() ? `Résultats pour "${search.trim()}"` : activeCatName ?? ""} · {filtered.length} article{filtered.length!==1?"s":""}
+          </p>
         </div>
         <button onClick={addProduct}
           className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-white shadow-sm hover:shadow-md active:scale-[0.97] transition-all"
