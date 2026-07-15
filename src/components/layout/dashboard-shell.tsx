@@ -7,7 +7,7 @@ import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import {
   Menu as MenuIcon, Settings, LogOut,
-  UtensilsCrossed, ExternalLink, Package,
+  UtensilsCrossed, ExternalLink, Package, ShoppingBag,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -27,11 +27,12 @@ type NavItem = {
 
 const NAV: NavItem[] = [
   { href: "/dashboard/menu",     label: "Menu",     icon: UtensilsCrossed },
+  { href: "/dashboard/after",    label: "After",    icon: ShoppingBag },
   { href: "/dashboard/stock",    label: "Stock",    icon: Package },
   { href: "/dashboard/settings", label: "Réglages", icon: Settings },
 ];
 
-function Sidebar({ onNavigate, slug }: { onNavigate?: () => void; slug?: string }) {
+function Sidebar({ onNavigate, slug, pendingOrders = 0 }: { onNavigate?: () => void; slug?: string; pendingOrders?: number }) {
   const pathname = usePathname();
 
   return (
@@ -59,6 +60,7 @@ function Sidebar({ onNavigate, slug }: { onNavigate?: () => void; slug?: string 
       <nav className="flex-1 px-3 py-4 space-y-0.5">
         {NAV.map((item) => {
           const active = pathname === item.href || pathname.startsWith(item.href + "/");
+          const badge = item.href === "/dashboard/after" && pendingOrders > 0 ? pendingOrders : 0;
           return (
             <Link
               key={item.href}
@@ -72,6 +74,11 @@ function Sidebar({ onNavigate, slug }: { onNavigate?: () => void; slug?: string 
             >
               <item.icon className="h-4 w-4 shrink-0" />
               <span className="flex-1">{item.label}</span>
+              {badge > 0 && (
+                <span className={`text-[10px] font-bold rounded-full px-1.5 py-0.5 leading-none ${active ? "bg-white/20 text-white" : "bg-amber-500 text-white"}`}>
+                  {badge}
+                </span>
+              )}
             </Link>
           );
         })}
@@ -104,7 +111,7 @@ function Sidebar({ onNavigate, slug }: { onNavigate?: () => void; slug?: string 
   );
 }
 
-function MobileBottomNav({ slug }: { slug?: string }) {
+function MobileBottomNav({ slug, pendingOrders }: { slug?: string; pendingOrders?: number }) {
   const pathname = usePathname();
   return (
     <nav
@@ -113,16 +120,22 @@ function MobileBottomNav({ slug }: { slug?: string }) {
     >
       {NAV.map((item) => {
         const active = pathname === item.href || pathname.startsWith(item.href + "/");
+        const badge = item.href === "/dashboard/after" && (pendingOrders ?? 0) > 0 ? pendingOrders : 0;
         return (
           <Link
             key={item.href}
             href={item.href}
-            className={`flex flex-1 flex-col items-center justify-center gap-1 py-3 text-[10px] font-semibold uppercase tracking-wide transition-colors ${
+            className={`relative flex flex-1 flex-col items-center justify-center gap-1 py-3 text-[10px] font-semibold uppercase tracking-wide transition-colors ${
               active ? "text-stone-900" : "text-stone-400"
             }`}
           >
             <item.icon className={`h-5 w-5 transition-transform ${active ? "scale-110" : ""}`} />
             <span>{item.label}</span>
+            {badge ? (
+              <span className="absolute top-1.5 right-1/4 translate-x-2 bg-amber-500 text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center leading-none">
+                {badge > 9 ? "9+" : badge}
+              </span>
+            ) : null}
           </Link>
         );
       })}
@@ -146,6 +159,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
   const { data: session }                 = useSession();
   const [slug, setSlug]                   = useState<string | undefined>();
   const [restaurantName, setRestaurantName] = useState<string | undefined>();
+  const [pendingOrders, setPendingOrders] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
@@ -159,6 +173,21 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
       })
       .catch(() => {});
     return () => { cancelled = true; };
+  }, []);
+
+  useEffect(() => {
+    const poll = async () => {
+      try {
+        const r = await fetch("/api/orders?status=pending");
+        if (r.ok) {
+          const d = await r.json();
+          setPendingOrders(d.orders?.length ?? 0);
+        }
+      } catch {}
+    };
+    poll();
+    const id = setInterval(poll, 8000);
+    return () => clearInterval(id);
   }, []);
 
   const email    = session?.user?.email || "";
@@ -175,14 +204,14 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
       {/* Desktop sidebar */}
       <aside className="hidden lg:block w-60 shrink-0">
         <div className="fixed top-0 left-0 h-screen w-60">
-          <Sidebar slug={slug} />
+          <Sidebar slug={slug} pendingOrders={pendingOrders} />
         </div>
       </aside>
 
       {/* Mobile sidebar sheet */}
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetContent side="left" className="p-0 w-64 bg-white border-r border-stone-100">
-          <Sidebar onNavigate={() => setOpen(false)} slug={slug} />
+          <Sidebar onNavigate={() => setOpen(false)} slug={slug} pendingOrders={pendingOrders} />
         </SheetContent>
       </Sheet>
 
@@ -277,7 +306,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
       </div>
 
       {/* Mobile bottom nav */}
-      <MobileBottomNav slug={slug} />
+      <MobileBottomNav slug={slug} pendingOrders={pendingOrders} />
     </div>
   );
 }
