@@ -1,15 +1,22 @@
 "use client";
 
 import type { CSSProperties } from "react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { LayoutGrid, List, Search, X } from "lucide-react";
+import { LayoutGrid, List, Search, X, ShoppingBag, Minus, Plus, Trash2, ChevronRight } from "lucide-react";
 import { MenuWelcome } from "@/components/menu/MenuWelcome";
 import { MenuCategoryChips } from "@/components/menu/MenuCategoryChips";
 import { MenuProductCard } from "@/components/menu/MenuProductCard";
 import { MenuProductRow } from "@/components/menu/MenuProductRow";
 import { MenuLogoFallback } from "@/components/menu/MenuLogoFallback";
 import { thumb } from "@/lib/utils";
+
+type CartItem = {
+  productId: string;
+  productName: string;
+  price: number;
+  quantity: number;
+};
 
 type Product = {
   _id: string;
@@ -27,6 +34,9 @@ type Category = { _id: string; name: string };
 type ViewMode = "grid" | "list";
 const VIEW_KEY = "cs.menu.view";
 
+const normalize = (s: string) =>
+  s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+
 const FALLBACK_CATEGORIES: Category[] = [
   { _id: "pizza", name: "Pizza" },
   { _id: "pasta", name: "Pasta" },
@@ -40,6 +50,7 @@ export function PublicMenuClient({
   restaurant,
   categories,
   products,
+  restaurantSlug,
 }: {
   restaurant: {
     name: string;
@@ -56,6 +67,7 @@ export function PublicMenuClient({
   };
   categories: Category[];
   products: Product[];
+  restaurantSlug?: string;
 }) {
   const showPrices = restaurant.showPrices !== false;
   const effectiveCategories = categories.length > 0 ? categories : FALLBACK_CATEGORIES;
@@ -64,6 +76,64 @@ export function PublicMenuClient({
   const [activeCategory, setActiveCategory] = useState(effectiveCategories[0]?.name ?? "");
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const scrollRef = useRef<HTMLDivElement | null>(null);
+  const [cart, setCart] = useState<CartItem[]>([]);
+  const [showCart, setShowCart] = useState(false);
+  const [tableNumber, setTableNumber] = useState("");
+  const [customerName, setCustomerName] = useState("");
+  const [orderNotes, setOrderNotes] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [orderSuccess, setOrderSuccess] = useState(false);
+
+  const addToCart = useCallback((product: Product) => {
+    if (!product.isAvailable) return;
+    setCart(prev => {
+      const existing = prev.find(i => i.productId === product._id);
+      if (existing) return prev.map(i => i.productId === product._id ? { ...i, quantity: i.quantity + 1 } : i);
+      return [...prev, { productId: product._id, productName: product.name, price: product.price, quantity: 1 }];
+    });
+  }, []);
+
+  const removeFromCart = useCallback((productId: string) => {
+    setCart(prev => prev.filter(i => i.productId !== productId));
+  }, []);
+
+  const changeQty = useCallback((productId: string, delta: number) => {
+    setCart(prev => prev
+      .map(i => i.productId === productId ? { ...i, quantity: i.quantity + delta } : i)
+      .filter(i => i.quantity > 0)
+    );
+  }, []);
+
+  const cartTotal = useMemo(() => cart.reduce((s, i) => s + i.price * i.quantity, 0), [cart]);
+  const cartCount = useMemo(() => cart.reduce((s, i) => s + i.quantity, 0), [cart]);
+
+  const submitOrder = async () => {
+    if (!restaurantSlug || cart.length === 0) return;
+    setSubmitting(true);
+    try {
+      const r = await fetch("/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          restaurantSlug,
+          tableNumber,
+          customerName,
+          notes: orderNotes,
+          items: cart,
+        }),
+      });
+      if (r.ok) {
+        setOrderSuccess(true);
+        setCart([]);
+        setTableNumber("");
+        setCustomerName("");
+        setOrderNotes("");
+        setTimeout(() => { setOrderSuccess(false); setShowCart(false); }, 3000);
+      }
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   // Restore view-mode pref
   useEffect(() => {
@@ -135,15 +205,40 @@ export function PublicMenuClient({
     containIntrinsicSize: "auto 700px",
   } as CSSProperties;
 
+  const deferredSearch = useDeferredValue(search);
   const filteredProducts = useMemo(() => {
-    if (!search.trim()) return effectiveProducts;
-    const q = search.toLowerCase();
+    if (!deferredSearch.trim()) return effectiveProducts;
+    const q = normalize(deferredSearch);
     return effectiveProducts.filter(
       (product) =>
-        product.name.toLowerCase().includes(q) ||
-        (product.description ?? "").toLowerCase().includes(q)
+        normalize(product.name).includes(q) ||
+        normalize(product.description ?? "").includes(q)
     );
-  }, [effectiveProducts, search]);
+  }, [effectiveProducts, deferredSearch]);
+
+  // Group once per filter change instead of filtering the whole list per category on every render.
+  const itemsByCategory = useMemo(() => {
+    const map = new Map<string, typeof filteredProducts>();
+    for (const p of filteredProducts) {
+      const arr = map.get(p.categoryName);
+      if (arr) arr.push(p);
+      else map.set(p.categoryName, [p]);
+    }
+    return map;
+  }, [filteredProducts]);
+
+  // Stable add-to-cart handler: keeps memoized cards from re-rendering on every scroll/state change.
+  const productById = useMemo(
+    () => new Map(effectiveProducts.map((p) => [p._id, p])),
+    [effectiveProducts]
+  );
+  const handleAdd = useCallback(
+    (id: string) => {
+      const p = productById.get(id);
+      if (p) addToCart(p);
+    },
+    [productById, addToCart]
+  );
 
   function goToCategory(categoryName: string) {
     setActiveCategory(categoryName);
@@ -453,7 +548,7 @@ export function PublicMenuClient({
                   ) : (
                     <div className="space-y-2">
                       {effectiveCategories.map((category) => {
-                        const items = filteredProducts.filter((p) => p.categoryName === category.name);
+                        const items = itemsByCategory.get(category.name) ?? [];
                         if (items.length === 0) return null;
 
                         return (
@@ -488,6 +583,7 @@ export function PublicMenuClient({
                                 {items.map((product) => (
                                   <MenuProductCard
                                     key={product._id}
+                                    id={product._id}
                                     name={product.name}
                                     description={product.description}
                                     price={`${Number(product.price).toFixed(3)} DT`}
@@ -495,6 +591,7 @@ export function PublicMenuClient({
                                     badge={product.badge}
                                     isAvailable={product.isAvailable}
                                     showPrice={showPrices}
+                                    onAdd={restaurantSlug ? handleAdd : undefined}
                                   />
                                 ))}
                               </div>
@@ -503,6 +600,7 @@ export function PublicMenuClient({
                                 {items.map((product) => (
                                   <MenuProductRow
                                     key={product._id}
+                                    id={product._id}
                                     name={product.name}
                                     description={product.description}
                                     price={`${Number(product.price).toFixed(3)} DT`}
@@ -510,6 +608,7 @@ export function PublicMenuClient({
                                     badge={product.badge}
                                     isAvailable={product.isAvailable}
                                     showPrice={showPrices}
+                                    onAdd={restaurantSlug ? handleAdd : undefined}
                                   />
                                 ))}
                               </div>
@@ -521,6 +620,122 @@ export function PublicMenuClient({
                   )}
                 </div>
               </div>
+
+              {/* ── FLOATING CART BAR ─────────────────────────────────── */}
+              {restaurantSlug && cart.length > 0 && !showCart && (
+                <div className="shrink-0 px-3 pb-3 pt-2 sm:px-4">
+                  <button
+                    onClick={() => setShowCart(true)}
+                    className="w-full flex items-center justify-between gap-3 rounded-2xl px-4 py-3 text-stone-950 font-bold shadow-lg active:scale-[0.97] transition-transform"
+                    style={{ background: "#c8a46a" }}
+                  >
+                    <div className="flex items-center gap-2">
+                      <ShoppingBag className="h-4.5 w-4.5" />
+                      <span>{cartCount} article{cartCount > 1 ? "s" : ""}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <span>{cartTotal.toFixed(2)} DT</span>
+                      <ChevronRight className="h-4 w-4" />
+                    </div>
+                  </button>
+                </div>
+              )}
+
+              {/* ── CART MODAL ────────────────────────────────────────── */}
+              {showCart && (
+                <div className="absolute inset-0 z-50 flex flex-col overflow-hidden" style={{ background: "var(--pm-bg-card)" }}>
+                  {/* Header */}
+                  <div className="shrink-0 flex items-center justify-between px-4 py-4 border-b" style={{ borderColor: "rgba(255,255,255,0.06)" }}>
+                    <h2 className="text-base font-bold text-white">Ma commande</h2>
+                    <button onClick={() => setShowCart(false)} className="h-8 w-8 flex items-center justify-center rounded-full text-zinc-400 hover:text-white" style={{ background: "rgba(255,255,255,0.05)" }}>
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+
+                  {/* Order success */}
+                  {orderSuccess ? (
+                    <div className="flex flex-col items-center justify-center flex-1 gap-4 text-center px-6">
+                      <div className="h-16 w-16 rounded-full bg-emerald-500/10 flex items-center justify-center">
+                        <span className="text-3xl">✅</span>
+                      </div>
+                      <h3 className="text-lg font-bold text-white">Commande envoyée !</h3>
+                      <p className="text-sm text-zinc-400">L'équipe a bien reçu votre commande et s'en occupe.</p>
+                    </div>
+                  ) : (
+                    <>
+                      {/* Cart items */}
+                      <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
+                        {cart.map(item => (
+                          <div key={item.productId} className="flex items-center gap-3 py-1">
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-semibold text-white truncate">{item.productName}</p>
+                              <p className="text-xs text-zinc-400">{item.price.toFixed(2)} DT / unité</p>
+                            </div>
+                            <div className="flex items-center gap-1.5 shrink-0">
+                              <button onClick={() => changeQty(item.productId, -1)} className="h-7 w-7 rounded-full flex items-center justify-center" style={{ background: "rgba(255,255,255,0.07)" }}>
+                                <Minus className="h-3 w-3 text-zinc-300" />
+                              </button>
+                              <span className="w-5 text-center text-sm font-bold text-white">{item.quantity}</span>
+                              <button onClick={() => changeQty(item.productId, +1)} className="h-7 w-7 rounded-full flex items-center justify-center" style={{ background: "rgba(255,255,255,0.07)" }}>
+                                <Plus className="h-3 w-3 text-zinc-300" />
+                              </button>
+                              <button onClick={() => removeFromCart(item.productId)} className="h-7 w-7 rounded-full flex items-center justify-center ml-1">
+                                <Trash2 className="h-3.5 w-3.5 text-red-400" />
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+
+                        {/* Divider */}
+                        <div className="h-px my-2" style={{ background: "rgba(255,255,255,0.06)" }} />
+
+                        {/* Info fields */}
+                        <div className="space-y-2 pb-2">
+                          <input
+                            type="text"
+                            value={tableNumber}
+                            onChange={e => setTableNumber(e.target.value)}
+                            placeholder="Numéro de table (ex: 5)"
+                            className="w-full h-10 rounded-xl px-3 text-[13px] text-white placeholder:text-zinc-500 outline-none"
+                            style={{ background: "rgba(17,17,21,0.85)", border: "1px solid rgba(255,255,255,0.08)" }}
+                          />
+                          <input
+                            type="text"
+                            value={customerName}
+                            onChange={e => setCustomerName(e.target.value)}
+                            placeholder="Votre prénom (optionnel)"
+                            className="w-full h-10 rounded-xl px-3 text-[13px] text-white placeholder:text-zinc-500 outline-none"
+                            style={{ background: "rgba(17,17,21,0.85)", border: "1px solid rgba(255,255,255,0.08)" }}
+                          />
+                          <textarea
+                            value={orderNotes}
+                            onChange={e => setOrderNotes(e.target.value)}
+                            placeholder="Notes ou remarques (allergies, cuisson…)"
+                            rows={2}
+                            className="w-full rounded-xl px-3 py-2.5 text-[13px] text-white placeholder:text-zinc-500 outline-none resize-none"
+                            style={{ background: "rgba(17,17,21,0.85)", border: "1px solid rgba(255,255,255,0.08)" }}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Footer */}
+                      <div className="shrink-0 px-4 pb-5 pt-3 border-t space-y-3" style={{ borderColor: "rgba(255,255,255,0.06)" }}>
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-zinc-400">Total</span>
+                          <span className="text-xl font-black text-white">{cartTotal.toFixed(2)} DT</span>
+                        </div>
+                        <button
+                          onClick={submitOrder}
+                          disabled={submitting || cart.length === 0}
+                          className="w-full h-12 rounded-2xl text-sm font-bold text-stone-950 shadow-lg transition-all active:scale-[0.97] disabled:opacity-50"
+                          style={{ background: "#c8a46a" }}>
+                          {submitting ? "Envoi en cours…" : "Envoyer la commande"}
+                        </button>
+                      </div>
+                    </>
+                  )}
+                </div>
+              )}
             </motion.section>
           )}
         </AnimatePresence>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { memo, useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { toast } from "sonner";
 import {
@@ -20,6 +20,9 @@ type Product = {
   price: number; image?: string; badge?: string; isAvailable: boolean; sortOrder?: number;
 };
 const BADGES = ["", "Nouveau", "Populaire", "Promo", "Signature", "Royal", "Ambiance"];
+
+const normalize = (s: string) =>
+  s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
 
 const inputCls = "w-full px-3 py-2.5 rounded-xl border border-stone-200 bg-stone-50 text-stone-900 text-sm focus:outline-none focus:ring-2 focus:ring-amber-300 transition-all";
 const labelCls = "block text-[11px] font-semibold text-stone-500 uppercase tracking-wider mb-1.5";
@@ -89,7 +92,7 @@ export default function MenuManagerPage() {
     finally { setUploadingCover(false); }
   }
 
-  async function loadAll() {
+  const loadAll = useCallback(async () => {
     const [cRes, pRes] = await Promise.all([fetch("/api/categories"), fetch("/api/products")]);
     if (cRes.ok) {
       const cats: Category[] = await cRes.json();
@@ -98,14 +101,19 @@ export default function MenuManagerPage() {
     }
     if (pRes.ok) setProducts(await pRes.json());
     setLoading(false);
-  }
-  useEffect(() => { loadAll(); }, []);
+  }, []);
+  useEffect(() => { loadAll(); }, [loadAll]);
 
+  const deferredSearch = useDeferredValue(search);
   const filtered = useMemo(() => {
-    const q = search.trim().toLowerCase();
-    if (q) return products.filter(p => p.name.toLowerCase().includes(q));
+    const q = normalize(deferredSearch.trim());
+    if (q) {
+      return products.filter(p =>
+        normalize(p.name).includes(q) || normalize(p.description ?? "").includes(q)
+      );
+    }
     return activeCat ? products.filter(p => p.categoryId === activeCat) : products;
-  }, [products, activeCat, search]);
+  }, [products, activeCat, deferredSearch]);
 
   // Category ops
   async function saveCatModal() {
@@ -145,11 +153,15 @@ export default function MenuManagerPage() {
     else toast.error("Erreur lors de la création");
   }
 
-  async function patchProduct(id: string, patch: Partial<Product>) {
+  const patchProduct = useCallback(async (id: string, patch: Partial<Product>) => {
     setProducts(ps => ps.map(p => p._id===id ? {...p,...patch} : p));
     const res = await fetch(`/api/products/${id}`, { method:"PATCH", headers:{"Content-Type":"application/json"}, body:JSON.stringify(patch) });
     if (!res.ok) { toast.error("Échec de l'enregistrement"); loadAll(); }
-  }
+  }, [loadAll]);
+
+  const openEditProduct   = useCallback((p: Product) => setEditSheet({ open:true, product:p }), []);
+  const openDeleteProduct = useCallback((p: Product) => setDeleteProductModal({ open:true, product:p }), []);
+  const toggleAvailable   = useCallback((id: string, v: boolean) => patchProduct(id, { isAvailable:v }), [patchProduct]);
 
   async function confirmDeleteProduct() {
     const p = deleteProductModal.product; if (!p) return;
@@ -333,9 +345,9 @@ export default function MenuManagerPage() {
             <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
               {filtered.map(p => (
                 <ProductCard key={p._id} product={p}
-                  onEdit={()=>setEditSheet({open:true,product:p})}
-                  onDelete={()=>setDeleteProductModal({open:true,product:p})}
-                  onToggleAvailable={v=>patchProduct(p._id,{isAvailable:v})} />
+                  onEdit={openEditProduct}
+                  onDelete={openDeleteProduct}
+                  onToggleAvailable={toggleAvailable} />
               ))}
             </div>
           )}
@@ -399,9 +411,12 @@ export default function MenuManagerPage() {
 }
 
 // ── ProductCard ────────────────────────────────────────────────────────────────
-function ProductCard({ product, onEdit, onDelete, onToggleAvailable }: {
-  product: Product; onEdit:()=>void; onDelete:()=>void; onToggleAvailable:(v:boolean)=>void;
+const ProductCard = memo(function ProductCard({ product, onEdit: onEditP, onDelete: onDeleteP, onToggleAvailable: onToggleP }: {
+  product: Product; onEdit:(p:Product)=>void; onDelete:(p:Product)=>void; onToggleAvailable:(id:string,v:boolean)=>void;
 }) {
+  const onEdit = () => onEditP(product);
+  const onDelete = () => onDeleteP(product);
+  const onToggleAvailable = (v: boolean) => onToggleP(product._id, v);
   return (
     <div className="group rounded-2xl border border-stone-200 bg-white shadow-sm overflow-hidden hover:shadow-md hover:border-stone-300 transition-all">
       <button type="button" onClick={onEdit}
@@ -465,7 +480,7 @@ function ProductCard({ product, onEdit, onDelete, onToggleAvailable }: {
       </div>
     </div>
   );
-}
+});
 
 // ── ProductEditSheet ───────────────────────────────────────────────────────────
 function ProductEditSheet({ product, open, onClose, onSave }: {

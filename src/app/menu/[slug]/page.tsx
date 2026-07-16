@@ -33,6 +33,7 @@ export default async function PublicMenuPage({ params }: { params: Promise<{ slu
 
   return (
     <PublicMenuClient
+      restaurantSlug={slug}
       restaurant={{
         name: restaurant.name,
         logo: restaurant.logo,

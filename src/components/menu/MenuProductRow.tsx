@@ -15,6 +15,7 @@ function resolvesBadge(badge?: string): BadgeType | undefined {
 }
 
 function MenuProductRowBase({
+  id,
   name,
   description,
   price,
@@ -22,7 +23,9 @@ function MenuProductRowBase({
   badge,
   isAvailable,
   showPrice = true,
+  onAdd,
 }: {
+  id: string;
   name: string;
   description?: string;
   price: string;
@@ -30,6 +33,7 @@ function MenuProductRowBase({
   badge?: string;
   isAvailable: boolean;
   showPrice?: boolean;
+  onAdd?: (id: string) => void;
 }) {
   const badgeKey = resolvesBadge(badge);
   const hasDescription = !!description?.trim();
@@ -94,6 +98,17 @@ function MenuProductRowBase({
         >
           {price}
         </div>
+      )}
+
+      {onAdd && isAvailable && (
+        <button
+          onClick={(e) => { e.stopPropagation(); onAdd(id); }}
+          className="shrink-0 flex h-7 w-7 items-center justify-center rounded-full text-black font-bold text-base shadow-sm active:scale-90 transition-transform ml-1"
+          style={{ background: "#c8a46a" }}
+          aria-label={`Ajouter ${name}`}
+        >
+          +
+        </button>
       )}
     </article>
   );
