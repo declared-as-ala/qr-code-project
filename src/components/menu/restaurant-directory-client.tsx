@@ -99,7 +99,7 @@ export function RestaurantDirectoryClient({ initialRestaurants }: RestaurantDire
             </div>
             <h1 
               className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl"
-              style={{ fontFamily: "var(--font-playfair)" }}
+              style={{ fontFamily: "var(--font-display)" }}
             >
               Nos Établissements Partenaires
             </h1>

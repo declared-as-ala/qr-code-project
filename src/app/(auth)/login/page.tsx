@@ -89,7 +89,7 @@ export default function LoginPage() {
               </span>
             </div>
             <h1 className="text-4xl xl:text-5xl font-extrabold text-white leading-[1.1]"
-              style={{ fontFamily: "var(--font-playfair)" }}>
+              style={{ fontFamily: "var(--font-display)" }}>
               Le menu digital qui sublime vos{" "}
               <span style={{ color: GOLD }}>tables</span>.
             </h1>
@@ -133,7 +133,7 @@ export default function LoginPage() {
           {/* Heading */}
           <div className="mb-8">
             <h2 className="text-3xl font-extrabold text-stone-900 leading-tight"
-              style={{ fontFamily: "var(--font-playfair)" }}>
+              style={{ fontFamily: "var(--font-display)" }}>
               Connexion
             </h2>
             <p className="mt-2 text-sm text-stone-500">

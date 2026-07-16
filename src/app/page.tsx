@@ -178,7 +178,7 @@ export default function HomePage() {
               </div>
 
               <h1 className="text-4xl sm:text-5xl lg:text-[3.6rem] font-extrabold leading-[1.05] tracking-tight text-white"
-                style={{ fontFamily: "var(--font-playfair)" }}>
+                style={{ fontFamily: "var(--font-display)" }}>
                 Votre restaurant mérite un{" "}
                 <span className="relative inline-block">
                   <span style={{ color: GOLD }}>menu digital</span>
@@ -259,7 +259,7 @@ export default function HomePage() {
               { val: "4.9⁄5", label: "Satisfaction client", sub: "basée sur les avis" },
             ].map(s => (
               <div key={s.label} className="flex flex-col items-center">
-                <p className="text-3xl sm:text-5xl font-black text-stone-900" style={{ fontFamily: "var(--font-playfair)" }}>{s.val}</p>
+                <p className="text-3xl sm:text-5xl font-black text-stone-900" style={{ fontFamily: "var(--font-display)" }}>{s.val}</p>
                 <p className="text-xs sm:text-sm font-semibold text-stone-700 mt-1.5">{s.label}</p>
                 <p className="text-xs text-stone-400 mt-0.5 hidden sm:block">{s.sub}</p>
               </div>
@@ -274,7 +274,7 @@ export default function HomePage() {
           <div className="max-w-2xl mx-auto text-center mb-14">
             <p className="text-xs font-bold uppercase tracking-[0.18em] mb-4" style={{ color: GOLD }}>Le concept ClickMenu</p>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-stone-900 leading-tight"
-              style={{ fontFamily: "var(--font-playfair)" }}>
+              style={{ fontFamily: "var(--font-display)" }}>
               بكل سهولة —{" "}
               <span>Zéro friction, 100% élégance</span>
             </h2>
@@ -308,7 +308,7 @@ export default function HomePage() {
           <div className="max-w-2xl mx-auto text-center mb-14">
             <p className="text-xs font-bold uppercase tracking-[0.18em] mb-4" style={{ color: GOLD }}>الخطوات · Étapes</p>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-stone-900 leading-tight"
-              style={{ fontFamily: "var(--font-playfair)" }}>
+              style={{ fontFamily: "var(--font-display)" }}>
               Comment ClickMenu fonctionne
             </h2>
             <p className="mt-4 text-base leading-relaxed text-stone-500">
@@ -325,7 +325,7 @@ export default function HomePage() {
             ].map((step, i) => (
               <div key={i} className="relative bg-white rounded-3xl border border-stone-100 p-7 overflow-hidden hover:border-amber-200 hover:shadow-md transition-all duration-300">
                 <div className="absolute top-3 right-4 text-[64px] font-black leading-none select-none opacity-[0.035]"
-                  style={{ color: GOLD, fontFamily: "var(--font-playfair)" }}>{step.n}</div>
+                  style={{ color: GOLD, fontFamily: "var(--font-display)" }}>{step.n}</div>
                 <div className="h-10 w-10 rounded-2xl flex items-center justify-center mb-5" style={{ background: GOLD + "15", color: GOLD }}>
                   {step.icon}
                 </div>
@@ -344,7 +344,7 @@ export default function HomePage() {
           <div className="max-w-2xl mx-auto text-center mb-14">
             <p className="text-xs font-bold uppercase tracking-[0.18em] mb-4" style={{ color: GOLD }}>ياسلام · Ils parlent de nous</p>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-stone-900 leading-tight"
-              style={{ fontFamily: "var(--font-playfair)" }}>
+              style={{ fontFamily: "var(--font-display)" }}>
               Ce que disent nos partenaires
             </h2>
           </div>
@@ -376,7 +376,7 @@ export default function HomePage() {
           <div className="max-w-2xl mx-auto text-center mb-14">
             <p className="text-xs font-bold uppercase tracking-[0.18em] mb-4" style={{ color: GOLD }}>Notre écosystème</p>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-stone-900 leading-tight"
-              style={{ fontFamily: "var(--font-playfair)" }}>
+              style={{ fontFamily: "var(--font-display)" }}>
               Solutions d'aujourd'hui et de demain
             </h2>
             <p className="mt-4 text-base leading-relaxed text-stone-500">
@@ -425,7 +425,7 @@ export default function HomePage() {
             <div className="relative grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
               <div>
                 <h2 className="text-3xl sm:text-4xl font-extrabold text-stone-900 leading-tight"
-                  style={{ fontFamily: "var(--font-playfair)" }}>
+                  style={{ fontFamily: "var(--font-display)" }}>
                   Découvrez les établissements qui utilisent ClickMenu
                 </h2>
                 <p className="mt-4 text-base text-stone-500 max-w-lg">
@@ -466,7 +466,7 @@ export default function HomePage() {
             <QrCode className="h-7 w-7" style={{ color: GOLD }} />
           </div>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white leading-tight"
-            style={{ fontFamily: "var(--font-playfair)" }}>
+            style={{ fontFamily: "var(--font-display)" }}>
             Vous avez un café ou un restaurant ?
           </h2>
           <p className="mt-5 text-base sm:text-lg text-stone-400 max-w-2xl mx-auto leading-relaxed">
