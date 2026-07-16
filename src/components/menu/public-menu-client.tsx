@@ -294,7 +294,7 @@ export function PublicMenuClient({
             >
               <MenuWelcome
                 restaurantName={restaurant.name || "Le Bistrot"}
-                subtitle="Cafe & Restaurant"
+                subtitle="Pâtisserie de luxe"
                 coverImage={restaurant.coverImage}
                 logo={restaurant.logo}
                 logoBg={restaurant.logoBg}
