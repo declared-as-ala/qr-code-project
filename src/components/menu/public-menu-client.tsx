@@ -199,11 +199,6 @@ export function PublicMenuClient({
     fontFamily: "var(--pm-font-sans)",
   } as CSSProperties;
 
-  // Skip rendering off-screen category lists (huge win for a 180+ item menu).
-  const cvStyle = {
-    contentVisibility: "auto",
-    containIntrinsicSize: "auto 700px",
-  } as CSSProperties;
 
   const deferredSearch = useDeferredValue(search);
   const filteredProducts = useMemo(() => {
@@ -579,7 +574,7 @@ export function PublicMenuClient({
                             </div>
 
                             {viewMode === "grid" ? (
-                              <div className="grid grid-cols-2 gap-2.5" style={cvStyle}>
+                              <div className="grid grid-cols-2 gap-2.5">
                                 {items.map((product) => (
                                   <MenuProductCard
                                     key={product._id}
@@ -596,7 +591,7 @@ export function PublicMenuClient({
                                 ))}
                               </div>
                             ) : (
-                              <div className="divide-y divide-white/[0.04]" style={cvStyle}>
+                              <div className="divide-y divide-white/[0.04]">
                                 {items.map((product) => (
                                   <MenuProductRow
                                     key={product._id}
