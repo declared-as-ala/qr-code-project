@@ -32,7 +32,7 @@ type Product = {
 type Category = { _id: string; name: string };
 
 type ViewMode = "grid" | "list";
-const VIEW_KEY = "cs.menu.view";
+const VIEW_KEY = "cs.menu.view.v2";
 
 const normalize = (s: string) =>
   s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
@@ -74,7 +74,7 @@ export function PublicMenuClient({
   const [search, setSearch] = useState("");
   const [menuVisible, setMenuVisible] = useState(false);
   const [activeCategory, setActiveCategory] = useState(effectiveCategories[0]?.name ?? "");
-  const [viewMode, setViewMode] = useState<ViewMode>("grid");
+  const [viewMode, setViewMode] = useState<ViewMode>("list");
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [showCart, setShowCart] = useState(false);
@@ -356,7 +356,7 @@ export function PublicMenuClient({
                         <div
                           className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-xl"
                           style={{
-                            background: "#09090b",
+                            background: restaurant.logoBg || "#09090b",
                             boxShadow: "0 8px 22px rgba(0, 0, 0, 0.4)",
                           }}
                         >
