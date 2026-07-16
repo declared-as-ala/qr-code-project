@@ -586,7 +586,6 @@ export function PublicMenuClient({
                                     badge={product.badge}
                                     isAvailable={product.isAvailable}
                                     showPrice={showPrices}
-                                    onAdd={restaurantSlug ? handleAdd : undefined}
                                   />
                                 ))}
                               </div>
@@ -603,7 +602,6 @@ export function PublicMenuClient({
                                     badge={product.badge}
                                     isAvailable={product.isAvailable}
                                     showPrice={showPrices}
-                                    onAdd={restaurantSlug ? handleAdd : undefined}
                                   />
                                 ))}
                               </div>
