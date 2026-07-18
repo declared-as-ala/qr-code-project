@@ -1,7 +1,7 @@
 "use client";
 
 import type { CSSProperties } from "react";
-import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
+import { memo, useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { LayoutGrid, List, Search, X, ShoppingBag, Minus, Plus, Trash2, ChevronRight } from "lucide-react";
 import { MenuWelcome } from "@/components/menu/MenuWelcome";
@@ -73,9 +73,19 @@ export function PublicMenuClient({
   const effectiveCategories = categories.length > 0 ? categories : FALLBACK_CATEGORIES;
   const [search, setSearch] = useState("");
   const [menuVisible, setMenuVisible] = useState(false);
-  const [activeCategory, setActiveCategory] = useState(effectiveCategories[0]?.name ?? "");
+  const [activeCatId, setActiveCatId] = useState(effectiveCategories[0]?._id ?? "");
   const [viewMode, setViewMode] = useState<ViewMode>("list");
-  const scrollRef = useRef<HTMLDivElement | null>(null);
+  // Callback refs kept in state: the menu subtree mounts only after the
+  // welcome screen's exit animation (AnimatePresence mode="wait"), so plain
+  // refs would still be null when effects fire on the menuVisible flip.
+  const [scrollEl, setScrollEl] = useState<HTMLDivElement | null>(null);
+  const [stickyEl, setStickyEl] = useState<HTMLDivElement | null>(null);
+  // Measured height of the sticky search+chips header; single source of truth
+  // for the scrollspy band, click-scroll offset and section sticky bands.
+  const [headerH, setHeaderH] = useState(112);
+  // True while a click-triggered smooth scroll is in flight: the scrollspy
+  // stays quiet so pills don't flicker across every section passed.
+  const scrollLockRef = useRef(false);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [showCart, setShowCart] = useState(false);
   const [tableNumber, setTableNumber] = useState("");
@@ -148,22 +158,11 @@ export function PublicMenuClient({
     } catch {}
   }, [viewMode]);
 
-  const productsWithCategory = useMemo(
-    () =>
-      products.map((product) => ({
-        ...product,
-        categoryName:
-          effectiveCategories.find((category) => category._id === product.categoryId)?.name ?? "",
-      })),
-    [products, effectiveCategories]
-  );
-
   const fallbackProducts = useMemo(
-    () => [
+    (): Product[] => [
       {
         _id: "f1",
         categoryId: effectiveCategories[0]?._id ?? "pizza",
-        categoryName: effectiveCategories[0]?.name ?? "Pizza",
         name: "Pizza Burrata",
         description: "Sauce tomate douce, burrata, basilic.",
         price: 24.5,
@@ -174,7 +173,6 @@ export function PublicMenuClient({
       {
         _id: "f2",
         categoryId: effectiveCategories[1]?._id ?? "pasta",
-        categoryName: effectiveCategories[1]?.name ?? "Pasta",
         name: "Pasta Cremeuse",
         description: "Parmesan, creme legere, champignons.",
         price: 21,
@@ -186,7 +184,7 @@ export function PublicMenuClient({
     [effectiveCategories]
   );
 
-  const effectiveProducts = productsWithCategory.length > 0 ? productsWithCategory : fallbackProducts;
+  const effectiveProducts = products.length > 0 ? products : fallbackProducts;
 
   const locationHref =
     restaurant.googleMapsUrl ||
@@ -212,61 +210,132 @@ export function PublicMenuClient({
   }, [effectiveProducts, deferredSearch]);
 
   // Group once per filter change instead of filtering the whole list per category on every render.
+  // Keyed by category _id: stable regardless of spaces/accents/duplicates in names.
   const itemsByCategory = useMemo(() => {
-    const map = new Map<string, typeof filteredProducts>();
+    const map = new Map<string, Product[]>();
     for (const p of filteredProducts) {
-      const arr = map.get(p.categoryName);
+      const arr = map.get(p.categoryId);
       if (arr) arr.push(p);
-      else map.set(p.categoryName, [p]);
+      else map.set(p.categoryId, [p]);
     }
     return map;
   }, [filteredProducts]);
 
-  // Stable add-to-cart handler: keeps memoized cards from re-rendering on every scroll/state change.
-  const productById = useMemo(
-    () => new Map(effectiveProducts.map((p) => [p._id, p])),
-    [effectiveProducts]
-  );
-  const handleAdd = useCallback(
-    (id: string) => {
-      const p = productById.get(id);
-      if (p) addToCart(p);
-    },
-    [productById, addToCart]
+  const chipCategories = useMemo(
+    () => effectiveCategories.map((c) => ({ id: c._id, name: c.name })),
+    [effectiveCategories]
   );
 
-  function goToCategory(categoryName: string) {
-    setActiveCategory(categoryName);
-    const section = document.getElementById(`category-${categoryName}`);
-    section?.scrollIntoView({ behavior: "smooth", block: "start" });
-  }
-
-  // Sync activeCategory with scroll position (IntersectionObserver)
+  // Measure the sticky header (search + chips) so every offset stays exact
+  // across devices, safe-areas and font loads.
   useEffect(() => {
-    if (!menuVisible) return;
-    const root = scrollRef.current;
+    if (!stickyEl) return;
+    const update = () =>
+      setHeaderH((h) => {
+        const next = stickyEl.offsetHeight;
+        return Math.abs(next - h) > 1 ? next : h;
+      });
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(stickyEl);
+    return () => ro.disconnect();
+  }, [stickyEl]);
+
+  const goToCategory = useCallback(
+    (id: string) => {
+      setActiveCatId(id);
+      const root = scrollEl;
+      if (!root) return;
+      const section = root.querySelector<HTMLElement>(`[data-cat-id="${CSS.escape(id)}"]`);
+      if (!section) return;
+      const top =
+        section.getBoundingClientRect().top - root.getBoundingClientRect().top + root.scrollTop - headerH + 1;
+      const target = Math.max(0, Math.min(top, root.scrollHeight - root.clientHeight));
+      if (Math.abs(target - root.scrollTop) < 2) return;
+      scrollLockRef.current = true;
+      const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      root.scrollTo({ top: target, behavior: reduced ? "auto" : "smooth" });
+    },
+    [scrollEl, headerH]
+  );
+
+  // Scrollspy. IntersectionObserver maintains the set of sections crossing the
+  // "active band" (just below the sticky header down to mid-viewport); a
+  // rAF-coalesced picker chooses the topmost one. A tiny passive scroll
+  // listener only handles what IO can't: top/bottom edges and detecting when a
+  // click-triggered smooth scroll has settled (scrollend fallback for Safari).
+  useEffect(() => {
+    const root = scrollEl;
     if (!root) return;
+    const sections = Array.from(root.querySelectorAll<HTMLElement>("[data-cat-id]"));
+    if (sections.length === 0) return;
+    const byId = new Map(sections.map((s) => [s.dataset.catId as string, s]));
+    const visible = new Set<string>();
     let raf = 0;
-    const obs = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter((e) => e.isIntersecting)
-          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
-        if (!visible) return;
-        const name = (visible.target as HTMLElement).dataset.categoryName;
-        if (!name) return;
-        // Coalesce rapid updates during a fast fling into one per frame.
-        if (raf) cancelAnimationFrame(raf);
-        raf = requestAnimationFrame(() => setActiveCategory((cur) => (cur === name ? cur : name)));
-      },
-      { root, rootMargin: "-72px 0px -60% 0px", threshold: 0 }
-    );
-    root.querySelectorAll<HTMLElement>("[data-category-name]").forEach((el) => obs.observe(el));
-    return () => {
-      if (raf) cancelAnimationFrame(raf);
-      obs.disconnect();
+    let settleTimer = 0;
+
+    const pick = () => {
+      raf = 0;
+      if (scrollLockRef.current) return;
+      let next: string | undefined;
+      if (root.scrollTop + root.clientHeight >= root.scrollHeight - 8) {
+        next = sections[sections.length - 1].dataset.catId;
+      } else if (visible.size > 0) {
+        let bestTop = Infinity;
+        for (const id of visible) {
+          const el = byId.get(id);
+          if (!el) continue;
+          const top = el.getBoundingClientRect().top;
+          if (top < bestTop) {
+            bestTop = top;
+            next = id;
+          }
+        }
+      } else if (root.scrollTop <= headerH) {
+        next = sections[0].dataset.catId;
+      }
+      if (next) setActiveCatId((cur) => (cur === next ? cur : next));
     };
-  }, [menuVisible, effectiveCategories, filteredProducts]);
+    const schedule = () => {
+      if (!raf) raf = requestAnimationFrame(pick);
+    };
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          const id = (e.target as HTMLElement).dataset.catId as string;
+          if (e.isIntersecting) visible.add(id);
+          else visible.delete(id);
+        }
+        schedule();
+      },
+      { root, rootMargin: `-${Math.max(0, headerH - 2)}px 0px -50% 0px`, threshold: 0 }
+    );
+    sections.forEach((s) => io.observe(s));
+
+    const releaseLock = () => {
+      if (!scrollLockRef.current) return;
+      scrollLockRef.current = false;
+      schedule();
+    };
+    const onScroll = () => {
+      schedule();
+      if (scrollLockRef.current) {
+        window.clearTimeout(settleTimer);
+        settleTimer = window.setTimeout(releaseLock, 150);
+      }
+    };
+    root.addEventListener("scroll", onScroll, { passive: true });
+    root.addEventListener("scrollend", releaseLock);
+
+    return () => {
+      io.disconnect();
+      root.removeEventListener("scroll", onScroll);
+      root.removeEventListener("scrollend", releaseLock);
+      if (raf) cancelAnimationFrame(raf);
+      window.clearTimeout(settleTimer);
+    };
+  }, [scrollEl, itemsByCategory, headerH]);
 
   return (
     <main
@@ -315,7 +384,7 @@ export function PublicMenuClient({
             >
               {/* Single scrollable area: compact hero scrolls away, search+chips stay sticky inside */}
               <div
-                ref={scrollRef}
+                ref={setScrollEl}
                 className="relative min-h-0 flex-1 overflow-y-auto overscroll-y-contain [-ms-overflow-style:none] [scrollbar-width:none] [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:hidden"
                 role="region"
                 aria-label="Menu"
@@ -442,6 +511,7 @@ export function PublicMenuClient({
 
                 {/* STICKY: search + view toggle */}
                 <div
+                  ref={setStickyEl}
                   className="sticky top-0 z-30 px-3 pt-3 pb-2 sm:px-4"
                   style={{ background: "var(--pm-bg-card)" }}
                 >
@@ -509,8 +579,8 @@ export function PublicMenuClient({
                   {/* Category chips */}
                   <div className="mt-2 -mx-1 overflow-hidden">
                     <MenuCategoryChips
-                      categories={effectiveCategories.map((c) => c.name)}
-                      activeCategory={activeCategory}
+                      categories={chipCategories}
+                      activeId={activeCatId}
                       onSelect={goToCategory}
                     />
                   </div>
@@ -541,75 +611,13 @@ export function PublicMenuClient({
                       </p>
                     </motion.div>
                   ) : (
-                    <div className="space-y-2">
-                      {effectiveCategories.map((category) => {
-                        const items = itemsByCategory.get(category.name) ?? [];
-                        if (items.length === 0) return null;
-
-                        return (
-                          <section
-                            key={category._id}
-                            id={`category-${category.name}`}
-                            data-category-name={category.name}
-                            className="scroll-mt-[120px]"
-                            aria-labelledby={`cat-heading-${category._id}`}
-                          >
-                            {/* Sticky thin band */}
-                            <div
-                              className="sticky top-[100px] z-20 -mx-3 mb-2 px-3 py-1.5 sm:-mx-4 sm:px-4"
-                              style={{
-                                background: "var(--pm-bg-card)",
-                                borderBottom: "1px solid rgba(255, 255, 255, 0.05)",
-                              }}
-                            >
-                              <h3
-                                id={`cat-heading-${category._id}`}
-                                className="text-[13px] font-bold uppercase tracking-[0.08em] text-white"
-                              >
-                                {category.name}
-                                <span className="ml-2 text-[11px] font-medium normal-case tracking-normal text-zinc-500">
-                                  · {items.length}
-                                </span>
-                              </h3>
-                            </div>
-
-                            {viewMode === "grid" ? (
-                              <div className="grid grid-cols-2 gap-2.5">
-                                {items.map((product) => (
-                                  <MenuProductCard
-                                    key={product._id}
-                                    id={product._id}
-                                    name={product.name}
-                                    description={product.description}
-                                    price={`${Number(product.price).toFixed(3)} DT`}
-                                    image={product.image}
-                                    badge={product.badge}
-                                    isAvailable={product.isAvailable}
-                                    showPrice={showPrices}
-                                  />
-                                ))}
-                              </div>
-                            ) : (
-                              <div className="divide-y divide-white/[0.04]">
-                                {items.map((product) => (
-                                  <MenuProductRow
-                                    key={product._id}
-                                    id={product._id}
-                                    name={product.name}
-                                    description={product.description}
-                                    price={`${Number(product.price).toFixed(3)} DT`}
-                                    image={product.image}
-                                    badge={product.badge}
-                                    isAvailable={product.isAvailable}
-                                    showPrice={showPrices}
-                                  />
-                                ))}
-                              </div>
-                            )}
-                          </section>
-                        );
-                      })}
-                    </div>
+                    <MenuSections
+                      categories={effectiveCategories}
+                      itemsByCategory={itemsByCategory}
+                      viewMode={viewMode}
+                      showPrices={showPrices}
+                      headerH={headerH}
+                    />
                   )}
                 </div>
               </div>
@@ -736,3 +744,98 @@ export function PublicMenuClient({
     </main>
   );
 }
+
+// Isolated + memoized: does NOT receive activeCatId, so scrollspy updates
+// while scrolling never re-render the product tree — only the chips bar.
+const MenuSections = memo(function MenuSections({
+  categories,
+  itemsByCategory,
+  viewMode,
+  showPrices,
+  headerH,
+}: {
+  categories: Category[];
+  itemsByCategory: Map<string, Product[]>;
+  viewMode: ViewMode;
+  showPrices: boolean;
+  headerH: number;
+}) {
+  const firstCatId = categories.find((c) => (itemsByCategory.get(c._id)?.length ?? 0) > 0)?._id;
+
+  return (
+    <div className="space-y-2">
+      {categories.map((category) => {
+        const items = itemsByCategory.get(category._id) ?? [];
+        if (items.length === 0) return null;
+        // Only the first visible products load eagerly; everything else is lazy.
+        const eagerCount = category._id === firstCatId ? 4 : 0;
+
+        return (
+          <section
+            key={category._id}
+            id={`cat-${category._id}`}
+            data-cat-id={category._id}
+            style={{ scrollMarginTop: headerH + 4 }}
+            aria-labelledby={`cat-heading-${category._id}`}
+          >
+            {/* Sticky thin band, pinned right below the measured sticky header */}
+            <div
+              className="sticky z-20 -mx-3 mb-2 px-3 py-1.5 sm:-mx-4 sm:px-4"
+              style={{
+                top: headerH - 1,
+                background: "var(--pm-bg-card)",
+                borderBottom: "1px solid rgba(255, 255, 255, 0.05)",
+              }}
+            >
+              <h3
+                id={`cat-heading-${category._id}`}
+                className="text-[13px] font-bold uppercase tracking-[0.08em] text-white"
+              >
+                {category.name}
+                <span className="ml-2 text-[11px] font-medium normal-case tracking-normal text-zinc-500">
+                  · {items.length}
+                </span>
+              </h3>
+            </div>
+
+            {viewMode === "grid" ? (
+              <div className="grid grid-cols-2 gap-2.5">
+                {items.map((product, i) => (
+                  <MenuProductCard
+                    key={product._id}
+                    id={product._id}
+                    name={product.name}
+                    description={product.description}
+                    price={`${Number(product.price).toFixed(3)} DT`}
+                    image={product.image}
+                    badge={product.badge}
+                    isAvailable={product.isAvailable}
+                    showPrice={showPrices}
+                    eager={i < eagerCount}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="divide-y divide-white/[0.04]">
+                {items.map((product, i) => (
+                  <MenuProductRow
+                    key={product._id}
+                    id={product._id}
+                    name={product.name}
+                    description={product.description}
+                    price={`${Number(product.price).toFixed(3)} DT`}
+                    image={product.image}
+                    badge={product.badge}
+                    isAvailable={product.isAvailable}
+                    showPrice={showPrices}
+                    eager={i < eagerCount}
+                  />
+                ))}
+              </div>
+            )}
+          </section>
+        );
+      })}
+    </div>
+  );
+});

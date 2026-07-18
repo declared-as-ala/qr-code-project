@@ -24,6 +24,7 @@ function MenuProductRowBase({
   isAvailable,
   showPrice = true,
   onAdd,
+  eager = false,
 }: {
   id: string;
   name: string;
@@ -34,6 +35,7 @@ function MenuProductRowBase({
   isAvailable: boolean;
   showPrice?: boolean;
   onAdd?: (id: string) => void;
+  eager?: boolean;
 }) {
   const badgeKey = resolvesBadge(badge);
   const hasDescription = !!description?.trim();
@@ -54,7 +56,8 @@ function MenuProductRowBase({
             width={56}
             height={56}
             className={`h-full w-full object-cover ${!isAvailable ? "grayscale-[60%]" : ""}`}
-            loading="lazy"
+            loading={eager ? "eager" : "lazy"}
+            fetchPriority={eager ? "high" : undefined}
             decoding="async"
           />
         ) : (

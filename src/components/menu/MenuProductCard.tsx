@@ -24,6 +24,7 @@ function MenuProductCardBase({
   isAvailable,
   showPrice = true,
   onAdd,
+  eager = false,
 }: {
   id: string;
   name: string;
@@ -34,13 +35,14 @@ function MenuProductCardBase({
   isAvailable: boolean;
   showPrice?: boolean;
   onAdd?: (id: string) => void;
+  eager?: boolean;
 }) {
   const badgeKey = resolvesBadge(badge);
   const hasDescription = !!description?.trim();
 
   return (
     <article
-      className={`group relative flex h-full select-none flex-col overflow-hidden rounded-2xl border bg-[var(--pm-bg-card-elevated)] transition-all duration-300 active:scale-[0.985] ${
+      className={`group relative flex h-full select-none flex-col overflow-hidden rounded-2xl border bg-[var(--pm-bg-card-elevated)] transition-transform duration-300 active:scale-[0.985] ${
         !isAvailable ? "opacity-40 grayscale-[40%]" : ""
       }`}
       style={{
@@ -57,7 +59,8 @@ function MenuProductCardBase({
             width={240}
             height={180}
             className="h-full w-full object-cover"
-            loading="lazy"
+            loading={eager ? "eager" : "lazy"}
+            fetchPriority={eager ? "high" : undefined}
             decoding="async"
           />
         ) : (
