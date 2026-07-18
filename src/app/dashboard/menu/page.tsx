@@ -5,7 +5,7 @@ import Image from "next/image";
 import { toast } from "sonner";
 import {
   Plus, Trash2, Pencil, ImagePlus, Loader2,
-  Check, X, Search,
+  Check, X, Search, GripVertical,
 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import {
@@ -144,6 +144,30 @@ export default function MenuManagerPage() {
     } else toast.error("Erreur lors de la suppression");
     setDeleteCatModal({ open:false });
   }
+
+  // Drag-and-drop reorder
+  const dragIdRef = useRef<string | null>(null);
+  const [dragOverId, setDragOverId] = useState<string | null>(null);
+
+  const reorderCategories = useCallback(async (fromId: string, toId: string) => {
+    if (fromId === toId) return;
+    setCategories(prev => {
+      const list = [...prev];
+      const fromIdx = list.findIndex(c => c._id === fromId);
+      const toIdx = list.findIndex(c => c._id === toId);
+      if (fromIdx === -1 || toIdx === -1) return prev;
+      const [moved] = list.splice(fromIdx, 1);
+      list.splice(toIdx, 0, moved);
+      fetch("/api/categories/reorder", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids: list.map(c => c._id) }),
+      }).then(res => {
+        if (!res.ok) { toast.error("Échec de l'enregistrement de l'ordre"); loadAll(); }
+      });
+      return list;
+    });
+  }, [loadAll]);
 
   // Product ops
   async function addProduct() {
@@ -293,10 +317,27 @@ export default function MenuManagerPage() {
               {categories.map(c => {
                 const count = products.filter(p => p.categoryId === c._id).length;
                 const active = activeCat === c._id;
+                const dragOver = dragOverId === c._id;
                 return (
-                  <div key={c._id} onClick={()=>setActiveCat(c._id)}
-                    className={`group flex items-center gap-1 rounded-xl px-3 py-2.5 text-sm transition-all cursor-pointer ${active ? "text-white shadow-sm" : "text-stone-600 hover:bg-stone-50 hover:text-stone-900"}`}
+                  <div key={c._id}
+                    draggable
+                    onDragStart={e=>{ dragIdRef.current = c._id; e.dataTransfer.effectAllowed = "move"; }}
+                    onDragOver={e=>{ e.preventDefault(); if (dragOverId !== c._id) setDragOverId(c._id); }}
+                    onDragLeave={()=>{ if (dragOverId === c._id) setDragOverId(null); }}
+                    onDrop={e=>{
+                      e.preventDefault();
+                      const fromId = dragIdRef.current;
+                      dragIdRef.current = null;
+                      setDragOverId(null);
+                      if (fromId) reorderCategories(fromId, c._id);
+                    }}
+                    onDragEnd={()=>{ dragIdRef.current = null; setDragOverId(null); }}
+                    onClick={()=>setActiveCat(c._id)}
+                    className={`group flex items-center gap-1 rounded-xl px-2 py-2.5 text-sm transition-all cursor-pointer border-t-2 ${dragOver ? "border-amber-400" : "border-transparent"} ${active ? "text-white shadow-sm" : "text-stone-600 hover:bg-stone-50 hover:text-stone-900"}`}
                     style={active ? {background:GOLD} : {}}>
+                    <span className={`shrink-0 cursor-grab active:cursor-grabbing p-1 -ml-1 ${active?"text-white/60":"text-stone-300"}`}>
+                      <GripVertical className="h-3.5 w-3.5"/>
+                    </span>
                     <span className="flex-1 truncate font-medium">{c.name}</span>
                     <span className={`text-[10px] tabular-nums mr-1 ${active?"text-white/70":"text-stone-400"}`}>{count}</span>
                     <button onClick={e=>{e.stopPropagation();setCatModal({open:true,mode:"rename",cat:c,value:c.name,saving:false});}}
@@ -312,6 +353,9 @@ export default function MenuManagerPage() {
               })}
               {categories.length === 0 && (
                 <p className="text-xs text-stone-400 px-3 py-4 text-center">Aucune catégorie.<br/>Clique sur + pour commencer.</p>
+              )}
+              {categories.length > 1 && (
+                <p className="px-3 pt-1.5 text-[10px] text-stone-400">Glissez <GripVertical className="inline h-2.5 w-2.5 -mt-0.5"/> pour réordonner</p>
               )}
             </div>
           </div>
