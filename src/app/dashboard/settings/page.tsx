@@ -7,6 +7,7 @@ import {
   ImagePlus, Loader2, Save, Lock, Trash2,
   Building2, Globe, Palette, KeyRound,
 } from "lucide-react";
+import { uploadImageDirect } from "@/lib/upload-image";
 
 const GOLD = "#c8a46a";
 const inputCls = "w-full px-3 py-2.5 rounded-xl border border-stone-200 bg-stone-50 text-stone-900 text-sm focus:outline-none focus:ring-2 focus:ring-amber-300 transition-all";
@@ -78,11 +79,7 @@ function ImageField({ label, value, ratio, onChange }: {
   async function handle(file: File) {
     setUploading(true);
     try {
-      const fd = new FormData();
-      fd.append("file", file);
-      const res = await fetch("/api/uploads/image", { method:"POST", body:fd });
-      if (!res.ok) throw new Error();
-      const { url } = await res.json() as { url:string };
+      const url = await uploadImageDirect(file);
       onChange(url);
       toast.success(`${label} mis à jour`);
     } catch { toast.error("Échec de l'upload"); }

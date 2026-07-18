@@ -11,6 +11,7 @@ import { Switch } from "@/components/ui/switch";
 import {
   Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter,
 } from "@/components/ui/sheet";
+import { uploadImageDirect } from "@/lib/upload-image";
 
 const GOLD = "#c8a46a";
 
@@ -81,10 +82,7 @@ export default function MenuManagerPage() {
   async function handleUploadCover(file: File) {
     setUploadingCover(true);
     try {
-      const fd = new FormData(); fd.append("file", file);
-      const res = await fetch("/api/uploads/image", { method:"POST", body:fd });
-      if (!res.ok) throw new Error();
-      const { url } = await res.json() as { url:string };
+      const url = await uploadImageDirect(file);
       const p = await fetch("/api/restaurants/me", { method:"PATCH", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ coverImage:url }) });
       if (p.ok) { setCoverImage(url); toast.success("Couverture mise à jour"); }
       else throw new Error();
@@ -541,10 +539,7 @@ function ProductEditSheet({ product, open, onClose, onSave }: {
   async function uploadImage(file: File) {
     setUploading(true);
     try {
-      const fd = new FormData(); fd.append("file", file);
-      const res = await fetch("/api/uploads/image", { method:"POST", body:fd });
-      if (!res.ok) throw new Error();
-      const { url } = await res.json() as { url:string };
+      const url = await uploadImageDirect(file);
       setDraft(d => ({...d, image:url}));
       toast.success("Photo mise à jour");
     } catch { toast.error("Échec de l'upload"); }
