@@ -410,16 +410,26 @@
 
 /* Landing page palette (self-contained: do not depend on menu tokens) */
 .home-root {
-  --h-sand: #f7f1e7;
-  --h-sand-2: #efe6d6;
+  --h-ink: #111111;
+  --h-muted: #5c6068;
+  --h-line: rgba(17, 17, 17, 0.08);
   --h-paper: #ffffff;
-  --h-ink: #141b2d;
-  --h-muted: #5f6676;
-  --h-line: rgba(20, 27, 45, 0.1);
-  --h-navy: #1b2a4a;
-  --h-navy-2: #121c33;
+  --h-sun: #f2d36b;
   --h-terra: #e0673a;
   --h-terra-2: #c9532a;
   --h-terra-soft: #fce6da;
-  --h-sun: #f4c65a;
+  --h-sand: #f6f3ee;
+  --h-sand-2: #ece7de;
 }
+.home-bg {
+  background:
+    radial-gradient(60% 40% at 8% 6%, #dfe6ff 0%, transparent 70%),
+    radial-gradient(50% 35% at 45% 4%, #def3e6 0%, transparent 70%),
+    radial-gradient(45% 35% at 95% 12%, #fdf1cf 0%, transparent 70%),
+    radial-gradient(60% 30% at 90% 55%, #e6e2ff 0%, transparent 70%),
+    radial-gradient(50% 25% at 5% 40%, #fdf1cf 0%, transparent 70%),
+    #fbfaf7;
+}
+@keyframes home-spin { to { transform: rotate(360deg); } }
+.home-spin { animation: home-spin 18s linear infinite; }
+@media (prefers-reduced-motion: reduce) { .home-spin { animation: none; } }

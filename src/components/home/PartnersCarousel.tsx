@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-export type Partner = { slug: string; name: string; logo?: string; type?: string };
+export type Partner = { slug: string; name: string; logo?: string; cover?: string; type?: string };
 
 const TYPE_LABEL: Record<string, string> = { cafe: "Café", restaurant: "Restaurant" };
 
@@ -14,9 +14,9 @@ export function PartnersCarousel({ partners }: { partners: Partner[] }) {
   const duration = Math.max(30, base.length * 4);
 
   return (
-    <section className="border-y border-[var(--h-line)] bg-[var(--h-sand-2)]/60 py-10" aria-label="Nos établissements partenaires">
-      <p className="mb-6 text-center text-[11px] font-bold uppercase tracking-[0.2em] text-[var(--h-terra)]">
-        Ils utilisent ClickMenu
+    <section className="py-10" aria-label="Nos établissements partenaires">
+      <p className="mb-6 text-center text-[11px] font-bold uppercase tracking-[0.2em] text-[var(--h-muted)]">
+        Ils nous font confiance
       </p>
       <div
         className="partners-viewport overflow-hidden"
@@ -31,7 +31,7 @@ export function PartnersCarousel({ partners }: { partners: Partner[] }) {
               <Link
                 href={`/menu/${p.slug}`}
                 tabIndex={i >= base.length ? -1 : undefined}
-                className="group flex w-56 items-center gap-3 rounded-2xl border border-[var(--h-line)] bg-white p-3 shadow-sm transition-all hover:-translate-y-0.5 hover:border-[var(--h-terra)]/50 hover:shadow-md"
+                className="group flex w-56 items-center gap-3 rounded-2xl border border-[var(--h-line)] bg-white p-3 shadow-[0_8px_24px_-16px_rgba(0,0,0,0.25)] transition-all hover:-translate-y-0.5 hover:border-[var(--h-ink)]/30 hover:shadow-md"
               >
                 <span className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-[var(--h-sand)]">
                   {p.logo ? (
