@@ -4,17 +4,18 @@ import { signIn } from "next-auth/react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { QrCode, Lock, Mail, ArrowRight, Eye, EyeOff, Sparkles } from "lucide-react";
+import { ArrowLeft, ArrowRight, BarChart3, Check, Eye, EyeOff, Lock, Mail, QrCode, Zap } from "lucide-react";
 
-const GOLD = "#c8a46a";
+const INPUT =
+  "h-13 w-full rounded-2xl border border-[var(--h-line)] bg-[#f6f3ee]/60 pl-11 pr-4 text-[15px] font-medium text-[var(--h-ink)] outline-none transition-all placeholder:text-[var(--h-muted)]/60 focus:border-[var(--h-ink)]/50 focus:bg-white focus:ring-4 focus:ring-[var(--h-sun)]/40";
 
 export default function LoginPage() {
   const router = useRouter();
-  const [email,    setEmail]    = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [show,     setShow]     = useState(false);
-  const [loading,  setLoading]  = useState(false);
-  const [error,    setError]    = useState("");
+  const [show, setShow] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -28,7 +29,7 @@ export default function LoginPage() {
     }
 
     const sessionRes = await fetch("/api/auth/session");
-    const session    = await sessionRes.json();
+    const session = await sessionRes.json();
 
     if (session?.user?.mustChangePassword) {
       router.push("/dashboard/settings");
@@ -38,206 +39,180 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex bg-[#fafaf8]">
+    <div className="home-root home-bg relative flex min-h-screen overflow-x-clip text-[var(--h-ink)] antialiased [font-family:var(--font-body),system-ui,sans-serif]">
+      {/* ── LEFT: brand panel ─────────────────────────────────────────────── */}
+      <aside className="relative hidden flex-1 flex-col justify-between p-12 lg:flex xl:p-16">
+        <Link href="/" className="flex w-fit items-baseline gap-0.5" aria-label="ClickMenu — accueil">
+          <span className="text-[26px] font-extrabold tracking-[-0.04em]">click</span>
+          <span className="text-[26px] font-extrabold tracking-[-0.04em] text-[var(--h-terra)]">menu</span>
+          <span className="ml-0.5 text-xs font-bold text-[var(--h-muted)]">.tn</span>
+        </Link>
 
-      {/* ── LEFT PANEL ──────────────────────────────────────────────────────── */}
-      <div className="hidden lg:flex lg:w-[52%] xl:w-[56%] relative flex-col overflow-hidden"
-        style={{ background: "linear-gradient(145deg, #1c1917 0%, #292524 60%, #1c1917 100%)" }}>
-
-        {/* Warm dot grid */}
-        <div className="pointer-events-none absolute inset-0"
-          style={{ backgroundImage: "radial-gradient(circle, rgba(200,164,106,0.12) 1px, transparent 1px)", backgroundSize: "32px 32px" }} />
-
-        {/* Gold glow blobs */}
-        <div className="pointer-events-none absolute -top-32 -left-32 h-96 w-96 rounded-full blur-3xl opacity-15"
-          style={{ background: GOLD }} />
-        <div className="pointer-events-none absolute bottom-0 right-0 h-64 w-64 rounded-full blur-3xl opacity-10"
-          style={{ background: GOLD }} />
-
-        {/* Subtle photo overlay */}
-        <div className="absolute inset-0 opacity-[0.07]"
-          style={{
-            backgroundImage: "url('https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=1200&q=60')",
-            backgroundSize: "cover", backgroundPosition: "center",
-          }} />
-
-        {/* Content */}
-        <div className="relative z-10 flex flex-col justify-between h-full p-12 xl:p-16">
-
-          {/* Logo */}
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl flex items-center justify-center shadow-lg"
-              style={{ background: GOLD }}>
-              <QrCode className="h-5 w-5 text-white stroke-[2.5]" />
-            </div>
-            <div className="flex flex-col leading-none">
-              <span className="text-lg font-extrabold tracking-tight text-white">
-                Click<span style={{ color: GOLD }}>Menu</span>
-              </span>
-              <span className="text-[9px] font-semibold tracking-[0.12em] uppercase" style={{ color: GOLD + "80" }}>
-                Luxury Hospitality
-              </span>
-            </div>
-          </div>
-
-          {/* Main quote */}
-          <div className="max-w-md">
-            <div className="flex items-center gap-2 mb-6">
-              <Sparkles className="h-4 w-4" style={{ color: GOLD }} />
-              <span className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: GOLD }}>
-                Tableau de bord
-              </span>
-            </div>
-            <h1 className="text-4xl xl:text-5xl font-extrabold text-white leading-[1.1]"
-              style={{ fontFamily: "var(--font-display)" }}>
-              Le menu digital qui sublime vos{" "}
-              <span style={{ color: GOLD }}>tables</span>.
-            </h1>
-            <p className="mt-5 text-base leading-relaxed" style={{ color: "rgba(255,255,255,0.5)" }}>
-              Une expérience client moderne, élégante et sans contact. Conçue pour les cafés et restaurants d'exception en Tunisie.
-            </p>
-
-            {/* Feature pills */}
-            <div className="mt-8 flex flex-wrap gap-2.5">
-              {["Mise à jour temps réel", "Menu 100% mobile", "QR Code premium", "Stock intégré"].map(f => (
-                <span key={f}
-                  className="px-3 py-1.5 rounded-full text-xs font-semibold"
-                  style={{ background: "rgba(200,164,106,0.12)", color: GOLD, border: `1px solid ${GOLD}25` }}>
-                  {f}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          {/* Bottom */}
-          <p className="text-[11px] font-medium" style={{ color: "rgba(255,255,255,0.2)" }}>
-            © {new Date().getFullYear()} ClickMenu · Plateforme SaaS Premium
-          </p>
-        </div>
-      </div>
-
-      {/* ── RIGHT PANEL — Form ──────────────────────────────────────────────── */}
-      <div className="flex-1 flex items-center justify-center p-6 sm:p-10">
-        <div className="w-full max-w-md">
-
-          {/* Mobile logo */}
-          <div className="lg:hidden flex items-center gap-2.5 mb-10">
-            <div className="h-9 w-9 rounded-xl flex items-center justify-center" style={{ background: GOLD }}>
-              <QrCode className="h-4 w-4 text-white stroke-[2.5]" />
-            </div>
-            <span className="text-lg font-extrabold text-stone-900">
-              Click<span style={{ color: GOLD }}>Menu</span>
+        <div className="relative max-w-lg">
+          <h1 className="text-5xl font-extrabold leading-[1.12] tracking-tight xl:text-6xl">
+            Votre menu,
+            <br />
+            <span className="relative isolate inline-block px-4">
+              <span className="absolute inset-y-[6%] left-0 right-0 -z-10 rounded-[999px] bg-[var(--h-sun)]" />
+              entre vos mains
             </span>
+          </h1>
+          <p className="mt-7 max-w-md text-lg leading-relaxed text-[var(--h-ink)]/75">
+            Modifiez vos prix, vos photos et vos plats en quelques secondes. Vos clients voient le changement tout de suite.
+          </p>
+
+          <ul className="mt-9 space-y-3.5">
+            {["Mise à jour en temps réel", "Menu 100% mobile, sans application", "QR code et statistiques de scans", "Stock et commandes intégrés"].map((t) => (
+              <li key={t} className="flex items-center gap-3 text-[15px] font-semibold">
+                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[var(--h-ink)] text-white">
+                  <Check className="h-3.5 w-3.5 stroke-[3]" />
+                </span>
+                {t}
+              </li>
+            ))}
+          </ul>
+
+          {/* floating chips */}
+          <div className="pointer-events-none absolute -right-10 top-2 hidden rotate-3 items-center gap-2.5 rounded-2xl bg-white px-4 py-3 shadow-[0_18px_40px_-20px_rgba(17,17,17,0.45)] xl:flex">
+            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--h-sun)]">
+              <Zap className="h-4 w-4" />
+            </span>
+            <div>
+              <p className="text-xs font-bold">Prix mis à jour</p>
+              <p className="text-[11px] text-[var(--h-muted)]">il y a 2 secondes</p>
+            </div>
           </div>
-
-          {/* Heading */}
-          <div className="mb-8">
-            <h2 className="text-3xl font-extrabold text-stone-900 leading-tight"
-              style={{ fontFamily: "var(--font-display)" }}>
-              Connexion
-            </h2>
-            <p className="mt-2 text-sm text-stone-500">
-              Accédez à votre espace de gestion du menu.
-            </p>
+          <div className="pointer-events-none absolute -right-4 bottom-6 hidden -rotate-2 items-center gap-2.5 rounded-2xl bg-white px-4 py-3 shadow-[0_18px_40px_-20px_rgba(17,17,17,0.45)] xl:flex">
+            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#dfe6ff]">
+              <BarChart3 className="h-4 w-4" />
+            </span>
+            <div>
+              <p className="text-xs font-bold">Scans du mois</p>
+              <p className="text-[11px] text-[var(--h-muted)]">en hausse ↑</p>
+            </div>
           </div>
+        </div>
 
-          {/* Form card */}
-          <div className="bg-white rounded-3xl border border-stone-100 shadow-sm p-8">
-            <form onSubmit={onSubmit} className="space-y-5">
+        <p className="text-xs font-medium text-[var(--h-muted)]">© {new Date().getFullYear()} ClickMenu · Made in Tunisia</p>
+      </aside>
 
-              {/* Email */}
+      {/* ── RIGHT: form ───────────────────────────────────────────────────── */}
+      <main className="flex w-full items-center justify-center px-5 py-10 sm:px-10 lg:w-[46%] lg:max-w-[640px]">
+        <div className="w-full max-w-md">
+          <Link href="/" className="mb-8 flex w-fit items-baseline gap-0.5 lg:hidden" aria-label="ClickMenu — accueil">
+            <span className="text-2xl font-extrabold tracking-[-0.04em]">click</span>
+            <span className="text-2xl font-extrabold tracking-[-0.04em] text-[var(--h-terra)]">menu</span>
+            <span className="ml-0.5 text-[11px] font-bold text-[var(--h-muted)]">.tn</span>
+          </Link>
+
+          <div className="rounded-[2rem] bg-white p-7 shadow-[0_30px_80px_-40px_rgba(17,17,17,0.45)] sm:p-10">
+            <span className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--h-sun)]">
+              <QrCode className="h-5 w-5" />
+            </span>
+            <h2 className="mt-5 text-3xl font-extrabold tracking-tight">Connexion</h2>
+            <p className="mt-2 text-sm text-[var(--h-muted)]">Accédez à votre espace de gestion du menu.</p>
+
+            <form onSubmit={onSubmit} className="mt-8 space-y-5" noValidate={false}>
               <div>
-                <label htmlFor="email" className="block text-xs font-semibold uppercase tracking-wider text-stone-500 mb-2">
+                <label htmlFor="email" className="mb-2 block text-xs font-bold uppercase tracking-wider text-[var(--h-muted)]">
                   Adresse e-mail
                 </label>
                 <div className="relative">
-                  <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-400 pointer-events-none" />
+                  <Mail className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--h-muted)]" />
                   <input
-                    id="email" type="email" required autoComplete="email"
-                    value={email} onChange={e => setEmail(e.target.value)}
+                    id="email"
+                    type="email"
+                    required
+                    autoComplete="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     placeholder="vous@exemple.com"
-                    className="w-full pl-10 pr-4 py-3 rounded-xl border border-stone-200 bg-stone-50 text-stone-900 text-sm placeholder:text-stone-300 focus:outline-none focus:ring-2 focus:ring-amber-300 focus:border-transparent transition-all"
+                    className={INPUT}
                   />
                 </div>
               </div>
 
-              {/* Password */}
               <div>
-                <div className="flex items-center justify-between mb-2">
-                  <label htmlFor="password" className="block text-xs font-semibold uppercase tracking-wider text-stone-500">
+                <div className="mb-2 flex items-center justify-between">
+                  <label htmlFor="password" className="block text-xs font-bold uppercase tracking-wider text-[var(--h-muted)]">
                     Mot de passe
                   </label>
-                  <Link href="/login/forgot-password"
-                    className="text-xs font-semibold hover:underline transition-colors"
-                    style={{ color: GOLD }}>
+                  <Link href="/login/forgot-password" className="text-xs font-bold text-[var(--h-terra-2)] hover:underline">
                     Mot de passe oublié ?
                   </Link>
                 </div>
                 <div className="relative">
-                  <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-400 pointer-events-none" />
+                  <Lock className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--h-muted)]" />
                   <input
-                    id="password" type={show ? "text" : "password"} required autoComplete="current-password"
-                    value={password} onChange={e => setPassword(e.target.value)}
+                    id="password"
+                    type={show ? "text" : "password"}
+                    required
+                    autoComplete="current-password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full pl-10 pr-11 py-3 rounded-xl border border-stone-200 bg-stone-50 text-stone-900 text-sm placeholder:text-stone-300 focus:outline-none focus:ring-2 focus:ring-amber-300 focus:border-transparent transition-all"
+                    className={`${INPUT} pr-12`}
                   />
-                  <button type="button" onClick={() => setShow(s => !s)} tabIndex={-1}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 h-6 w-6 flex items-center justify-center text-stone-400 hover:text-stone-700 transition-colors"
-                    aria-label={show ? "Masquer" : "Afficher"}>
+                  <button
+                    type="button"
+                    onClick={() => setShow((s) => !s)}
+                    className="absolute right-3 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full text-[var(--h-muted)] transition-colors hover:bg-[#f1efe9] hover:text-[var(--h-ink)]"
+                    aria-label={show ? "Masquer le mot de passe" : "Afficher le mot de passe"}
+                  >
                     {show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
                 </div>
               </div>
 
-              {/* Error */}
-              {error && (
-                <div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-red-50 border border-red-100 text-red-600 text-sm">
-                  <span className="h-4 w-4 shrink-0 mt-0.5 rounded-full bg-red-500 flex items-center justify-center">
-                    <span className="text-white text-[9px] font-black leading-none">!</span>
-                  </span>
-                  {error}
-                </div>
-              )}
+              <div aria-live="polite">
+                {error && (
+                  <div role="alert" className="flex items-start gap-2.5 rounded-2xl border border-red-100 bg-red-50 p-3.5 text-sm font-medium text-red-600">
+                    <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-red-500 text-[9px] font-black leading-none text-white">!</span>
+                    {error}
+                  </div>
+                )}
+              </div>
 
-              {/* Submit */}
               <button
-                type="submit" disabled={loading}
-                className="w-full flex h-12 items-center justify-center gap-2 rounded-xl text-sm font-bold text-white shadow-md transition-all hover:opacity-90 active:scale-[0.98] disabled:opacity-60 mt-2"
-                style={{ background: loading ? "#d4b896" : GOLD, boxShadow: `0 4px 20px ${GOLD}35` }}>
+                type="submit"
+                disabled={loading}
+                className="group flex h-13 w-full items-center justify-center gap-2 rounded-2xl bg-[var(--h-ink)] text-[15px] font-bold text-white transition-transform hover:bg-black active:scale-[0.98] disabled:opacity-60"
+              >
                 {loading ? (
                   <>
-                    <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                    <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden>
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                     </svg>
                     Connexion en cours…
                   </>
                 ) : (
-                  <>Se connecter <ArrowRight className="h-4 w-4" /></>
+                  <>
+                    Se connecter
+                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                  </>
                 )}
               </button>
             </form>
           </div>
 
-          {/* Note */}
-          <p className="mt-6 text-xs text-stone-400 text-center leading-relaxed">
-            L'accès est réservé aux comptes créés par le Super Admin.<br />
-            Contactez-nous via{" "}
-            <a href="https://wa.me/21697991266" target="_blank" rel="noreferrer"
-              className="font-semibold hover:underline" style={{ color: GOLD }}>
+          <p className="mt-6 text-center text-xs leading-relaxed text-[var(--h-muted)]">
+            L’accès est réservé aux comptes créés par notre équipe.
+            <br />
+            Une question ? Écrivez-nous sur{" "}
+            <a href="https://wa.me/21697991266" target="_blank" rel="noreferrer" className="font-bold text-[var(--h-ink)] hover:underline">
               WhatsApp
-            </a>{" "}pour toute demande.
+            </a>
+            .
           </p>
 
-          {/* Back home */}
-          <div className="mt-8 text-center">
-            <Link href="/"
-              className="inline-flex items-center gap-1.5 text-sm font-medium text-stone-400 hover:text-stone-700 transition-colors">
-              ← Retour à l'accueil
+          <div className="mt-6 text-center">
+            <Link href="/" className="inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--h-muted)] transition-colors hover:text-[var(--h-ink)]">
+              <ArrowLeft className="h-4 w-4" /> Retour à l’accueil
             </Link>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 }
