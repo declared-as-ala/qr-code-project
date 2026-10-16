@@ -433,3 +433,39 @@
 @keyframes home-spin { to { transform: rotate(360deg); } }
 .home-spin { animation: home-spin 18s linear infinite; }
 @media (prefers-reduced-motion: reduce) { .home-spin { animation: none; } }
+
+/* ── Dashboard: light pastel/black theme (same language as the home page) ───────────────
+   Scoped to .dash-root so the public menus (dark) and dialogs portaled to <body> are untouched. */
+.dash-root {
+  --background: #fbfaf7;
+  --foreground: #111111;
+  --card: #ffffff;
+  --card-foreground: #111111;
+  --popover: #ffffff;
+  --popover-foreground: #111111;
+  --primary: #111111;
+  --primary-foreground: #ffffff;
+  --secondary: #f1efe9;
+  --secondary-foreground: #111111;
+  --muted: #f1efe9;
+  --muted-foreground: #5c6068;
+  --accent: #f6f3ee;
+  --accent-foreground: #111111;
+  --border: rgba(17, 17, 17, 0.1);
+  --input: rgba(17, 17, 17, 0.12);
+  --ring: rgba(17, 17, 17, 0.35);
+  --radius: 0.9rem;
+  color: var(--h-ink);
+  font-family: var(--font-body), system-ui, sans-serif;
+}
+.dash-root h1 { font-weight: 800; letter-spacing: -0.03em; }
+.dash-root .border-stone-100,
+.dash-root .border-stone-200,
+.dash-root .border-stone-200\/80 { border-color: rgba(17, 17, 17, 0.08); }
+/* white cards: soft floating shadow instead of hard outlines */
+.dash-root .bg-white.border:not(button):not(input):not(a) {
+  box-shadow: 0 14px 40px -28px rgba(17, 17, 17, 0.35);
+}
+.dash-root .bg-stone-50 { background-color: rgba(255, 255, 255, 0.65); }
+.dash-root .rounded-xl { border-radius: 1rem; }
+.dash-root .rounded-2xl { border-radius: 1.25rem; }

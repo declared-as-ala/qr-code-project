@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
-import Image from "next/image";
 import {
   Menu as MenuIcon, Settings, LogOut,
   UtensilsCrossed, ExternalLink, Package, ShoppingBag,
@@ -36,28 +35,25 @@ function Sidebar({ onNavigate, slug, pendingOrders = 0 }: { onNavigate?: () => v
   const pathname = usePathname();
 
   return (
-    <div className="flex h-full flex-col bg-white border-r border-stone-100">
+    <div className="flex h-full flex-col bg-white lg:rounded-[1.75rem] lg:border lg:border-[var(--h-line)] lg:shadow-[0_18px_50px_-28px_rgba(17,17,17,0.35)]">
       {/* Brand — clickable */}
       <Link
         href="/dashboard"
         onClick={onNavigate}
-        className="px-5 py-4 flex items-center gap-3 border-b border-stone-100 hover:bg-stone-50 transition-colors group"
+        className="flex flex-col gap-1 px-6 pb-4 pt-6"
       >
-        <div className="h-9 w-9 rounded-xl overflow-hidden shrink-0 shadow-sm ring-1 ring-stone-200">
-          <Image src="/logos/logo.png" alt="ClickMenu" width={36} height={36} priority unoptimized />
-        </div>
-        <div className="flex flex-col">
-          <span className="font-bold text-sm text-stone-900 tracking-tight group-hover:text-amber-700 transition-colors">
-            ClickMenu
-          </span>
-          <span className="text-[10px] font-semibold uppercase tracking-widest text-amber-600">
-            Dashboard
-          </span>
-        </div>
+        <span className="flex items-baseline gap-0.5">
+          <span className="text-[22px] font-extrabold tracking-[-0.04em] text-[var(--h-ink)]">click</span>
+          <span className="text-[22px] font-extrabold tracking-[-0.04em] text-[var(--h-terra)]">menu</span>
+          <span className="ml-0.5 text-[11px] font-bold text-[var(--h-muted)]">.tn</span>
+        </span>
+        <span className="w-fit rounded-full bg-[var(--h-sun)] px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-widest text-[var(--h-ink)]">
+          Dashboard
+        </span>
       </Link>
 
       {/* Nav */}
-      <nav className="flex-1 px-3 py-4 space-y-0.5">
+      <nav className="flex-1 space-y-1 px-3 py-3">
         {NAV.map((item) => {
           const active = pathname === item.href || pathname.startsWith(item.href + "/");
           const badge = item.href === "/dashboard/after" && pendingOrders > 0 ? pendingOrders : 0;
@@ -66,16 +62,16 @@ function Sidebar({ onNavigate, slug, pendingOrders = 0 }: { onNavigate?: () => v
               key={item.href}
               href={item.href}
               onClick={onNavigate}
-              className={`group flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-medium transition-all duration-150 ${
+              className={`group flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold transition-all duration-150 ${
                 active
-                  ? "bg-stone-900 text-white shadow-sm"
-                  : "text-stone-500 hover:bg-stone-100 hover:text-stone-900"
+                  ? "bg-[var(--h-ink)] text-white shadow-[0_10px_24px_-12px_rgba(17,17,17,0.6)]"
+                  : "text-[var(--h-muted)] hover:bg-[#f6f3ee] hover:text-[var(--h-ink)]"
               }`}
             >
               <item.icon className="h-4 w-4 shrink-0" />
               <span className="flex-1">{item.label}</span>
               {badge > 0 && (
-                <span className={`text-[10px] font-bold rounded-full px-1.5 py-0.5 leading-none ${active ? "bg-white/20 text-white" : "bg-amber-500 text-white"}`}>
+                <span className={`text-[10px] font-bold rounded-full px-1.5 py-0.5 leading-none ${active ? "bg-white/20 text-white" : "bg-[var(--h-terra)] text-white"}`}>
                   {badge}
                 </span>
               )}
@@ -89,7 +85,7 @@ function Sidebar({ onNavigate, slug, pendingOrders = 0 }: { onNavigate?: () => v
             target="_blank"
             rel="noreferrer"
             onClick={onNavigate}
-            className="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-medium text-stone-500 hover:bg-stone-100 hover:text-stone-900 transition-all"
+            className="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold text-[var(--h-muted)] hover:bg-[#f6f3ee] hover:text-[var(--h-ink)] transition-all"
           >
             <ExternalLink className="h-4 w-4 shrink-0" />
             <span className="flex-1">Voir le menu public</span>
@@ -98,10 +94,10 @@ function Sidebar({ onNavigate, slug, pendingOrders = 0 }: { onNavigate?: () => v
       </nav>
 
       {/* Logout */}
-      <div className="px-3 pb-4 pt-3 border-t border-stone-100">
+      <div className="border-t border-[var(--h-line)] px-3 pb-4 pt-3">
         <button
           onClick={() => signOut({ callbackUrl: "/login" })}
-          className="w-full flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-medium text-stone-400 hover:bg-red-50 hover:text-red-500 transition-all"
+          className="w-full flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold text-[var(--h-muted)] hover:bg-red-50 hover:text-red-500 transition-all"
         >
           <LogOut className="h-4 w-4 shrink-0" />
           Se déconnecter
@@ -115,8 +111,8 @@ function MobileBottomNav({ slug, pendingOrders }: { slug?: string; pendingOrders
   const pathname = usePathname();
   return (
     <nav
-      className="lg:hidden fixed bottom-0 inset-x-0 z-40 flex items-stretch bg-white/95 backdrop-blur-xl border-t border-stone-100 shadow-[0_-1px_12px_rgba(0,0,0,0.06)]"
-      style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+      className="lg:hidden fixed inset-x-3 z-40 flex items-stretch overflow-hidden rounded-2xl border border-[var(--h-line)] bg-white/95 backdrop-blur-xl shadow-[0_18px_40px_-16px_rgba(17,17,17,0.45)]"
+      style={{ bottom: "calc(0.75rem + env(safe-area-inset-bottom))" }}
     >
       {NAV.map((item) => {
         const active = pathname === item.href || pathname.startsWith(item.href + "/");
@@ -126,13 +122,13 @@ function MobileBottomNav({ slug, pendingOrders }: { slug?: string; pendingOrders
             key={item.href}
             href={item.href}
             className={`relative flex flex-1 flex-col items-center justify-center gap-1 py-3 text-[10px] font-semibold uppercase tracking-wide transition-colors ${
-              active ? "text-stone-900" : "text-stone-400"
+              active ? "text-[var(--h-ink)]" : "text-stone-400"
             }`}
           >
             <item.icon className={`h-5 w-5 transition-transform ${active ? "scale-110" : ""}`} />
             <span>{item.label}</span>
             {badge ? (
-              <span className="absolute top-1.5 right-1/4 translate-x-2 bg-amber-500 text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center leading-none">
+              <span className="absolute top-1.5 right-1/4 translate-x-2 bg-[var(--h-terra)] text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center leading-none">
                 {badge > 9 ? "9+" : badge}
               </span>
             ) : null}
@@ -199,18 +195,18 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
     .join("");
 
   return (
-    <div className="min-h-dvh flex bg-stone-50">
+    <div className="dash-root home-root home-bg min-h-dvh flex">
 
       {/* Desktop sidebar */}
-      <aside className="hidden lg:block w-60 shrink-0">
-        <div className="fixed top-0 left-0 h-screen w-60">
+      <aside className="hidden lg:block w-64 shrink-0">
+        <div className="fixed left-3 top-3 h-[calc(100vh-1.5rem)] w-[15.5rem]">
           <Sidebar slug={slug} pendingOrders={pendingOrders} />
         </div>
       </aside>
 
       {/* Mobile sidebar sheet */}
       <Sheet open={open} onOpenChange={setOpen}>
-        <SheetContent side="left" className="p-0 w-64 bg-white border-r border-stone-100">
+        <SheetContent side="left" className="dash-root home-root p-0 w-64 bg-white border-r border-[var(--h-line)]">
           <Sidebar onNavigate={() => setOpen(false)} slug={slug} pendingOrders={pendingOrders} />
         </SheetContent>
       </Sheet>
@@ -218,7 +214,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
       <div className="flex-1 flex flex-col min-w-0">
 
         {/* Header */}
-        <header className="sticky top-0 z-30 h-14 border-b border-stone-100 bg-white/95 backdrop-blur-sm shadow-[0_1px_0_0_rgba(0,0,0,0.04)]">
+        <header className="sticky top-0 z-30 h-16 bg-white/40 backdrop-blur-md">
           <div className="h-full px-4 sm:px-6 flex items-center justify-between gap-4">
 
             {/* Mobile: hamburger + name */}
@@ -241,7 +237,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
             {/* Desktop: restaurant name */}
             {restaurantName ? (
               <div className="hidden lg:block">
-                <span className="text-sm font-medium text-stone-400">{restaurantName}</span>
+                <span className="text-sm font-semibold text-[var(--h-muted)]">{restaurantName}</span>
               </div>
             ) : (
               <div className="hidden lg:block" />
@@ -250,8 +246,8 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
             {/* User dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="flex items-center gap-2 rounded-full pl-1 pr-3 py-1 hover:bg-stone-100 transition-colors border border-stone-200">
-                  <div className="h-7 w-7 rounded-full bg-stone-900 text-white flex items-center justify-center text-xs font-bold shrink-0">
+                <button className="flex items-center gap-2 rounded-full border border-[var(--h-line)] bg-white py-1 pl-1 pr-3 shadow-sm transition-colors hover:bg-[#f6f3ee]">
+                  <div className="h-8 w-8 rounded-full bg-[var(--h-ink)] text-white flex items-center justify-center text-xs font-bold shrink-0">
                     {initials || "A"}
                   </div>
                   <span className="hidden sm:block text-xs text-stone-600 max-w-[140px] truncate font-medium">
