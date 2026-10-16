@@ -10,10 +10,16 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   await connectDb();
   const { slug } = await params;
   const restaurant = await Restaurant.findOne({ slug }).lean();
-  if (!restaurant) return { title: "Menu" };
+  if (!restaurant) return { title: "Menu", robots: { index: false } };
+  const image = restaurant.coverImage || restaurant.logo;
+  const title = `Menu ${restaurant.name} : carte, prix et produits`;
+  const description = `Consultez le menu digital de ${restaurant.name} en Tunisie : toutes les catégories, produits et prix, à jour, sur votre téléphone.`;
   return {
-    title: `${restaurant.name} | Menu QR`,
-    description: `Menu digital de ${restaurant.name}`,
+    title,
+    description,
+    alternates: { canonical: `/menu/${slug}` },
+    openGraph: { type: "website", locale: "fr_TN", title, description, url: `/menu/${slug}`, ...(image ? { images: [{ url: image }] } : {}) },
+    twitter: { card: image ? "summary_large_image" : "summary", title, description, ...(image ? { images: [image] } : {}) },
   };
 }
 

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Plus_Jakarta_Sans, Fraunces } from "next/font/google";
 import "./globals.css";
 import { AppProviders } from "@/components/providers/app-providers";
+import { HOME_DESCRIPTION, HOME_TITLE, SITE_NAME, SITE_URL } from "@/lib/site";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
@@ -18,14 +19,42 @@ const fraunces = Fraunces({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: {
-    default: "ClickMenu — Digital QR menus for cafés & restaurants",
-    template: "%s · ClickMenu",
+    default: `${HOME_TITLE} | ${SITE_NAME}`,
+    template: `%s · ${SITE_NAME}`,
   },
-  description:
-    "ClickMenu: build and manage premium digital QR menus for cafés and restaurants in minutes.",
-  applicationName: "ClickMenu",
-  appleWebApp: { capable: true, title: "ClickMenu", statusBarStyle: "black-translucent" },
+  description: HOME_DESCRIPTION,
+  applicationName: SITE_NAME,
+  keywords: [
+    "menu digital Tunisie",
+    "menu digital en Tunisie",
+    "menu QR code Tunisie",
+    "menu QR code restaurant",
+    "menu QR café",
+    "carte digitale restaurant",
+    "menu numérique restaurant Tunisie",
+    "QR code menu café Tunis",
+    "ClickMenu",
+  ],
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    locale: "fr_TN",
+    siteName: SITE_NAME,
+    url: "/",
+    title: `${HOME_TITLE} | ${SITE_NAME}`,
+    description: HOME_DESCRIPTION,
+    images: [{ url: "/logos/clickmenu-mark-512.png", width: 512, height: 512, alt: "ClickMenu — menu digital en Tunisie" }],
+  },
+  twitter: {
+    card: "summary",
+    title: `${HOME_TITLE} | ${SITE_NAME}`,
+    description: HOME_DESCRIPTION,
+    images: ["/logos/clickmenu-mark-512.png"],
+  },
+  robots: { index: true, follow: true, googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 } },
+  appleWebApp: { capable: true, title: SITE_NAME, statusBarStyle: "black-translucent" },
   icons: {
     icon: "/logos/logo.png",
     shortcut: "/logos/logo.png",

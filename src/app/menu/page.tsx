@@ -6,8 +6,9 @@ import type { Metadata } from "next";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Nos Établissements Partenaires | ClickMenu",
-  description: "Explorez et accédez aux cartes et menus digitaux des meilleurs cafés, restaurants et fast-foods en Tunisie.",
+  title: "Menus digitaux des cafés et restaurants en Tunisie",
+  description: "Explorez les menus digitaux (QR code) des cafés, restaurants, pâtisseries et fast-foods partenaires de ClickMenu en Tunisie.",
+  alternates: { canonical: "/menu" },
 };
 
 export default async function RestaurantDirectoryPage() {

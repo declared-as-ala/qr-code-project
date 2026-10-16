@@ -395,3 +395,12 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+/* Landing page category marquee */
+@keyframes home-marquee {
+  to { transform: translateX(-50%); }
+}
+.home-marquee { animation: home-marquee 40s linear infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .home-marquee { animation: none; }
+}
