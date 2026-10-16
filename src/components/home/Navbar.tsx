@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowUpRight, Menu as MenuIcon, X } from "lucide-react";
 
@@ -26,7 +27,10 @@ function Logo() {
 }
 
 export function Navbar() {
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  // On other pages (e.g. /menu) in-page anchors must point back to the home page.
+  const href = (h: string) => (h.startsWith("#") && pathname !== "/" ? `/${h}` : h);
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -56,7 +60,7 @@ export function Navbar() {
           {LINKS.map((l) => (
             <a
               key={l.href}
-              href={l.href}
+              href={href(l.href)}
               className="rounded-full px-3.5 py-2 text-[14px] font-medium text-[var(--h-ink)]/80 transition-colors hover:text-[var(--h-terra)]"
             >
               {l.label}
@@ -101,7 +105,7 @@ export function Navbar() {
             {LINKS.map((l) => (
               <a
                 key={l.href}
-                href={l.href}
+                href={href(l.href)}
                 onClick={() => setOpen(false)}
                 className="flex items-center justify-between border-b border-[var(--h-line)] py-4 text-[16px] font-semibold text-[var(--h-ink)]"
               >

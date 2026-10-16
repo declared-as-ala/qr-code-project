@@ -1,22 +1,11 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
-import {
-  Search,
-  MapPin,
-  Phone,
-  Utensils,
-  Coffee,
-  ArrowRight,
-  Sparkles,
-  Store,
-  ChevronRight,
-  SlidersHorizontal,
-  Home
-} from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import { AnimatePresence, motion } from "framer-motion";
+import { ArrowRight, Coffee, MapPin, Phone, Search, Store, Utensils } from "lucide-react";
+import { Navbar, WHATSAPP } from "@/components/home/Navbar";
+import { thumb } from "@/lib/utils";
 
 interface RestaurantItem {
   _id: string;
@@ -30,269 +19,186 @@ interface RestaurantItem {
   primaryColor: string;
 }
 
-interface RestaurantDirectoryClientProps {
-  initialRestaurants: RestaurantItem[];
-}
+const FILTERS = [
+  { id: "all", label: "Tous", icon: null },
+  { id: "cafe", label: "Cafés & Lounges", icon: Coffee },
+  { id: "restaurant", label: "Restaurants & Fast-foods", icon: Utensils },
+] as const;
 
-export function RestaurantDirectoryClient({ initialRestaurants }: RestaurantDirectoryClientProps) {
+type Filter = (typeof FILTERS)[number]["id"];
+
+export function RestaurantDirectoryClient({ initialRestaurants }: { initialRestaurants: RestaurantItem[] }) {
   const [search, setSearch] = useState("");
-  const [activeFilter, setActiveFilter] = useState<"all" | "cafe" | "restaurant">("all");
+  const [filter, setFilter] = useState<Filter>("all");
 
-  // Premium fallbacks for restaurant cover images based on culinary styles
-  const defaultCovers: Record<string, string> = {
-    cafe: "https://images.unsplash.com/photo-1517701604599-bb29b565090c?auto=format&fit=crop&w=800&q=85",
-    restaurant: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=85",
-  };
-
-  // Real-time filtering and searching of establishments
-  const filteredRestaurants = useMemo(() => {
-    return initialRestaurants.filter((res) => {
-      const matchesSearch =
-        res.name.toLowerCase().includes(search.toLowerCase()) ||
-        (res.address ?? "").toLowerCase().includes(search.toLowerCase());
-      
-      const matchesFilter =
-        activeFilter === "all" || res.establishmentType === activeFilter;
-
-      return matchesSearch && matchesFilter;
+  const list = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    return initialRestaurants.filter((r) => {
+      const matchesSearch = !q || r.name.toLowerCase().includes(q) || (r.address ?? "").toLowerCase().includes(q);
+      return matchesSearch && (filter === "all" || r.establishmentType === filter);
     });
-  }, [initialRestaurants, search, activeFilter]);
+  }, [initialRestaurants, search, filter]);
 
   return (
-    <div className="relative min-h-screen bg-zinc-950 text-zinc-100 font-sans selection:bg-amber-500/20 selection:text-amber-300 pb-20">
-      
-      {/* Background ambient lighting */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-[450px] bg-gradient-to-b from-amber-500/[0.04] via-transparent to-transparent" />
-      <div className="pointer-events-none absolute top-1/4 left-1/4 h-96 w-96 rounded-full bg-amber-500/[0.02] blur-3xl" />
-      <div className="pointer-events-none absolute bottom-1/4 right-1/4 h-96 w-96 rounded-full bg-yellow-500/[0.02] blur-3xl" />
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:32px_32px] opacity-40" />
+    <div className="home-root home-bg relative min-h-screen overflow-x-clip text-[var(--h-ink)] antialiased [font-family:var(--font-body),system-ui,sans-serif]">
+      <Navbar />
 
-      {/* Floating Mini Navigation Bar */}
-      <header className="border-b border-zinc-900 bg-zinc-950/70 backdrop-blur-md sticky top-0 z-40">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6 lg:px-8">
-          <Link href="/" className="flex items-center gap-2 group">
-            <div className="relative flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-tr from-amber-500 to-yellow-600 shadow-md">
-              <Store className="h-4 w-4 text-zinc-950 stroke-[2.5]" />
-            </div>
-            <span className="text-base font-bold text-white transition-colors group-hover:text-amber-400">
-              Click<span className="text-amber-500 font-medium">Menu</span>
-            </span>
-          </Link>
+      {/* Header */}
+      <section className="mx-auto max-w-4xl px-5 pt-28 text-center sm:px-8 sm:pt-36">
+        <h1 className="text-[2.3rem] font-extrabold leading-[1.12] tracking-tight sm:text-6xl">
+          Nos{" "}
+          <span className="relative isolate inline-block px-3 sm:px-5">
+            <span className="absolute inset-y-[6%] left-0 right-0 -z-10 rounded-[999px] bg-[var(--h-sun)]" />
+            établissements
+          </span>
+          <br />
+          partenaires
+        </h1>
+        <p className="mx-auto mt-6 max-w-xl text-base leading-relaxed text-[var(--h-ink)]/75 sm:text-lg">
+          Explorez les menus digitaux des cafés, restaurants et lounges qui utilisent ClickMenu. Scannez, découvrez, savourez.
+        </p>
 
-          <Link
-            href="/"
-            className="flex items-center gap-1.5 text-xs font-semibold text-zinc-400 hover:text-white transition-colors"
-          >
-            <Home className="h-4 w-4" />
-            <span>Retour Accueil</span>
-          </Link>
-        </div>
-      </header>
-
-      {/* Banner / Title Header */}
-      <section className="relative mx-auto max-w-7xl px-6 pt-12 pb-8 lg:px-8 text-center sm:text-left">
-        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6">
-          <div className="max-w-2xl">
-            <div className="inline-flex items-center gap-2 rounded-full border border-amber-500/20 bg-amber-500/5 px-3 py-1 mb-4 text-[10px] font-extrabold tracking-widest text-amber-400 uppercase">
-              <Sparkles className="h-3.5 w-3.5" />
-              <span>ClickMenu Partners</span>
-            </div>
-            <h1 
-              className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl"
-              style={{ fontFamily: "var(--font-display)" }}
-            >
-              Nos Établissements Partenaires
-            </h1>
-            <p className="mt-3 text-sm text-zinc-400 leading-relaxed">
-              Explorez les cartes interactives et les menus digitaux des meilleures adresses gastronomiques. Scannez, découvrez les spécialités et dégustez !
-            </p>
-          </div>
-        </div>
-
-        {/* Search and Filters Segment */}
-        <div className="mt-12 flex flex-col md:flex-row gap-4 items-stretch md:items-center">
-          
-          {/* Search bar */}
-          <div className="relative flex-1">
-            <Search className="absolute left-4 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-zinc-500" />
+        {/* Search + filters */}
+        <div className="mx-auto mt-10 max-w-2xl">
+          <div className="relative">
+            <Search className="absolute left-5 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-[var(--h-muted)]" />
             <input
-              type="text"
+              type="search"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Rechercher par nom, emplacement, ville..."
-              className="h-12 w-full rounded-xl border border-zinc-900 bg-zinc-900/50 pl-11 pr-4 text-sm font-medium text-white placeholder:text-zinc-500 outline-none transition-all focus:border-amber-500/30 focus:bg-zinc-900 focus:ring-4 focus:ring-amber-500/5"
+              placeholder="Rechercher un café, un restaurant, une ville…"
+              aria-label="Rechercher un établissement"
+              className="h-14 w-full rounded-full border border-[var(--h-line)] bg-white pl-12 pr-5 text-[15px] font-medium text-[var(--h-ink)] shadow-[0_12px_30px_-20px_rgba(17,17,17,0.4)] outline-none transition-shadow placeholder:text-[var(--h-muted)] focus:border-[var(--h-ink)]/40"
             />
           </div>
-
-          {/* Category Chips Filters */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 md:pb-0 scrollbar-none">
-            <button
-              onClick={() => setActiveFilter("all")}
-              className={`flex h-11 items-center gap-1.5 rounded-xl px-5 text-xs font-bold transition-all whitespace-nowrap ${
-                activeFilter === "all"
-                  ? "bg-gradient-to-tr from-amber-500 to-yellow-600 text-zinc-950 font-black shadow-lg shadow-amber-500/10"
-                  : "bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white"
-              }`}
-            >
-              Tous
-            </button>
-            <button
-              onClick={() => setActiveFilter("cafe")}
-              className={`flex h-11 items-center gap-1.5 rounded-xl px-5 text-xs font-bold transition-all whitespace-nowrap ${
-                activeFilter === "cafe"
-                  ? "bg-gradient-to-tr from-amber-500 to-yellow-600 text-zinc-950 font-black shadow-lg shadow-amber-500/10"
-                  : "bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white"
-              }`}
-            >
-              <Coffee className="h-4 w-4" />
-              Cafés & Lounges
-            </button>
-            <button
-              onClick={() => setActiveFilter("restaurant")}
-              className={`flex h-11 items-center gap-1.5 rounded-xl px-5 text-xs font-bold transition-all whitespace-nowrap ${
-                activeFilter === "restaurant"
-                  ? "bg-gradient-to-tr from-amber-500 to-yellow-600 text-zinc-950 font-black shadow-lg shadow-amber-500/10"
-                  : "bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white"
-              }`}
-            >
-              <Utensils className="h-4 w-4" />
-              Restaurants & Fast-foods
-            </button>
+          <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
+            {FILTERS.map((f) => (
+              <button
+                key={f.id}
+                onClick={() => setFilter(f.id)}
+                aria-pressed={filter === f.id}
+                className={`inline-flex h-10 items-center gap-1.5 rounded-full px-5 text-[13px] font-bold transition-colors ${
+                  filter === f.id
+                    ? "bg-[var(--h-ink)] text-white"
+                    : "border border-[var(--h-line)] bg-white text-[var(--h-ink)] hover:border-[var(--h-ink)]/40"
+                }`}
+              >
+                {f.icon && <f.icon className="h-4 w-4" />}
+                {f.label}
+              </button>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Main Grid Section */}
-      <main className="mx-auto max-w-7xl px-6 lg:px-8 mt-6">
+      {/* Grid */}
+      <main className="mx-auto max-w-6xl px-5 pb-24 pt-14 sm:px-8 sm:pt-16">
         <AnimatePresence mode="wait">
-          {filteredRestaurants.length === 0 ? (
+          {list.length === 0 ? (
             <motion.div
+              key="empty"
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
-              className="flex flex-col items-center justify-center py-20 text-center rounded-3xl border border-zinc-900 bg-zinc-950/40 p-8 shadow-xl"
+              className="mx-auto flex max-w-lg flex-col items-center rounded-[1.75rem] bg-white p-10 text-center shadow-[0_18px_50px_-28px_rgba(17,17,17,0.35)]"
             >
-              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-amber-500/5 border border-amber-500/10 text-amber-500 mb-6">
-                <Store className="h-8 w-8" />
-              </div>
-              <h2 className="text-xl font-bold text-white">Aucun établissement trouvé</h2>
-              <p className="mt-2 text-sm text-zinc-500 max-w-md">
-                Nous n’avons trouvé aucun partenaire correspondant à vos critères de recherche. Essayez un autre mot-clé ou filtrez par type.
-              </p>
+              <span className="flex h-14 w-14 items-center justify-center rounded-full bg-[var(--h-sun)]">
+                <Store className="h-6 w-6" />
+              </span>
+              <h2 className="mt-5 text-xl font-bold">Aucun établissement trouvé</h2>
+              <p className="mt-2 text-sm text-[var(--h-muted)]">Essayez un autre mot-clé ou changez de filtre.</p>
               <button
                 onClick={() => {
                   setSearch("");
-                  setActiveFilter("all");
+                  setFilter("all");
                 }}
-                className="mt-6 flex h-11 items-center gap-2 rounded-xl bg-zinc-900 border border-zinc-800 px-6 text-xs font-bold text-amber-400 hover:bg-zinc-800 transition-all active:scale-[0.98]"
+                className="mt-6 inline-flex h-11 items-center rounded-xl bg-[var(--h-ink)] px-6 text-sm font-bold text-white active:scale-[0.97]"
               >
-                Réinitialiser la recherche
+                Réinitialiser
               </button>
             </motion.div>
           ) : (
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
-            >
-              {filteredRestaurants.map((res, idx) => (
-                <motion.div
-                  key={res._id}
+            <motion.ul key="grid" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {list.map((r, i) => (
+                <motion.li
+                  key={r._id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, delay: idx * 0.05 }}
-                  className="group"
+                  transition={{ duration: 0.4, delay: Math.min(i, 8) * 0.05 }}
                 >
-                  <Card className="h-full rounded-2xl border border-zinc-900 bg-zinc-950 overflow-hidden shadow-xl transition-all duration-300 hover:border-amber-500/20 hover:shadow-2xl hover:shadow-black/60 relative">
-                    
-                    {/* Header Image Background banner */}
-                    <div className="relative h-44 w-full bg-zinc-900 overflow-hidden">
-                      <img
-                        src={res.coverImage || defaultCovers[res.establishmentType] || defaultCovers.restaurant}
-                        alt={res.name}
-                        className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                        loading="lazy"
-                      />
-                      
-                      <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/20 to-transparent" />
-                      
-                      {/* Logo badge overlay */}
-                      <div className="absolute bottom-4 left-4 flex items-center gap-3">
-                        <div 
-                          className="relative flex h-12 w-12 items-center justify-center overflow-hidden rounded-xl bg-white shadow-lg border-2 border-zinc-950 shrink-0"
-                          style={{ borderColor: res.primaryColor }}
-                        >
-                          {res.logo ? (
-                            <img src={res.logo} alt={res.name} className="h-full w-full object-cover" />
-                          ) : (
-                            <span 
-                              className="text-xs font-black uppercase text-zinc-900 select-none"
-                              style={{ color: res.primaryColor }}
-                            >
-                              {res.name.substring(0, 2)}
-                            </span>
-                          )}
-                        </div>
-
-                        <div className="min-w-0">
-                          <h2 className="text-lg font-black text-white truncate drop-shadow-md leading-tight">
-                            {res.name}
-                          </h2>
-                          <div className="flex items-center gap-1.5 mt-0.5">
-                            {res.establishmentType === "cafe" ? (
-                              <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 border border-amber-500/10 px-2 py-0.5 text-[8.5px] font-bold uppercase tracking-wider text-amber-400">
-                                <Coffee className="h-2.5 w-2.5" />
-                                Café
-                              </span>
-                            ) : (
-                              <span className="inline-flex items-center gap-1 rounded-full bg-yellow-500/10 border border-yellow-500/5 px-2 py-0.5 text-[8.5px] font-bold uppercase tracking-wider text-yellow-300">
-                                <Utensils className="h-2.5 w-2.5" />
-                                Restaurant
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
+                  <Link
+                    href={`/menu/${r.slug}`}
+                    className="group flex h-full flex-col overflow-hidden rounded-[1.75rem] bg-white shadow-[0_18px_50px_-28px_rgba(17,17,17,0.35)] transition-transform duration-300 hover:-translate-y-1"
+                  >
+                    <div className="relative aspect-[16/10] overflow-hidden bg-gradient-to-br from-[#f2d36b] via-[#f6e7b4] to-[#e6e2ff]">
+                      {r.coverImage && (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={thumb(r.coverImage, 640, 400)}
+                          alt={`Menu ${r.name}`}
+                          loading="lazy"
+                          decoding="async"
+                          className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                        />
+                      )}
+                      <span className="absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-full bg-white/90 px-3 py-1 text-[11px] font-bold backdrop-blur">
+                        {r.establishmentType === "cafe" ? <Coffee className="h-3.5 w-3.5" /> : <Utensils className="h-3.5 w-3.5" />}
+                        {r.establishmentType === "cafe" ? "Café" : "Restaurant"}
+                      </span>
                     </div>
 
-                    <CardContent className="p-5 flex flex-col gap-4">
-                      
-                      {/* Details specs */}
-                      <div className="flex flex-col gap-2.5 text-xs text-zinc-400">
-                        {res.address && (
-                          <div className="flex items-start gap-2">
-                            <MapPin className="h-4 w-4 shrink-0 text-zinc-600 mt-0.5" />
-                            <span className="truncate">{res.address}</span>
-                          </div>
+                    <div className="relative flex flex-1 flex-col px-6 pb-6 pt-9">
+                      <span className="absolute -top-7 left-6 flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl border-4 border-white bg-[#f1efe9] shadow-md">
+                        {r.logo ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={thumb(r.logo, 112, 112)} alt="" className="h-full w-full object-cover" loading="lazy" />
+                        ) : (
+                          <span className="text-sm font-black uppercase">{r.name.substring(0, 2)}</span>
                         )}
-                        {res.phone && (
-                          <div className="flex items-center gap-2">
-                            <Phone className="h-4 w-4 shrink-0 text-zinc-600" />
-                            <span>{res.phone}</span>
-                          </div>
+                      </span>
+
+                      <h2 className="truncate text-lg font-extrabold leading-tight">{r.name}</h2>
+                      <div className="mt-3 space-y-2 text-[13px] text-[var(--h-muted)]">
+                        {r.address && (
+                          <p className="flex items-start gap-2">
+                            <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
+                            <span className="line-clamp-2">{r.address}</span>
+                          </p>
+                        )}
+                        {r.phone && (
+                          <p className="flex items-center gap-2">
+                            <Phone className="h-4 w-4 shrink-0" />
+                            {r.phone}
+                          </p>
                         )}
                       </div>
 
-                      {/* Card Button */}
-                      <Link
-                        href={`/menu/${res.slug}`}
-                        className="group/btn flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-zinc-900 border border-zinc-800 text-xs font-bold text-white transition-all hover:bg-zinc-850 hover:border-zinc-700 active:scale-[0.985] mt-2 shadow-inner"
-                      >
+                      <span className="mt-6 inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-[var(--h-ink)] text-sm font-bold text-white transition-colors group-hover:bg-black">
                         Voir le menu
-                        <ArrowRight className="h-3.5 w-3.5 text-amber-500 transition-transform duration-200 group-hover/btn:translate-x-1" />
-                      </Link>
-
-                    </CardContent>
-
-                  </Card>
-                </motion.div>
+                        <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                      </span>
+                    </div>
+                  </Link>
+                </motion.li>
               ))}
-            </motion.div>
+            </motion.ul>
           )}
         </AnimatePresence>
+
+        <div className="mt-16 rounded-[2rem] bg-[#111] px-6 py-12 text-center text-white sm:px-12">
+          <h2 className="text-2xl font-extrabold leading-tight sm:text-4xl">
+            Votre établissement ici ?
+          </h2>
+          <p className="mx-auto mt-3 max-w-md text-sm text-white/65">Rejoignez les cafés et restaurants qui ont digitalisé leur carte.</p>
+          <a href={WHATSAPP} target="_blank" rel="noreferrer" className="mt-7 inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-white px-7 text-[15px] font-bold text-[#111] active:scale-[0.97]">
+            Devenir partenaire <ArrowRight className="h-4 w-4" />
+          </a>
+        </div>
       </main>
 
+      <footer className="border-t border-[var(--h-line)] py-8 text-center text-xs text-[var(--h-muted)]">
+        © {new Date().getFullYear()} ClickMenu · Made in Tunisia
+      </footer>
     </div>
   );
 }
