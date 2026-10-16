@@ -117,7 +117,7 @@ function PhoneMockup() {
           <p className="text-[10px] text-[var(--h-muted)]">Aucune app à installer</p>
         </div>
       </div>
-      <div className="absolute -left-4 bottom-16 rounded-2xl bg-white p-3 shadow-xl sm:-left-14">
+      <div className="absolute -bottom-6 -left-4 rounded-2xl bg-white p-3 shadow-xl sm:-left-14">
         <p className="text-[9px] font-bold uppercase tracking-wider text-[var(--h-muted)]">Ce mois</p>
         <div className="mt-1 flex items-end gap-3">
           <div>
@@ -177,7 +177,7 @@ export default async function HomePage() {
                 style={{ fontFamily: "var(--font-display)" }}
               >
                 Le menu digital en Tunisie qui{" "}
-                <span className="relative whitespace-nowrap text-[var(--h-terra)]">
+                <span className="relative text-[var(--h-terra)] sm:whitespace-nowrap">
                   donne envie
                   <svg className="absolute -bottom-2 left-0 w-full" viewBox="0 0 200 10" preserveAspectRatio="none" height="8" aria-hidden>
                     <path d="M2 7 Q50 1 100 6 T198 4" stroke="#f4c65a" strokeWidth="4" fill="none" strokeLinecap="round" />

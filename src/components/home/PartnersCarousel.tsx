@@ -43,8 +43,8 @@ export function PartnersCarousel({ partners }: { partners: Partner[] }) {
                 </span>
                 <span className="min-w-0">
                   <span className="block truncate text-sm font-bold text-[var(--h-ink)]">{p.name}</span>
-                  <span className="block text-[11px] font-medium text-[var(--h-muted)] transition-colors group-hover:text-[var(--h-terra)]">
-                    {TYPE_LABEL[p.type || ""] || "Voir le menu"} · Voir le menu →
+                  <span className="block whitespace-nowrap text-[11px] font-medium text-[var(--h-muted)] transition-colors group-hover:text-[var(--h-terra)]">
+                    {TYPE_LABEL[p.type || ""] || "Menu"} · Voir le menu →
                   </span>
                 </span>
               </Link>
