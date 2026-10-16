@@ -7,8 +7,13 @@
         "build": "next build",
         "start": "next start",
         "lint": "eslint",
-        "seed": "node scripts/seed.js",
-        "upload:cheese-steak": "node scripts/upload-cheese-steak-images.js"
+"seed": "node scripts/seed.js",
+      "seed:big-a-food": "node scripts/seed-big-a-food.js",
+      "seed:oliva-nera": "node scripts/seed-oliva-nera.js",
+      "seed:metropolitan": "node scripts/seed-metropolitan.js",
+      "backup:metropolitan": "node scripts/backup-metropolitan.js",
+      "images:big-a-food": "node scripts/upload-big-a-food-images.js",
+      "upload:cheese-steak": "node scripts/upload-cheese-steak-images.js"
     },
     "dependencies": {
         "@base-ui/react": "^1.4.1",

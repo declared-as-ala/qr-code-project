@@ -47,7 +47,7 @@ export default async function PublicMenuPage({ params }: { params: Promise<{ slu
         showPrices: restaurant.showPrices !== false,
         logoBg: (restaurant as any).logoBg,
       }}
-      categories={categories.map((c) => ({ _id: String(c._id), name: c.name }))}
+      categories={categories.map((c) => ({ _id: String(c._id), name: c.name, description: c.description }))}
       products={products.map((p) => ({
         _id: String(p._id),
         categoryId: String(p.categoryId),
@@ -56,6 +56,7 @@ export default async function PublicMenuPage({ params }: { params: Promise<{ slu
         price: p.price,
         image: p.image,
         badge: p.badge,
+        supplements: (p.supplements ?? []).map((s: { name: string; price: number }) => ({ name: s.name, price: s.price })),
         isAvailable: p.isAvailable,
       }))}
     />

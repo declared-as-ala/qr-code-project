@@ -3,6 +3,7 @@
 import { memo } from "react";
 import { BadgePill } from "@/components/BadgePill";
 import { thumb } from "@/lib/utils";
+import { MenuSupplements, type Supplement } from "@/components/menu/MenuSupplements";
 
 type BadgeType = "nouveau" | "populaire" | "promo" | "signature";
 
@@ -21,6 +22,7 @@ function MenuProductRowBase({
   price,
   image,
   badge,
+  supplements,
   isAvailable,
   showPrice = true,
   onAdd,
@@ -32,6 +34,7 @@ function MenuProductRowBase({
   price: string;
   image?: string;
   badge?: string;
+  supplements?: Supplement[];
   isAvailable: boolean;
   showPrice?: boolean;
   onAdd?: (id: string) => void;
@@ -87,6 +90,7 @@ function MenuProductRowBase({
             Indisponible
           </p>
         ) : null}
+        <MenuSupplements items={supplements} showPrice={showPrice} />
       </div>
 
       {/* Price */}

@@ -8,6 +8,8 @@ const ProductSchema = new Schema(
     description: String,
     price: { type: Number, required: true },
     image: String,
+    // Optional extras shown under the product (not sold as standalone items).
+    supplements: { type: [{ _id: false, name: { type: String, required: true }, price: { type: Number, required: true } }], default: [] },
     badge: { type: String, enum: ["Nouveau", "Populaire", "Promo", ""], default: "" },
     isAvailable: { type: Boolean, default: true },
     isFeatured: { type: Boolean, default: false },

@@ -26,10 +26,11 @@ type Product = {
   price: number;
   image?: string;
   badge?: string;
+  supplements?: { name: string; price: number }[];
   isAvailable: boolean;
 };
 
-type Category = { _id: string; name: string };
+type Category = { _id: string; name: string; description?: string };
 
 type ViewMode = "grid" | "list";
 const VIEW_KEY = "cs.menu.view.v2";
@@ -796,6 +797,11 @@ const MenuSections = memo(function MenuSections({
                   · {items.length}
                 </span>
               </h3>
+              {category.description && (
+                <p className="mt-0.5 text-[10.5px] font-medium normal-case tracking-normal" style={{ color: "var(--pm-accent)" }}>
+                  {category.description}
+                </p>
+              )}
             </div>
 
             {viewMode === "grid" ? (
@@ -809,6 +815,7 @@ const MenuSections = memo(function MenuSections({
                     price={`${Number(product.price).toFixed(3)} DT`}
                     image={product.image}
                     badge={product.badge}
+                    supplements={product.supplements}
                     isAvailable={product.isAvailable}
                     showPrice={showPrices}
                     eager={i < eagerCount}
@@ -826,6 +833,7 @@ const MenuSections = memo(function MenuSections({
                     price={`${Number(product.price).toFixed(3)} DT`}
                     image={product.image}
                     badge={product.badge}
+                    supplements={product.supplements}
                     isAvailable={product.isAvailable}
                     showPrice={showPrices}
                     eager={i < eagerCount}
