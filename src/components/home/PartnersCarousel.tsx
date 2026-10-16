@@ -38,7 +38,7 @@ export function PartnersCarousel({ partners }: { partners: Partner[] }) {
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={p.logo} alt="" width={48} height={48} loading="lazy" decoding="async" className="h-full w-full object-cover" />
                   ) : (
-                    <span className="text-base font-black text-[var(--h-teal)]">{p.name.charAt(0).toUpperCase()}</span>
+                    <span className="text-base font-black text-[var(--h-navy)]">{p.name.charAt(0).toUpperCase()}</span>
                   )}
                 </span>
                 <span className="min-w-0">

@@ -57,7 +57,7 @@ const JSON_LD = {
   ],
 };
 
-const CARD = "rounded-[1.75rem] border border-[var(--h-line)] bg-white shadow-[0_1px_0_rgba(16,35,31,0.04)]";
+const CARD = "rounded-[1.75rem] border border-[var(--h-line)] bg-white shadow-[0_1px_0_rgba(20,27,45,0.04)]";
 const EYEBROW = "inline-flex items-center gap-2 rounded-full bg-[var(--h-terra-soft)] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--h-terra-2)]";
 const H2 = "mt-4 text-[2rem] font-extrabold leading-[1.08] tracking-tight text-[var(--h-ink)] sm:text-5xl";
 const BTN_PRIMARY =
@@ -75,10 +75,10 @@ function PhoneMockup() {
   return (
     <div className="relative mx-auto w-[230px] sm:w-[250px]">
       <div
-        className="relative overflow-hidden rounded-[38px] border-[6px] border-[#10231f] bg-[#09090b] shadow-[0_40px_70px_-20px_rgba(0,0,0,0.6)]"
+        className="relative overflow-hidden rounded-[38px] border-[6px] border-[#141b2d] bg-[#09090b] shadow-[0_40px_70px_-20px_rgba(0,0,0,0.6)]"
         style={{ aspectRatio: "9/18.5" }}
       >
-        <div className="absolute left-1/2 top-0 z-10 h-5 w-20 -translate-x-1/2 rounded-b-2xl bg-[#10231f]" />
+        <div className="absolute left-1/2 top-0 z-10 h-5 w-20 -translate-x-1/2 rounded-b-2xl bg-[#141b2d]" />
         <div className="relative h-[34%] overflow-hidden bg-gradient-to-br from-[#4a3818] via-[#1d1710] to-[#09090b]">
           <div className="absolute inset-0 bg-gradient-to-t from-[#09090b] to-transparent" />
           <div className="absolute bottom-3 left-3.5 flex items-center gap-2">
@@ -124,7 +124,7 @@ function PhoneMockup() {
             <p className="text-xl font-black leading-none text-[var(--h-ink)]">15 248</p>
             <p className="mt-1 text-[10px] text-[var(--h-muted)]">scans QR</p>
           </div>
-          <span className="text-[11px] font-bold text-emerald-600">↑ 24%</span>
+          <span className="text-[11px] font-bold text-[var(--h-terra-2)]">↑ 24%</span>
         </div>
         <div className="mt-2 flex h-6 items-end gap-0.5">
           {[45, 62, 50, 78, 64, 92, 74].map((h, i) => (
@@ -208,7 +208,7 @@ export default async function HomePage() {
               <ul className="mt-9 flex flex-wrap gap-x-6 gap-y-2 text-sm font-semibold text-[var(--h-ink)]">
                 {["En ligne en 48h", "Sans application", "Mise à jour instantanée"].map((t) => (
                   <li key={t} className="flex items-center gap-2">
-                    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[var(--h-teal)] text-white">
+                    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[var(--h-navy)] text-white">
                       <Check className="h-3 w-3 stroke-[3]" />
                     </span>
                     {t}
@@ -219,7 +219,7 @@ export default async function HomePage() {
           </div>
 
           <Reveal delay={0.15}>
-            <div className="relative mx-auto max-w-md rounded-[2.5rem] bg-[var(--h-teal)] px-6 pb-12 pt-14 sm:px-10">
+            <div className="relative mx-auto max-w-md rounded-[2.5rem] bg-[var(--h-navy)] px-6 pb-12 pt-14 sm:px-10">
               <div className="absolute -right-5 -top-5 h-24 w-24 rounded-full bg-[var(--h-sun)]" />
               <div className="absolute -left-4 bottom-10 h-14 w-14 rounded-full bg-[var(--h-terra)]" />
               <div
@@ -245,7 +245,7 @@ export default async function HomePage() {
             ["4.9/5", "Satisfaction client", "selon nos clients"],
           ].map(([v, l, s], i) => (
             <Reveal key={l} delay={i * 0.08} className={`${CARD} p-8 text-center`}>
-              <p className="text-5xl font-black tracking-tight text-[var(--h-teal)] sm:text-6xl" style={{ fontFamily: "var(--font-display)" }}>
+              <p className="text-5xl font-black tracking-tight text-[var(--h-navy)] sm:text-6xl" style={{ fontFamily: "var(--font-display)" }}>
                 {v}
               </p>
               <p className="mt-3 text-sm font-bold text-[var(--h-ink)]">{l}</p>
@@ -265,7 +265,7 @@ export default async function HomePage() {
         </Reveal>
 
         <div className="mt-12 grid gap-4 md:grid-cols-6">
-          <Reveal className="relative overflow-hidden rounded-[1.75rem] bg-[var(--h-teal)] p-8 text-white md:col-span-4">
+          <Reveal className="relative overflow-hidden rounded-[1.75rem] bg-[var(--h-navy)] p-8 text-white md:col-span-4">
             <div className="absolute -right-8 -top-8 h-40 w-40 rounded-full bg-[var(--h-sun)]/90" />
             <Smartphone className="relative h-7 w-7 text-[var(--h-sun)]" />
             <h3 className="relative mt-6 text-2xl font-bold">Aucune application à installer</h3>
@@ -285,7 +285,7 @@ export default async function HomePage() {
             <p className="mt-2 text-sm leading-relaxed text-[var(--h-ink)]/70">Logo, couleurs et photos des plats, pensés pour mettre en appétit.</p>
           </Reveal>
           <Reveal delay={0.12} className={`${CARD} p-8 md:col-span-4`}>
-            <BarChart3 className="h-7 w-7 text-[var(--h-teal)]" />
+            <BarChart3 className="h-7 w-7 text-[var(--h-navy)]" />
             <h3 className="mt-6 text-2xl font-bold">Statistiques de scans en direct</h3>
             <p className="mt-2 max-w-md text-[15px] leading-relaxed text-[var(--h-muted)]">
               Suivez la fréquentation de votre menu et vos plats les plus consultés depuis le tableau de bord.
@@ -300,7 +300,7 @@ export default async function HomePage() {
       </section>
 
       {/* ── STEPS ────────────────────────────────────────────────────────── */}
-      <section id="fonctionnement" className="scroll-mt-24 bg-[var(--h-teal-2)] py-24 text-white sm:py-32">
+      <section id="fonctionnement" className="scroll-mt-24 bg-[var(--h-navy-2)] py-24 text-white sm:py-32">
         <div className="mx-auto max-w-6xl px-5 sm:px-8">
           <Reveal className="max-w-2xl">
             <span className="inline-flex rounded-full bg-white/10 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--h-sun)]">Fonctionnement</span>
@@ -351,7 +351,7 @@ export default async function HomePage() {
               </div>
               <p className="flex-1 text-[15px] leading-relaxed">“{t.q}”</p>
               <div className="flex items-center gap-3">
-                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--h-teal)] text-sm font-bold text-white">{t.n.charAt(0)}</span>
+                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--h-navy)] text-sm font-bold text-white">{t.n.charAt(0)}</span>
                 <div>
                   <p className="text-sm font-bold">{t.n}</p>
                   <p className="text-xs text-[var(--h-muted)]">{t.r}</p>
@@ -383,7 +383,7 @@ export default async function HomePage() {
               <Reveal key={s.t} delay={(i % 3) * 0.07} className={`${CARD} relative p-7 ${s.ok ? "" : "bg-white/60"}`}>
                 <span
                   className={`absolute right-5 top-5 inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider ${
-                    s.ok ? "bg-[var(--h-teal)]/10 text-[var(--h-teal)]" : "bg-[var(--h-sand-2)] text-[var(--h-muted)]"
+                    s.ok ? "bg-[var(--h-navy)]/10 text-[var(--h-navy)]" : "bg-[var(--h-sand-2)] text-[var(--h-muted)]"
                   }`}
                 >
                   {s.ok && <Check className="h-3 w-3" />}
@@ -424,7 +424,7 @@ export default async function HomePage() {
       {/* ── FINAL CTA ────────────────────────────────────────────────────── */}
       <section className="px-5 pb-24 sm:px-8 sm:pb-32">
         <Reveal>
-          <div className="relative mx-auto max-w-5xl overflow-hidden rounded-[2.5rem] bg-[var(--h-teal)] px-6 py-16 text-center text-white sm:px-14 sm:py-20">
+          <div className="relative mx-auto max-w-5xl overflow-hidden rounded-[2.5rem] bg-[var(--h-navy)] px-6 py-16 text-center text-white sm:px-14 sm:py-20">
             <div className="absolute -left-10 -top-10 h-40 w-40 rounded-full bg-[var(--h-sun)]" />
             <div className="absolute -bottom-12 -right-8 h-48 w-48 rounded-full bg-[var(--h-terra)]" />
             <h2 className="relative text-3xl font-extrabold leading-[1.08] tracking-tight sm:text-5xl" style={{ fontFamily: "var(--font-display)" }}>
@@ -450,7 +450,7 @@ export default async function HomePage() {
       <footer className="border-t border-[var(--h-line)] py-10 text-xs text-[var(--h-muted)]">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-5 px-5 sm:flex-row sm:px-8">
           <Link href="/" className="flex items-center gap-2.5">
-            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--h-teal)] text-white">
+            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--h-navy)] text-white">
               <QrCode className="h-4 w-4 stroke-[2.25]" />
             </span>
             <span className="text-sm font-extrabold tracking-tight text-[var(--h-ink)]">Click<span className="text-[var(--h-terra)]">Menu</span></span>

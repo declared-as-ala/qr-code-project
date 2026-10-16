@@ -37,12 +37,12 @@ export function Navbar() {
       <div
         className={`mx-auto flex h-14 max-w-5xl items-center justify-between rounded-full border pl-4 pr-1.5 transition-all duration-300 sm:h-16 sm:pl-5 ${
           scrolled
-            ? "border-[var(--h-line)] bg-white/90 shadow-[0_10px_30px_-12px_rgba(16,35,31,0.25)] backdrop-blur-xl"
+            ? "border-[var(--h-line)] bg-white/90 shadow-[0_10px_30px_-12px_rgba(20,27,45,0.25)] backdrop-blur-xl"
             : "border-transparent bg-white/60 backdrop-blur-md"
         }`}
       >
         <Link href="/" className="group flex items-center gap-2.5" aria-label="ClickMenu — accueil">
-          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--h-teal)] text-white transition-transform group-hover:rotate-[-8deg]">
+          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--h-navy)] text-white transition-transform group-hover:rotate-[-8deg]">
             <QrCode className="h-4 w-4 stroke-[2.25]" />
           </span>
           <span className="text-[18px] font-extrabold tracking-tight text-[var(--h-ink)]">
