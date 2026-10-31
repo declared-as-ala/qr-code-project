@@ -14,9 +14,9 @@ export function PartnersCarousel({ partners }: { partners: Partner[] }) {
   const duration = Math.max(30, base.length * 4);
 
   return (
-    <section className="py-10" aria-label="Nos établissements partenaires">
+    <section className="py-10" aria-label="Nos établissements partenaires en Tunisie">
       <p className="mb-6 text-center text-[11px] font-bold uppercase tracking-[0.2em] text-[var(--h-muted)]">
-        Ils nous font confiance
+        Établissements équipés en Tunisie · Cliquez pour voir le menu en direct
       </p>
       <div
         className="partners-viewport overflow-hidden"
@@ -36,7 +36,15 @@ export function PartnersCarousel({ partners }: { partners: Partner[] }) {
                 <span className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-[var(--h-sand)]">
                   {p.logo ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={p.logo} alt="" width={48} height={48} loading="lazy" decoding="async" className="h-full w-full object-cover" />
+                    <img
+                      src={p.logo}
+                      alt={`Logo ${p.name}`}
+                      width={48}
+                      height={48}
+                      loading="lazy"
+                      decoding="async"
+                      className="h-full w-full object-cover"
+                    />
                   ) : (
                     <span className="text-base font-black text-[var(--h-navy)]">{p.name.charAt(0).toUpperCase()}</span>
                   )}
