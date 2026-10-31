@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Building2, ChartColumn, Store, ChevronRight, Coffee } from "lucide-react";
+import { Building2, ChartColumn, Store, ChevronRight, Coffee, Globe } from "lucide-react";
 
 const nav = [
   { label: "Tableau de bord", href: "/admin", icon: ChartColumn },
   { label: "Enseignes", href: "/admin/enseignes", icon: Building2 },
   { label: "Comptes", href: "/admin/users", icon: Store },
+  { label: "SEO & Blog", href: "/admin/seo", icon: Globe },
 ];
 
 export function AdminSidebar() {

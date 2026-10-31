@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { LogOut, Menu as MenuIcon } from "lucide-react";
 import { auth } from "@/lib/auth";
@@ -5,6 +6,11 @@ import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { AdminSidebar } from "@/components/layout/admin-sidebar";
+
+export const metadata: Metadata = {
+  title: "Administration ClickMenu",
+  robots: { index: false, follow: false },
+};
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const session = await auth();

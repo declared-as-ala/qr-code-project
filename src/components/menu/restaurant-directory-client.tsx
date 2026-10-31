@@ -5,6 +5,7 @@ import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRight, Coffee, MapPin, Phone, Search, Store, Utensils } from "lucide-react";
 import { Navbar, WHATSAPP } from "@/components/home/Navbar";
+import { SiteFooter } from "@/components/home/SiteFooter";
 import { thumb } from "@/lib/utils";
 
 interface RestaurantItem {
@@ -45,6 +46,11 @@ export function RestaurantDirectoryClient({ initialRestaurants }: { initialResta
 
       {/* Header */}
       <section className="mx-auto max-w-4xl px-5 pt-28 text-center sm:px-8 sm:pt-36">
+        <nav aria-label="Fil d’Ariane" className="mb-4 flex items-center justify-center gap-2 text-xs font-semibold text-[var(--h-muted)]">
+          <Link href="/" className="hover:text-[var(--h-ink)]">Accueil</Link>
+          <span>/</span>
+          <span className="text-[var(--h-ink)]">Menus Partenaires</span>
+        </nav>
         <h1 className="text-[2.3rem] font-extrabold leading-[1.12] tracking-tight sm:text-6xl">
           Nos{" "}
           <span className="relative isolate inline-block px-3 sm:px-5">
@@ -52,10 +58,10 @@ export function RestaurantDirectoryClient({ initialRestaurants }: { initialResta
             établissements
           </span>
           <br />
-          partenaires
+          partenaires en Tunisie
         </h1>
         <p className="mx-auto mt-6 max-w-xl text-base leading-relaxed text-[var(--h-ink)]/75 sm:text-lg">
-          Explorez les menus digitaux des cafés, restaurants et lounges qui utilisent ClickMenu. Scannez, découvrez, savourez.
+          Explorez et testez en direct les menus digitaux des cafés, restaurants, pâtisseries et lounges équipés par ClickMenu.
         </p>
 
         {/* Search + filters */}
@@ -135,7 +141,7 @@ export function RestaurantDirectoryClient({ initialRestaurants }: { initialResta
                         // eslint-disable-next-line @next/next/no-img-element
                         <img
                           src={thumb(r.coverImage, 640, 400)}
-                          alt={`Menu ${r.name}`}
+                          alt={`Menu digital ${r.name}`}
                           loading="lazy"
                           decoding="async"
                           className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
@@ -151,7 +157,12 @@ export function RestaurantDirectoryClient({ initialRestaurants }: { initialResta
                       <span className="absolute -top-7 left-6 flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl border-4 border-white bg-[#f1efe9] shadow-md">
                         {r.logo ? (
                           // eslint-disable-next-line @next/next/no-img-element
-                          <img src={thumb(r.logo, 112, 112)} alt="" className="h-full w-full object-cover" loading="lazy" />
+                          <img
+                            src={thumb(r.logo, 112, 112)}
+                            alt={`Logo ${r.name}`}
+                            className="h-full w-full object-cover"
+                            loading="lazy"
+                          />
                         ) : (
                           <span className="text-sm font-black uppercase">{r.name.substring(0, 2)}</span>
                         )}
@@ -187,18 +198,32 @@ export function RestaurantDirectoryClient({ initialRestaurants }: { initialResta
 
         <div className="mt-16 rounded-[2rem] bg-[#111] px-6 py-12 text-center text-white sm:px-12">
           <h2 className="text-2xl font-extrabold leading-tight sm:text-4xl">
-            Votre établissement ici ?
+            Votre établissement ici en 48h ?
           </h2>
-          <p className="mx-auto mt-3 max-w-md text-sm text-white/65">Rejoignez les cafés et restaurants qui ont digitalisé leur carte.</p>
-          <a href={WHATSAPP} target="_blank" rel="noreferrer" className="mt-7 inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-white px-7 text-[15px] font-bold text-[#111] active:scale-[0.97]">
-            Devenir partenaire <ArrowRight className="h-4 w-4" />
-          </a>
+          <p className="mx-auto mt-3 max-w-md text-sm text-white/65">
+            Rejoignez les cafés et restaurants en Tunisie qui ont digitalisé leur carte avec ClickMenu.
+          </p>
+          <div className="mt-7 flex flex-wrap justify-center gap-3">
+            <a
+              href={WHATSAPP}
+              target="_blank"
+              rel="noreferrer"
+              data-cta-location="menu_directory_cta"
+              className="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-white px-7 text-[15px] font-bold text-[#111] active:scale-[0.97]"
+            >
+              Devenir partenaire <ArrowRight className="h-4 w-4" />
+            </a>
+            <Link
+              href="/prix-menu-digital-tunisie"
+              className="inline-flex h-12 items-center justify-center rounded-xl border border-white/25 px-6 text-[15px] font-bold text-white hover:bg-white/10"
+            >
+              Voir nos formules & tarifs
+            </Link>
+          </div>
         </div>
       </main>
 
-      <footer className="border-t border-[var(--h-line)] py-8 text-center text-xs text-[var(--h-muted)]">
-        © {new Date().getFullYear()} ClickMenu · Made in Tunisia
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

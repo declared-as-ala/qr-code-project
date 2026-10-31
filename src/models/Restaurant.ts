@@ -18,6 +18,12 @@ const RestaurantSchema = new Schema(
     logoBg: String,
     isActive: { type: Boolean, default: true },
     showPrices: { type: Boolean, default: true },
+    seoTitle: String,
+    metaDescription: String,
+    canonicalUrl: String,
+    indexable: { type: Boolean, default: true },
+    includeInSitemap: { type: Boolean, default: true },
+    ogImage: String,
   },
   { timestamps: true }
 );

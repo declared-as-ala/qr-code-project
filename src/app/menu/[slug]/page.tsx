@@ -7,23 +7,51 @@ import { Product } from "@/models/Product";
 import { ScanAnalytics } from "@/models/ScanAnalytics";
 import { PublicMenuClient } from "@/components/menu/public-menu-client";
 import { buildRestaurantJsonLd, groupMenu } from "@/lib/menu-seo";
+import { DUPLICATE_SLUG_CANONICALS, SITE_URL } from "@/lib/site";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   await connectDb();
   const { slug } = await params;
   const restaurant = await Restaurant.findOne({ slug }).lean();
   if (!restaurant) return { title: "Menu introuvable", robots: { index: false, follow: false } };
-  const image = restaurant.coverImage || restaurant.logo;
-  const title = `Menu ${restaurant.name} : carte, prix et produits`;
+
+  const duplicateTarget = DUPLICATE_SLUG_CANONICALS[slug];
+  const canonicalSlug = duplicateTarget || slug;
+  const customCanonical = (restaurant as any).canonicalUrl?.trim();
+  const canonical = customCanonical || `${SITE_URL}/menu/${canonicalSlug}`;
+
+  const image = (restaurant as any).ogImage?.trim() || restaurant.coverImage || restaurant.logo;
+  const defaultTitle = `Menu ${restaurant.name} : carte, prix et produits`;
   const where = restaurant.address ? ` à ${restaurant.address}` : " en Tunisie";
-  const description = `Menu digital de ${restaurant.name}${where} : carte complète, produits et prix à jour. Consultez le menu en ligne sur votre téléphone.`;
+  const defaultDescription = `Menu digital de ${restaurant.name}${where} : carte complète, produits et prix en dinars à jour. Consultez le menu en ligne sur votre téléphone.`;
+
+  const title = (restaurant as any).seoTitle?.trim() || defaultTitle;
+  const description = (restaurant as any).metaDescription?.trim() || defaultDescription;
+
+  const isIndexable =
+    restaurant.isActive !== false &&
+    (restaurant as any).indexable !== false &&
+    !duplicateTarget;
+
   return {
     title,
     description,
-    robots: restaurant.isActive === false ? { index: false, follow: false } : undefined,
-    alternates: { canonical: `/menu/${slug}` },
-    openGraph: { type: "website", locale: "fr_TN", title, description, url: `/menu/${slug}`, ...(image ? { images: [{ url: image }] } : {}) },
-    twitter: { card: image ? "summary_large_image" : "summary", title, description, ...(image ? { images: [image] } : {}) },
+    robots: isIndexable ? { index: true, follow: true } : { index: false, follow: true },
+    alternates: { canonical },
+    openGraph: {
+      type: "website",
+      locale: "fr_TN",
+      title,
+      description,
+      url: canonical,
+      ...(image ? { images: [{ url: image }] } : {}),
+    },
+    twitter: {
+      card: image ? "summary_large_image" : "summary",
+      title,
+      description,
+      ...(image ? { images: [image] } : {}),
+    },
   };
 }
 
@@ -55,7 +83,7 @@ export default async function PublicMenuPage({ params }: { params: Promise<{ slu
   const jsonLd = buildRestaurantJsonLd(
     {
       name: restaurant.name,
-      slug,
+      slug: DUPLICATE_SLUG_CANONICALS[slug] || slug,
       establishmentType: restaurant.establishmentType,
       logo: restaurant.logo,
       coverImage: restaurant.coverImage,
