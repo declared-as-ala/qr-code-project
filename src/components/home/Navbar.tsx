@@ -5,16 +5,17 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowUpRight, Menu as MenuIcon, X } from "lucide-react";
+import { WHATSAPP_BASE } from "@/lib/site";
 
 const LINKS = [
-  { href: "#concept", label: "Concept" },
-  { href: "#fonctionnement", label: "Fonctionnement" },
-  { href: "#services", label: "Services" },
+  { href: "/solutions", label: "Solutions" },
+  { href: "/prix-menu-digital-tunisie", label: "Tarifs" },
+  { href: "/menu", label: "Menus Clients" },
+  { href: "/blog", label: "Blog" },
   { href: "#faq", label: "FAQ" },
-  { href: "/menu", label: "Partenaires" },
 ];
 
-export const WHATSAPP = "https://wa.me/21697991266";
+export const WHATSAPP = WHATSAPP_BASE;
 
 function Logo() {
   return (
@@ -29,7 +30,7 @@ function Logo() {
 export function Navbar() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
-  // On other pages (e.g. /menu) in-page anchors must point back to the home page.
+  // On other pages in-page anchors must point back to the home page.
   const href = (h: string) => (h.startsWith("#") && pathname !== "/" ? `/${h}` : h);
   const [scrolled, setScrolled] = useState(false);
 
@@ -58,13 +59,13 @@ export function Navbar() {
 
         <nav className="hidden items-center gap-1 md:flex" aria-label="Navigation principale">
           {LINKS.map((l) => (
-            <a
+            <Link
               key={l.href}
               href={href(l.href)}
               className="rounded-full px-3.5 py-2 text-[14px] font-medium text-[var(--h-ink)]/80 transition-colors hover:text-[var(--h-terra)]"
             >
               {l.label}
-            </a>
+            </Link>
           ))}
         </nav>
 
@@ -76,6 +77,7 @@ export function Navbar() {
             href={WHATSAPP}
             target="_blank"
             rel="noreferrer"
+            data-cta-location="navbar_desktop"
             className="group inline-flex h-10 items-center gap-1.5 rounded-xl bg-[var(--h-ink)] px-5 text-[14px] font-bold text-white transition-transform active:scale-[0.97]"
           >
             Demander une démo
@@ -103,7 +105,7 @@ export function Navbar() {
             className="border-t border-[var(--h-line)] bg-white px-5 pb-5 pt-2 md:hidden"
           >
             {LINKS.map((l) => (
-              <a
+              <Link
                 key={l.href}
                 href={href(l.href)}
                 onClick={() => setOpen(false)}
@@ -111,7 +113,7 @@ export function Navbar() {
               >
                 {l.label}
                 <ArrowUpRight className="h-4 w-4 text-[var(--h-muted)]" />
-              </a>
+              </Link>
             ))}
             <div className="mt-4 flex gap-2">
               <Link
@@ -125,6 +127,7 @@ export function Navbar() {
                 href={WHATSAPP}
                 target="_blank"
                 rel="noreferrer"
+                data-cta-location="navbar_mobile"
                 className="flex h-12 flex-[1.4] items-center justify-center rounded-xl bg-[var(--h-ink)] text-sm font-bold text-white"
               >
                 Demander une démo

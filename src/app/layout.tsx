@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Plus_Jakarta_Sans, Fraunces } from "next/font/google";
 import "./globals.css";
 import { AppProviders } from "@/components/providers/app-providers";
+import { ConversionTracker } from "@/components/home/ConversionTracker";
 import { HOME_DESCRIPTION, HOME_TITLE, SITE_NAME, SITE_URL } from "@/lib/site";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
@@ -28,32 +29,36 @@ export const metadata: Metadata = {
   applicationName: SITE_NAME,
   keywords: [
     "menu digital Tunisie",
-    "menu digital en Tunisie",
     "menu QR code Tunisie",
-    "menu QR code restaurant",
-    "menu QR café",
-    "carte digitale restaurant",
-    "menu numérique restaurant Tunisie",
-    "QR code menu café Tunis",
+    "menu restaurant QR code",
+    "menu digital café",
+    "créer menu QR code",
+    "prix menu digital Tunisie",
+    "menu digital restaurant",
+    "menu QR code sans application",
+    "menu digital multilingue",
+    "carte restaurant digitale",
     "ClickMenu",
   ],
-  alternates: { canonical: "/" },
+  alternates: { canonical: `${SITE_URL}/` },
   openGraph: {
     type: "website",
     locale: "fr_TN",
     siteName: SITE_NAME,
-    url: "/",
+    url: `${SITE_URL}/`,
     title: `${HOME_TITLE} | ${SITE_NAME}`,
     description: HOME_DESCRIPTION,
-    images: [{ url: "/logos/clickmenu-mark-512.png", width: 512, height: 512, alt: "ClickMenu — menu digital en Tunisie" }],
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: `${HOME_TITLE} | ${SITE_NAME}`,
     description: HOME_DESCRIPTION,
-    images: ["/logos/clickmenu-mark-512.png"],
   },
-  robots: { index: true, follow: true, googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 } },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 },
+  },
   appleWebApp: { capable: true, title: SITE_NAME, statusBarStyle: "black-translucent" },
   icons: {
     icon: "/logos/logo.png",
@@ -66,7 +71,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="fr" className={`${geistSans.variable} ${geistMono.variable} ${jakarta.variable} ${fraunces.variable}`}>
       <body className="min-h-screen bg-[#fafaf8] text-stone-900 antialiased">
-        <AppProviders>{children}</AppProviders>
+        <AppProviders>
+          {children}
+          <ConversionTracker />
+        </AppProviders>
       </body>
     </html>
   );
